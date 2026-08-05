@@ -1,0 +1,39 @@
+{
+  "name": "touch-domain-next",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "next": "^14.2.3",
+    "nodemailer": "^8.0.9",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/nodemailer": "^8.0.0",
+    "@types/react": "^18.2.15",
+    "autoprefixer": "^10.5.0",
+    "eslint": "^10.4.0",
+    "eslint-config-next": "16.2.6",
+    "postcss": "^8.5.15",
+    "stylelint": "^17.12.0",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-order": "^8.1.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^6.0.3"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "stylelint": "stylelint \"**/*.css\""
+  }
+}

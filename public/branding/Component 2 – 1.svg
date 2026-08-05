@@ -1,0 +1,24 @@
+<svg id="Component_2_1" data-name="Component 2 – 1" xmlns="http://www.w3.org/2000/svg" width="200.6" height="115.336" viewBox="0 0 200.6 115.336">
+  <g id="Group_2" data-name="Group 2">
+    <rect id="Rectangle_1" data-name="Rectangle 1" width="196" height="92" transform="translate(0 2)" fill="none"/>
+    <ellipse id="Ellipse_1" data-name="Ellipse 1" cx="9" cy="8.5" rx="9" ry="8.5" transform="translate(22 22)" fill="#9972ab"/>
+    <path id="Icon_awesome-hand-pointer" data-name="Icon awesome-hand-pointer" d="M51,25.468V35.655a3.969,3.969,0,0,1-.121.972L47.236,51.06A4.5,4.5,0,0,1,42.8,54.332H19.125a4.667,4.667,0,0,1-3.683-1.748L.871,33.907a4.061,4.061,0,0,1,1-5.929,4.772,4.772,0,0,1,6.361.936l3.6,4.618V4.245A4.407,4.407,0,0,1,16.393,0a4.407,4.407,0,0,1,4.554,4.245V25.468h.911V21.223a4.407,4.407,0,0,1,4.554-4.245,4.407,4.407,0,0,1,4.554,4.245v4.245h.911V22.921a4.565,4.565,0,0,1,9.107,0v2.547h.911a4.565,4.565,0,0,1,9.107,0ZM21.857,33.957h-.911V44.145h.911Zm10.018,0h-.911V44.145h.911Zm10.018,0h-.911V44.145h.911Z" transform="translate(14.498 29.334)" fill="#452c63"/>
+    <text id="TOUCH" transform="translate(43 43)" fill="#452c63" font-size="40" font-family="SegoeUIBlack, Segoe UI"><tspan x="0" y="0">TOUCH</tspan></text>
+    <text id="DOMAIN" transform="translate(73 70)" fill="#452c63" font-size="22" font-family="Rockwell"><tspan x="0" y="0">DOMAIN</tspan></text>
+  </g>
+  <g id="Group_1" data-name="Group 1" transform="translate(34.782 35.4)">
+    <path id="Path_1" data-name="Path 1" d="M63.307,95.748,104.87,16.4" transform="translate(-33.711 -16.4)"/>
+    <path id="Path_2" data-name="Path 2" d="M127.489,95.748,169.053,16.4" transform="translate(-58.748 -16.4)"/>
+    <path id="Path_3" data-name="Path 3" d="M151.753,95.747,193.3,16.472" transform="translate(-68.208 -16.4)"/>
+    <path id="Path_4" data-name="Path 4" d="M218.509,95.748,260.073,16.4" transform="translate(-94.255 -16.4)"/>
+    <path id="Path_5" data-name="Path 5" d="M31.2,96.336,73.072,16.4" transform="translate(-14.782 -16.4)"/>
+    <path id="Path_6" data-name="Path 6" d="M14.782,96.336,56.654,16.4" transform="translate(-14.782 -16.4)"/>
+    <path id="Path_7" data-name="Path 7" d="M18.864,53.094h160.9" transform="translate(-14.782 -16.4)"/>
+    <path id="Path_8" data-name="Path 8" d="M18.864,27.257h160.9" transform="translate(-14.782 -16.4)"/>
+    <path id="Path_9" data-name="Path 9" d="M18.864,84.718h160.9" transform="translate(-14.782 -16.4)"/>
+    <path id="Path_10" data-name="Path 10" d="M18.864,58.877h160.9" transform="translate(-14.782 -16.4)"/>
+    <path id="Path_11" data-name="Path 11" d="M99.693,95.747,80.758,16.4" transform="translate(-37.946 -16.4)"/>
+    <path id="Path_12" data-name="Path 12" d="M151.753,95.748,132.936,16.895" transform="translate(-56.244 -16.4)"/>
+    <path id="Path_13" data-name="Path 13" d="M212.215,95.748,193.28,16.4" transform="translate(-77.452 -16.4)"/>
+  </g>
+</svg>
