@@ -71,7 +71,7 @@ export default function ServicesPage() {
           <h2>Crafting Your Digital Presence</h2>
           <h3 className="heading-text mb-[10px]">Our Core Services in Detail</h3>
           <p className="intro">
-            Your vision deserves an extraordinary online home. From brand identity to web design, content, and the hosting that keeps it all live — explore the full suite of services designed to take your idea from concept to something real, and keep it running.
+            Your vision deserves an extraordinary online home. From brand identity to web design, custom apps, content, and the hosting that keeps it all live — explore the full suite of services designed to take your idea from concept to something real, and keep it running.
           </p>
           <HalfCircleTopRight />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 md:mt-[8rem] relative z-10 flex flex-col gap-16 md:gap-24">
@@ -81,6 +81,9 @@ export default function ServicesPage() {
   {/* Brand Identity Packages */}
   <div className="w-full">
     <h4 className="text-center text-[24px] font-[700] text-td-purple mb-10 uppercase">Brand Identity Packages</h4>
+    <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
+      Your visual identity, built to earn trust before you've said a word — logo, colour, typography, and the guidelines to keep it all consistent.
+    </p>
     <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-8 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Launchpad" price="3,500" description="Igniting Your Brand's Digital Journey"
@@ -132,6 +135,9 @@ export default function ServicesPage() {
   {/* Web Design Packages */}
   <div className="w-full">
     <h4 className="text-center text-[24px] font-[700] text-td-purple mb-10 uppercase">Web Design Packages</h4>
+    <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
+      A site engineered to load fast, work on any device, and actually turn visitors into enquiries — not just look good in a screenshot.
+    </p>
     <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-8 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Digital Launchpad" price="6,500" description="Building Your Online Foundation with Impact"
@@ -182,6 +188,9 @@ export default function ServicesPage() {
   {/* Digital Content Packages */}
   <div className="w-full">
     <h4 className="text-center text-[24px] font-[700] text-td-purple mb-10 uppercase">Digital Content Packages</h4>
+    <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
+      The graphics, video, and copy that keep your brand alive between projects — because a great website still needs something to say.
+    </p>
     <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-8 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Storyteller Starter" price="4,000" description="Engagement Through Compelling Visuals"
@@ -273,6 +282,103 @@ export default function ServicesPage() {
           { name: "Free SSL Certificate", tooltip: "Every visitor connects securely, automatically — no extra cost." },
           { name: "Free Daily Backups", tooltip: "Your site is backed up every day, so nothing is ever truly lost." },
           { name: "Priority Support Response", tooltip: "Jump the queue when something needs our attention fast." }
+        ]}
+      />
+    </div>
+    <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
+      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[10px] mr-1"></i>
+      Swipe to see more
+      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[10px] ml-1"></i>
+    </p>
+
+    {/* Email — for anyone who just wants a professional inbox, no website required */}
+    <h5 className="text-center text-[17px] font-[700] text-td-purple mt-16 mb-2 uppercase tracking-wide">Just Need Email?</h5>
+    <p className="text-center text-gray-500 text-[13.5px] max-w-xl mx-auto mb-8">
+      No website yet, or already hosted elsewhere? Get a professional @yourdomain inbox on its own.
+    </p>
+    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-8 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+      <PricingCard 
+        title="Email Starter" price="49" period="/month" description="A Professional Inbox, Simply"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        onOrder={handleOrderClick}
+        buttonText="Get Email"
+        features={[
+          { name: "5 Mailboxes", tooltip: "Room for you and a small team, each with their own @yourdomain address." },
+          { name: "2GB Storage Per Mailbox", tooltip: "Enough for years of everyday business email." },
+          { name: "Webmail & Mobile Access", tooltip: "Check your inbox from any device, anywhere." },
+          { name: "Standard Support", tooltip: "Email support with a response time you can rely on." }
+        ]}
+      />
+      <PricingCard 
+        title="Email Team" price="89" period="/month" description="For A Growing Team" isPopular={true}
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        onOrder={handleOrderClick}
+        buttonText="Get Email"
+        features={[
+          { name: "15 Mailboxes", tooltip: "Enough professional addresses for a full small team." },
+          { name: "5GB Storage Per Mailbox", tooltip: "Comfortable headroom for attachments and archives." },
+          { name: "Webmail & Mobile Access", tooltip: "Check your inbox from any device, anywhere." },
+          { name: "Standard Support", tooltip: "Email support with a response time you can rely on." }
+        ]}
+      />
+      <PricingCard 
+        title="Email Business" price="149" period="/month" description="For Established Teams"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        onOrder={handleOrderClick}
+        buttonText="Get Email"
+        features={[
+          { name: "30 Mailboxes", tooltip: "Room for your whole team, with space left to grow." },
+          { name: "10GB Storage Per Mailbox", tooltip: "Generous space for even the heaviest email users." },
+          { name: "Webmail & Mobile Access", tooltip: "Check your inbox from any device, anywhere." },
+          { name: "Priority Support Response", tooltip: "Jump the queue when something needs our attention fast." }
+        ]}
+      />
+    </div>
+    <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
+      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[10px] mr-1"></i>
+      Swipe to see more
+      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[10px] ml-1"></i>
+    </p>
+  </div>
+
+  {/* App Development Packages */}
+  <div className="w-full">
+    <h4 className="text-center text-[24px] font-[700] text-td-purple mb-10 uppercase">App Development</h4>
+    <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
+      From an installable, offline-ready web app to a fully custom platform with real business logic behind it.
+    </p>
+    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-8 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+      <PricingCard 
+        title="App Essentials" price="14,500" description="Installable, Offline-Ready, Yours"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        onOrder={handleOrderClick}
+        features={[
+          { name: "Progressive Web App Build", tooltip: "Your site becomes installable straight from the browser, no app store needed." },
+          { name: "Offline Capability", tooltip: "Core pages stay accessible even with a patchy connection." },
+          { name: "Add-to-Home-Screen", tooltip: "Visitors get a real app icon on their phone, launching like a native app." },
+          { name: "Push Notification Ready", tooltip: "The technical foundation for re-engaging visitors is in place from day one." }
+        ]}
+      />
+      <PricingCard 
+        title="App Growth" price="32,000" description="Real Functionality, Built For You" isPopular={true}
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        onOrder={handleOrderClick}
+        features={[
+          { name: "User Accounts & Authentication", tooltip: "Visitors can sign up, log in, and have their own space." },
+          { name: "Database-Backed Dashboard", tooltip: "A real, working dashboard your users actually interact with." },
+          { name: "One Core Workflow", tooltip: "A booking system, client portal, or scheduling tool — built around what your business actually needs." },
+          { name: "Mobile-Responsive Throughout", tooltip: "Every screen works properly, on every device." }
+        ]}
+      />
+      <PricingCard 
+        title="App Priority" price="55,000" description="Complex Logic, Built To Scale"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        onOrder={handleOrderClick}
+        features={[
+          { name: "Multi-User Roles & Permissions", tooltip: "Different people see and can do different things, exactly as your business requires." },
+          { name: "Payment Integration", tooltip: "Real transactions, handled securely through a trusted payment gateway." },
+          { name: "Admin Dashboard", tooltip: "A control panel for managing the app without touching a line of code." },
+          { name: "Third-Party API Integrations", tooltip: "Connecting your app to the other tools your business already relies on." }
         ]}
       />
     </div>

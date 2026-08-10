@@ -20,7 +20,7 @@ export default function Navigation() {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <header className="absolute top-0 left-0 w-full z-[99999] h-[55px] md:h-[65px] lg:h-[75px] xl:h-[85px] flex items-center bg-transparent">
+    <header className="fixed md:absolute top-0 left-0 w-full z-[99999] h-[55px] md:h-[65px] lg:h-[75px] xl:h-[85px] flex items-center bg-white md:bg-transparent shadow-[0_4px_12px_rgba(0,0,0,0.08)] md:shadow-none">
       <div className="w-full max-w-[97%] 2xl:max-w-[98%] mx-auto px-[0px] relative flex items-center justify-between h-full gap-2 ml-0">
         
         <div className="flex items-center min-w-0">

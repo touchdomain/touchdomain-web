@@ -8,7 +8,7 @@ const slides = [
   {
     title: "Captivate Your Audience",
     subtitle: "With Stunning Digital Experiences",
-    desc: "Engage your audience with visually striking websites that reflect your brand and captivate visitors from the start. With our expert web design services, we combine creativity and functionality to create a unique online presence that stands out.",
+    desc: "Engage your audience with visually striking websites that reflect your brand and captivate visitors from the start. Built for South African SMEs, our web design services combine creativity and functionality to create a unique online presence that stands out.",
     img: "/branding/slider-img1.png",
     buttons: [
       { text: "See Our Work", href: "/work", type: "secondary" },
@@ -18,7 +18,7 @@ const slides = [
   {
     title: "Engineering Digital Success",
     subtitle: "Robust & Scalable Solutions",
-    desc: "We build secure, high-performance digital ecosystems using the latest technologies and best practices, tailored to your business goals and operational needs — then host and look after them long after launch, so your site stays fast, secure, and genuinely yours.",
+    desc: "We build secure, high-performance digital ecosystems — from websites to fully custom apps — using the latest technologies and best practices, tailored to your business goals and operational needs. Then we host and look after them long after launch, so everything stays fast, secure, and genuinely yours.",
     img: "/branding/slider-img2.png",
     buttons: [
       { text: "Book Free Consultation", isModal: true, type: "primary" }
@@ -67,6 +67,13 @@ export default function HeroSlider() {
               
               {/* Text Block */}
               <div key={`text-${currentSlide}`} className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
+                {/* Persistent kicker — deliberately OUTSIDE the slides array, so
+                    who we are and who we're for is visible immediately on load,
+                    not dependent on which of the 3 rotating slides happens to
+                    be showing or how long a visitor sticks around. */}
+                <span className="text-td-accent font-[700] uppercase tracking-widest text-[11px] xs:text-[12px] mb-2 ml-0 md:ml-[5px]">
+                  South African Digital Studio for SMEs
+                </span>
                 <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
                   {slides[currentSlide].title}
                 </h1>

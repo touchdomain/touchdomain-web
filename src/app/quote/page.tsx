@@ -8,7 +8,7 @@ import FormStatus from './../../components/FormStatus';
 // Configure your base prices here (in ZAR)
 const PRICING_MAP: Record<string, number> = {
   // Web Selects
-  'Informational': 2500, 'E-commerce Store': 8500, 'Portfolio/Personal': 2000, 'Blog/Content Hub': 3500, 'Custom Web Application': 12000,
+  'Informational': 2500, 'E-commerce Store': 8500, 'Portfolio/Personal': 2000, 'Blog/Content Hub': 3500,
   'Up to 5 Pages': 1000, '6-10 Pages': 2000, '11-20 Pages': 3500, '20+ Pages': 5000,
   'Yes': 1500, // Copywriting
   'Yes, I need stock images': 800,
@@ -45,7 +45,14 @@ const PRICING_MAP: Record<string, number> = {
   'Care Plan — Basic': 1800, 'Care Plan — Growth': 3500, 'Care Plan — Scale': 6500,
   // Website Hosting — mutually exclusive tiers, selected via dropdown further down.
   'Hosting — Foundation': 89, 'Hosting — Growth': 159, 'Hosting — Priority': 249,
+  // Email-only — an alternative to a full hosting tier, not stacked with it.
+  'Email — Starter': 49, 'Email — Team': 89, 'Email — Business': 149,
   'Monthly Content Retainer': 2800, 'Monthly SEO Retainer': 3200,
+
+  // App Development — once-off, but priced "from" like Digital Dominator,
+  // since real custom scope varies too much for a fixed number. The
+  // calculator uses the starting price as its estimate.
+  'App Essentials': 14500, 'App Growth': 32000, 'App Priority': 55000,
 };
 
 
@@ -100,17 +107,26 @@ export default function QuotePage() {
     );
   };
 
-  // Hosting tiers are mutually exclusive (you're on one plan, not several at
-  // once) unlike the Care Plan/retainer checkboxes above, which can stack —
-  // so this strips out any previously-selected hosting tier before adding
-  // the new one, while still feeding into the same retainerFeatures array
-  // (and therefore the same monthly total) as everything else in this section.
+  // Hosting and Email tiers are mutually exclusive with EACH OTHER too, not
+  // just within themselves — every hosting tier already includes email
+  // accounts, so picking a hosting plan makes a separate email plan
+  // redundant, and vice versa. Both still feed into the same
+  // retainerFeatures array (and therefore the same monthly total) as
+  // everything else in this section.
   const HOSTING_TIERS = ['Hosting — Foundation', 'Hosting — Growth', 'Hosting — Priority'];
+  const EMAIL_TIERS = ['Email — Starter', 'Email — Team', 'Email — Business'];
   const handleHostingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setRetainerFeatures(prev => {
-      const withoutHosting = prev.filter(f => !HOSTING_TIERS.includes(f));
-      return value ? [...withoutHosting, value] : withoutHosting;
+      const cleared = prev.filter(f => !HOSTING_TIERS.includes(f) && !EMAIL_TIERS.includes(f));
+      return value ? [...cleared, value] : cleared;
+    });
+  };
+  const handleEmailChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setRetainerFeatures(prev => {
+      const cleared = prev.filter(f => !HOSTING_TIERS.includes(f) && !EMAIL_TIERS.includes(f));
+      return value ? [...cleared, value] : cleared;
     });
   };
 
@@ -240,7 +256,6 @@ export default function QuotePage() {
                             <option value="E-commerce Store">E-commerce Store</option>
                             <option value="Portfolio/Personal">Portfolio/Personal</option>
                             <option value="Blog/Content Hub">Blog/Content Hub</option>
-                            <option value="Custom Web Application">Custom Web Application</option>
                         </select>
                     </div>
                     <div>
@@ -432,6 +447,66 @@ export default function QuotePage() {
                     ))}
                 </div>
 
+                {/* App Development Section */}
+                <h4 className="text-xl font-bold text-td-purple mt-10">App Development <span className="text-sm font-normal text-gray-500">(Optional)</span></h4>
+                <hr className="my-3 border-gray-200" />
+                <p className="text-sm text-gray-600 mb-4">From an installable, offline-ready web app to a fully custom platform with real business logic behind it — priced separately since scope varies widely.</p>
+
+                <div className="grid grid-cols-1 phone-lg:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
+                    <div>
+                        <label className="form-label text-sm font-semibold">App Tier</label>
+                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'App Development')} value={selections['App Development'] || ''}>
+                            <option value="">No app needed</option>
+                            <option value="App Essentials">App Essentials — from R14,500 (installable PWA)</option>
+                            <option value="App Growth">App Growth — from R32,000 (custom web app)</option>
+                            <option value="App Priority">App Priority — from R55,000 (advanced/multi-user)</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Website Hosting Section — recurring, so it's kept out of the
+                    once-off total above and grouped with Email below, which
+                    shares its billing rhythm. */}
+                <h4 className="text-xl font-bold text-td-purple mt-10">Website Hosting <span className="text-sm font-normal text-gray-500">(Optional)</span></h4>
+                <hr className="my-3 border-gray-200" />
+                <p className="text-sm text-gray-600 mb-4">Built and hosted by the same team, so there's one person to call, not three. Billed monthly, separate from the once-off total, cancel any time.</p>
+
+                <div className="grid grid-cols-1 phone-lg:grid-cols-2 gap-4 mb-10">
+                    <div>
+                        <label htmlFor="hostingTierSelect" className="block text-sm font-semibold text-td-purple mb-2">
+                          Full Hosting <span className="text-xs font-normal text-gray-500">(pick one)</span>
+                        </label>
+                        <select
+                          id="hostingTierSelect"
+                          className="form-select w-full text-sm border-gray-300 rounded-md"
+                          onChange={handleHostingChange}
+                          value={HOSTING_TIERS.find(t => retainerFeatures.includes(t)) || ''}
+                        >
+                          <option value="">No hosting needed</option>
+                          <option value="Hosting — Foundation">Foundation — R89/month (2GB, 5 email accounts)</option>
+                          <option value="Hosting — Growth">Growth — R159/month (5GB, 15 email accounts)</option>
+                          <option value="Hosting — Priority">Priority — R249/month (10GB, 25 email accounts, priority support)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="emailTierSelect" className="block text-sm font-semibold text-td-purple mb-2">
+                          Just Need Email? <span className="text-xs font-normal text-gray-500">(no website hosting needed)</span>
+                        </label>
+                        <select
+                          id="emailTierSelect"
+                          className="form-select w-full text-sm border-gray-300 rounded-md"
+                          onChange={handleEmailChange}
+                          value={EMAIL_TIERS.find(t => retainerFeatures.includes(t)) || ''}
+                        >
+                          <option value="">No email plan needed</option>
+                          <option value="Email — Starter">Email Starter — R49/month (5 mailboxes)</option>
+                          <option value="Email — Team">Email Team — R89/month (15 mailboxes)</option>
+                          <option value="Email — Business">Email Business — R149/month (30 mailboxes)</option>
+                        </select>
+                    </div>
+                </div>
+                <p className="text-xs text-gray-400 -mt-6 mb-10">Already hosted elsewhere and just want a professional inbox? Email is a standalone alternative to full hosting, not an add-on to it.</p>
+
                 {/* Ongoing Support Section */}
                 <h4 className="text-xl font-bold text-td-purple mt-10">Ongoing Support <span className="text-sm font-normal text-gray-500">(Optional)</span></h4>
                 <hr className="my-3 border-gray-200" />
@@ -461,24 +536,6 @@ export default function QuotePage() {
                       </label>
                     </div>
                   ))}
-                </div>
-
-                <div className="mb-6">
-                  <label htmlFor="hostingTierSelect" className="block text-sm font-semibold text-td-purple mb-2">
-                    Website Hosting <span className="text-xs font-normal text-gray-500">(optional — pick one)</span>
-                  </label>
-                  <select
-                    id="hostingTierSelect"
-                    className="form-select w-full md:w-auto md:min-w-[320px] text-sm border-gray-300 rounded-md"
-                    onChange={handleHostingChange}
-                    value={HOSTING_TIERS.find(t => retainerFeatures.includes(t)) || ''}
-                  >
-                    <option value="">No hosting needed</option>
-                    <option value="Hosting — Foundation">Foundation — R89/month (2GB, 5 email accounts)</option>
-                    <option value="Hosting — Growth">Growth — R159/month (5GB, 15 email accounts)</option>
-                    <option value="Hosting — Priority">Priority — R249/month (10GB, 25 email accounts, priority support)</option>
-                  </select>
-                  <p className="text-xs text-gray-400 mt-1">Built and hosted by the same team — one invoice, one person to call.</p>
                 </div>
 
                 {monthlyTotal > 0 && (

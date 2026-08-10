@@ -29,9 +29,12 @@ export default function Footer() {
       {/* ── Links Column ── */}
       {/* text-left explicitly overrides the global h3 base rule (text-center) —
           without it, these column headings render centered while the links
-          below stay left-aligned, which is the "footer looks broken" bug. */}
-      <div className="flex flex-col w-full md:w-auto">
-        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-left">Links</h3>
+          below stay left-aligned, which is the "footer looks broken" bug.
+          Centered together on mobile now (heading + links match), reset to
+          left-aligned from md: up where the wider multi-column layout reads
+          better left-aligned. */}
+      <div className="flex flex-col items-center md:items-start w-full md:w-auto">
+        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Links</h3>
         <Link href="/about" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">About</Link>
         <Link href="/services" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Services</Link>
         <Link href="/work" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Portfolio</Link>
@@ -41,15 +44,15 @@ export default function Footer() {
       </div>
 
       {/* ── Information Column ── */}
-      <div className="flex flex-col w-full md:w-auto">
-        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-left">Information</h3>
+      <div className="flex flex-col items-center md:items-start w-full md:w-auto">
+        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Information</h3>
         <Link href="/terms" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Terms & conditions</Link>
         <Link href="/privacy" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit">Privacy policy</Link>
       </div>
 
       {/* ── Social Media Column ── */}
-      <div className="flex flex-col w-full md:w-auto">
-        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-left">Social Media</h3>
+      <div className="flex flex-col items-center md:items-start w-full md:w-auto">
+        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Social Media</h3>
         {/* We use !bg-transparent and !p-[5px] to override the global icon styles in globals.css */}
         <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
           <i className="fab fa-facebook-square !bg-transparent !p-[5px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch Domain
@@ -63,8 +66,8 @@ export default function Footer() {
       </div>
 
       {/* ── Reach Us Column ── */}
-      <div className="flex flex-col w-full md:w-auto">
-        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-left">Reach Us</h3>
+      <div className="flex flex-col items-center md:items-start w-full md:w-auto">
+        <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Reach Us</h3>
         <a href="mailto:info@touchdomain.co.za" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">info@touchdomain.co.za</a>
         <a href="tel:+27813276153" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit">081 327 6153</a>
       </div>
