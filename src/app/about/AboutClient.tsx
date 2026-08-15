@@ -2,72 +2,73 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import HeroSlider from '../components/HeroSlider';
-import ContactSnippet from '../components/ContactSnippet';
-import ConsultationModal from '../components/ConsultationModal';
-import HalfCircleTopRight from '../components/HalfcircleTopRight';
-import HalfCircleBottomLeft from '../components/HalfcircleBottomLeft';
+import ContactSnippet from './../../components/ContactSnippet';
+import ConsultationModal from './../../components/ConsultationModal';
+import HalfCircleTopRight from '../../components/HalfcircleTopRight';
+import HalfCircleBottomLeft from '../../components/HalfcircleBottomLeft';
 
 
-export default function Home() {
+export default function AboutClient() {
   const [activeTab, setActiveTab] = useState('mission');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
-      <HeroSlider />
-      
-      <main className="relative py-[2rem] my-[1.5rem]">
-        
-        {/* ── Reasons Section ── */}
-        <section id="reasons" className="section-wrapper overflow-hidden">
-          <h2>Join the WWW</h2>
-          <h3 className="heading-text mb-[10px]">Here are three reasons why</h3>
-          <p className="intro">
-            The internet is more than just websites, it's a community. Here are three reasons why you should join us and also have an online presence.
-          </p>
-          <HalfCircleTopRight />
-          <div className="px-4 sm:px-6 md:px-[42px] flex flex-col w-full relative z-10 mx-auto">
-            <div className="flex flex-row mb-[30px] items-center justify-start">
-              <div className="flex flex-row mb-[30px] w-full md:w-[60%] lg:w-[43%]">
-                <span className="text-td-purple text-[40px] font-[700] mr-[11px] leading-none">1</span>
-                <blockquote className="border-l-[8px] border-td-accent pl-[25px] text-[16px]">
-                  <span className="block text-td-purple text-[20px] font-[600] -ml-[9px] mb-1">Don't Just Look Credible, Be Credible</span>
-                  A professional online presence — sharp branding, a website that works, and an app if your business needs one — is your digital storefront, instantly boosting credibility and showing clients you're the real deal. Clear, quality execution builds trust and positions you as the expert.
-                </blockquote>
-              </div>
-            </div>
+      {/* ── Static Hero Section ── */}
+      <section className="relative block h-screen overflow-x-hidden bg-white w-full pt-[100px] pb-0 md:pt-0 md:pb-0">
+        {/* Right 45% Background Image Overlay — desktop/tablet only */}
+        <div className="hidden md:block absolute top-0 right-0 w-[45%] h-full bg-[url('/branding/hero-background.png')] bg-cover bg-center z-0"></div>
 
-            <div className="flex flex-row mb-[30px] items-center justify-center">
-              <div className="flex flex-row mb-[30px] w-full md:w-[60%] lg:w-[43%]">
-                <span className="text-td-purple text-[40px] font-[700] mr-[11px] leading-none">2</span>
-                <blockquote className="border-l-[8px] border-td-accent pl-[25px] text-[16px]">
-                  <span className="block text-td-purple text-[20px] font-[600] -ml-[9px] mb-1">Shout It From the Rooftops</span>
-                  Your brand is your business's core, and your website — backed by content that actually sounds like you — is its perfect showcase. Tell your story, share your values, and highlight your unique qualities. A strong, consistent online presence solidifies your brand, differentiates you from competitors, and provides a crucial advantage.
-                </blockquote>
+        <div className="relative md:absolute md:top-1/2 md:-translate-y-1/2 w-full h-full md:h-auto z-10 flex flex-col md:flex-row justify-start md:justify-center">
+          <div className="w-full h-full md:h-auto md:max-w-[93%] md:mx-auto px-0 flex flex-col md:block">
+            <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
+              
+              <div className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                  We Are About You
+                </h1>
+                <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
+                  Here Is Our Story
+                </span>
+                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.0625rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
+                  Just as we craft visually striking websites that captivate from the start, our story at Touch Domain began with a vision to revolutionize online engagement. We specialize in bringing brands to life digitally through expert web design, development, and compelling graphic design — build the custom apps that take you beyond a website — then host it all and stick around long after launch. We partner closely with you to create custom solutions that not only meet your unique needs but also tell your distinct brand story in a captivating online experience.
+                </p>
+                
+                <div className="mt-4 ml-0 md:ml-[5px]">
+                  <button onClick={() => setIsModalOpen(true)} className="inline-block text-[14px] px-[15px] py-[10px] bg-td-purple text-white rounded-[20px] border-[1.7px] border-transparent transition-all duration-300 hover:bg-transparent hover:border-td-accent hover:text-td-accent font-semibold">
+                    Let's Talk
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className="flex flex-row mb-[30px] items-center justify-end">
-              <div className="flex flex-row mb-[30px] w-full md:w-[60%] lg:w-[43%]">
-                <span className="text-td-purple text-[40px] font-[700] mr-[11px] leading-none">3</span>
-                <blockquote className="border-l-[8px] border-td-accent pl-[25px] text-[16px]">
-                  <span className="block text-td-purple text-[20px] font-[600] -ml-[9px] mb-1">Catch Those Leads While They're Hot!</span>
-                  A website acts like a magnet for potential customers — but only if it's actually there when they show up. A site that's slow or down loses leads before they even see your pitch, which is exactly why we host what we build: so the magnet keeps working, long after launch day.
-                </blockquote>
+              <div className="relative w-full bg-td-purple md:bg-transparent flex-1 md:flex-none flex flex-col items-center justify-center md:block overflow-hidden">
+                <div className="relative flex justify-center md:justify-end animate-fadeIn">
+                <div className="w-[190px] xs:w-[220px] sm:w-[260px] md:w-[280px] lg:w-[340px] xl:w-[400px] 2xl:w-[460px]">
+                  <Image 
+                    src="/branding/about-landing.png" 
+                    alt="About page landing page" 
+                    width={500} 
+                    height={400} 
+                    className="w-full h-auto object-contain drop-shadow-2xl" 
+                    priority 
+                  />
+                </div>
               </div>
+              </div>
+
             </div>
           </div>
-          
-          <HalfCircleBottomLeft />
-        </section>
+        </div>
+      </section>
 
+      <main className="relative py-[2rem] my-[1.5rem]">
+        
         {/* ── About Section ── */}
-        <section id="about-intro" className="section-wrapper overflow-hidden">
-          <h2>Elevate Your Brand with Touch Domain</h2>
-          <h3 className="heading-text mb-[10px]">A Strategic Process for Lasting Impact</h3>
+        <section id="about-page" className="section-wrapper overflow-hidden">
+          <h2>Our Blueprint for Digital Excellence</h2>
+          <h3 className="heading-text mb-[10px]">Our Foundation & Your Advantage</h3>
           <p className="intro">
-            Touch Domain helps brands thrive — with a proven process spanning brand identity, web design, custom apps, content, and the hosting that keeps it all running. We're passionate about client goals and committed to their success, long after launch day.
+            Most agencies do one thing — a logo, or a website, or your social content. We do all five under one roof — brand, build, content, hosting, and the custom apps that go beyond a website — as one coherent identity, with a real plan for what comes after launch, not just a handshake and an invoice.
           </p>
           <HalfCircleTopRight />
           <div className="flex flex-col md:flex-row justify-around items-center md:items-start mt-20 sm:mt-28 md:mt-[13rem] mx-4 sm:mx-8 mb-16 md:mb-[7rem] relative z-10 max-w-7xl md:mx-auto">
@@ -78,7 +79,6 @@ export default function Home() {
                 <span className="text-td-purple font-[700] text-[17px]">What Guides Us</span>
               </div>
 
-              {/* Pill tab bar — replaces the outlined-box tabs */}
               <nav role="tablist" aria-label="Mission, Vision, and Values" className="inline-flex !bg-td-purple/8 rounded-full p-1 mb-4" style={{ backgroundColor: '#372A6624' }}>
                 <button
                   role="tab"
@@ -100,11 +100,11 @@ export default function Home() {
                 >Values</button>
               </nav>
 
-              {/* Tinted card wrapper so this side has the same visual weight as "Our Designs Are" */}
               <div role="tabpanel" className="mt-2">
                 {activeTab === 'mission' && (
                   <>
-                    <p className="mb-[14px] text-[17px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
+                    <p className="mb-[12px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
+                    <p className="mb-[16px]">We firmly believe that in today's digital landscape, every business, regardless of size or industry, deserves the opportunity to not just exist online, but to operate flawlessly and truly thrive. Too often, we see a vast chasm between a business's untapped potential and their current digital and technical reality.</p>
                     <div className="flex flex-wrap gap-2">
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
                         <i className="fa fa-lightbulb-o text-[11px]"></i>Innovation
@@ -123,33 +123,36 @@ export default function Home() {
                 )}
 
                 {activeTab === 'vision' && (
-                  <p className="mb-[12px] text-[17px]">To empower businesses with comprehensive digital engineering and creative solutions that unlock their full potential, elevate their brand presence, and drive sustained, unprecedented growth, enabling them to lead in their industries and thrive in the dynamic digital landscape.</p>
+                  <>
+                    <p className="mb-[12px]">To empower businesses with comprehensive digital engineering and creative solutions that unlock their full potential, elevate their brand presence, and drive sustained, unprecedented growth, enabling them to lead in their industries and thrive in the dynamic digital landscape.</p>
+                    <p className="mb-[12px]">Our vision extends far beyond simply building websites; we aim to be the catalyst that propels businesses into new realms of digital achievement. We see a future where our clients are not just participants in the online world, but confident leaders setting benchmarks for engagement and innovation.</p>
+                  </>
                 )}
 
                 {activeTab === 'values' && (
                   <div className="text-[15px]">
-                    <div className="flex justify-center flex-col md:flex-row md:gap-x-10">
+                    <div className="flex justify-center flex-col lg:flex-row lg:gap-x-10">
                       <div className="flex-1">
-                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">1</span></div> Client-Centric Collaboration</h5>
-                        <p className="ml-[30px] mb-[12px]">We believe in building strong, collaborative partnerships with our clients.</p>
+                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">1</span></div> Client-Centric Collaboration</h5>
+                        <p className="ml-[30px] mb-[12px]">At the heart of our approach lies a commitment to Client-Centric Collaboration. We don't just work for you; we work with you, forging strong partnerships built on open communication and shared goals. Your vision is paramount, and by working hand-in-hand, we ensure the final digital experience truly reflects your unique identity and objectives, leading to impactful and resonant results.</p>
                       </div>
                       <div className="flex-1">
-                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">2</span></div> Innovation</h5>
-                        <p className="ml-[30px] mb-[12px]">We embrace a culture of continuous innovation, constantly seeking new and creative ways to solve problems and improve our services.</p>
-                      </div>
-                    </div>
-                    <div className="flex justify-center flex-col md:flex-row md:gap-x-10">
-                      <div className="flex-1">
-                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">3</span></div> Integrity</h5>
-                        <p className="ml-[30px] mb-[12px]">We conduct our business with the highest ethical standards, demonstrating honesty, transparency, and fairness in all our interactions.</p>
-                      </div>
-                      <div className="flex-1">
-                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">4</span></div> Continuous Learning</h5>
-                        <p className="ml-[30px] mb-[12px]">We are dedicated to ongoing learning and development, recognizing that the digital landscape is constantly evolving.</p>
+                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">2</span></div> Innovation</h5>
+                        <p className="ml-[30px] mb-[12px]">Fueling our creative process is a deep-seated culture of Innovation. We're not content with the status quo; instead, we actively embrace new technologies and explore imaginative solutions to overcome challenges and elevate the digital experiences we craft. This constant drive to evolve ensures that your brand benefits from the most cutting-edge and effective online strategies, keeping you ahead of the curve.</p>
                       </div>
                     </div>
-                    <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">5</span></div> Accountability</h5>
-                    <p className="ml-[30px] mb-[12px]">We take ownership of our work and are accountable for our actions.</p>
+                    <div className="flex justify-center flex-col lg:flex-row lg:gap-x-10">
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">3</span></div> Integrity</h5>
+                        <p className="ml-[30px] mb-[12px]">Integrity is the bedrock of our operations at Touch Domain. We believe in conducting every aspect of our business with unwavering ethical standards, ensuring complete honesty, transparency, and fairness in all our interactions. This commitment to strong moral principles fosters trust and reliability, building a solid foundation for lasting partnerships and the delivery of dependable digital solutions.</p>
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">4</span></div> Continuous Learning</h5>
+                        <p className="ml-[30px] mb-[12px]">In the ever-evolving digital landscape, our commitment to Continuous Learning is paramount. We recognize that staying ahead means actively pursuing knowledge and mastering the latest trends and technologies. This dedication to growth ensures that we consistently deliver cutting-edge solutions and strategic insights that empower your brand to not just adapt, but to thrive in the dynamic online world.</p>
+                      </div>
+                    </div>
+                    <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">5</span></div> Accountability</h5>
+                    <p className="ml-[30px] mb-[12px]">At Touch Domain, Accountability is a cornerstone of our service. We embrace complete ownership of every project we undertake, standing firmly behind our work and taking full responsibility for our actions. This commitment ensures that we are dedicated to delivering exceptional results and fostering a relationship of trust and reliability with our clients, knowing that we are always answerable for our performance.</p>
                   </div>
                 )}
               </div>
@@ -195,60 +198,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <HalfCircleBottomLeft />
-        </section>
-
-        {/* ── Testimonials Section ── */}
-        <section id="testimonials" className="section-wrapper overflow-hidden">
-          <h2>Our Clients' Experiences</h2>
-          <h3 className="heading-text mb-[10px]">Genuine Reviews and Stories</h3>
-          <p className="intro">
-            See the impact we've made on businesses and individuals alike. Browse our customer reviews and discover their success stories.
-          </p>
-          <HalfCircleTopRight />
-          <div className="relative w-full">
-            <div className="flex flex-row md:flex-row overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] justify-start md:justify-evenly items-stretch md:items-center p-0 pb-2 md:pb-0 mt-24 sm:mt-32 md:mt-[18rem] relative z-10 md:flex-wrap gap-x-5 md:gap-x-8 gap-y-0 max-w-7xl mx-auto px-4 scroll-smooth">
-            
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="flex flex-col w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center">
-                
-                <div className="flex flex-col items-center bg-td-accent text-white rounded-t-[35px] py-[1.5rem] relative flex-1">
-                  <div className="absolute -top-[62px]">
-                    <Image src="/branding/DisplayPic.jpg" alt="Client" width={125} height={125} className="rounded-full border-[4px] border-td-purple w-[125px] h-[125px] object-cover" />
-                  </div>
-                  <div className="text-center mt-[70px]">
-                    <span className="text-[19px] font-[500] block mb-[6px]">"Thabo Mtsweni"</span>
-                    <span className="text-[14px] block mb-[6px]">White Lines, Co-founder</span>
-                    
-                    <div className="mb-[12px] flex justify-center gap-1">
-                      <i className="fab fa-facebook-square !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white"></i>
-                      <i className="fab fa-instagram !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white"></i>
-                      <i className="fab fa-linkedin-in !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white"></i>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center justify-center bg-td-purple text-white rounded-b-[35px] text-center py-[1.5rem] px-4 flex-1">
-                  <q className="mb-[1rem] text-[14px] text-center block">
-                    Not only did Touch Media deliver on what they promised but they exceeded my expectation. My friends are even asking who made the website for me.
-                  </q>
-                  <Link href="/work" className="inline-block text-[14px] px-[10px] py-[10px] bg-td-accent text-white rounded-[20px] border-[1.7px] border-transparent transition-all duration-300 hover:bg-white hover:border-td-purple hover:text-td-accent font-semibold">
-                    View Project
-                  </Link>
-                </div>
-
-              </div>
-            ))}
-
-          </div>
-          </div>
-
-          <p className="md:hidden text-center text-gray-400 text-[12px] mt-3 relative z-10">
-            <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
-            Swipe to see more
-            <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
-          </p>
-
           <HalfCircleBottomLeft />
         </section>
 
@@ -359,11 +308,12 @@ export default function Home() {
           <HalfCircleBottomLeft />
         </section>
 
-        {/* ── Contact Section ── */}
-        <ContactSnippet />
-
       </main>
+      
+      {/* ── Contact Snippet ── */}
+      <ContactSnippet />
 
+      {/* ── Consultation Modal ── */}
       <ConsultationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );

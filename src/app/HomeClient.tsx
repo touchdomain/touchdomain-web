@@ -9,7 +9,7 @@ import HalfCircleTopRight from '../components/HalfcircleTopRight';
 import HalfCircleBottomLeft from '../components/HalfcircleBottomLeft';
 
 
-export default function Home() {
+export default function HomeClient() {
   const [activeTab, setActiveTab] = useState('mission');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
