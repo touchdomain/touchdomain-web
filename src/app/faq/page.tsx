@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import FAQClient, { faqItems } from './FAQClient';
+import FAQClient from './FAQClient';
+import { faqItems } from './faqData';
 
 export const metadata: Metadata = {
   title: 'FAQ | Touch Domain',
