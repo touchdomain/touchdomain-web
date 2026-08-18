@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Icon from '../../components/Icon';
 import OrderModal from './../../components/OrderModal';
 import PricingCard from './../../components/PricingCard';
 import ContactSnippet from './../../components/ContactSnippet';
@@ -424,9 +425,9 @@ export default function ServicesClient() {
                     <span className="text-[19px] font-[500] block mb-[6px]">"Thabo Mtsweni"</span>
                     <span className="text-[14px] block mb-[6px]">White Lines, Co-founder</span>
                     <div className="mb-[12px] flex justify-center gap-1">
-                      <i className="fab fa-facebook-square !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors"></i>
-                      <i className="fab fa-instagram !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors"></i>
-                      <i className="fab fa-linkedin-in !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors"></i>
+                      <Icon name="facebook" size={16} className="-facebook-square !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors" />
+                      <Icon name="instagram" size={16} className="-instagram !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors" />
+                      <Icon name="linkedin" size={16} className="-linkedin-in !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors" />
                     </div>
                   </div>
                 </div>

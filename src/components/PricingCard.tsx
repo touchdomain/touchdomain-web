@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Icon from './Icon';
 
 export interface PricingFeature {
   name: string;
@@ -21,7 +22,7 @@ interface PricingCardProps {
 export default function PricingCard({ title, price, description, isPopular, features, onOrder, className = '', period, buttonText = 'Order Now' }: PricingCardProps) {
   
   return (
-    <div className={`relative w-full max-w-[345px] bg-td-purple rounded-[10px] text-white py-4 flex flex-col mx-auto shadow-[0px_5px_15px_rgba(0,0,0,0.2)] ${isPopular ? 'min-h-[580px] scale-105 z-10' : 'min-h-[550px] mt-0 lg:mt-8'} ${className}`}>
+    <div className={`relative w-full max-w-[345px] bg-td-purple rounded-[10px] text-white py-4 flex flex-col mx-auto shadow-[0px_5px_15px_rgba(0,0,0,0.2)] ${isPopular ? 'min-h-[580px] scale-105 z-10 mt-4' : 'min-h-[550px] mt-0 lg:mt-8'} ${className}`}>
       
       <h4 className="text-[20px] font-[700] text-center uppercase tracking-wide px-2">
         {title}
@@ -43,7 +44,7 @@ export default function PricingCard({ title, price, description, isPopular, feat
         {features.map((feature, idx) => (
           // Pure CSS Group-Hover Tooltip 
           <li key={idx} className="relative flex items-start text-[14px] my-[6px] font-light group w-full cursor-help">
-            <i className="fa fa-info-circle !bg-transparent !p-0 !text-td-accent !mr-[8px] !mt-[3px] !text-[14px] flex-shrink-0"></i>
+            <Icon name="info" size={14} className="-info-circle !p-0 !text-td-accent !mr-[8px] !mt-[3px] !text-[14px] flex-shrink-0" />
             <span className="leading-snug">{feature.name}</span>
             
             {/* The Tooltip Box */}

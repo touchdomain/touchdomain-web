@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Icon from '../components/Icon';
 import Link from 'next/link';
 import Image from 'next/image';
 import HeroSlider from '../components/HeroSlider';
@@ -74,7 +75,7 @@ export default function HomeClient() {
             <div className="w-full md:w-[60%] border border-td-purple/15 rounded-[24px] p-6 md:p-8 bg-white shadow-sm">
 
               <div className="flex items-center gap-[10px] mb-5">
-                <i className="fa fa-compass text-td-purple text-[20px] !bg-transparent !p-0"></i>
+                <Icon name="compass" size={20} className="-compass text-td-purple text-[20px] !p-0" />
                 <span className="text-td-purple font-[700] text-[17px]">What Guides Us</span>
               </div>
 
@@ -107,16 +108,16 @@ export default function HomeClient() {
                     <p className="mb-[14px] text-[17px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
                     <div className="flex flex-wrap gap-2">
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fa fa-lightbulb-o text-[11px]"></i>Innovation
+                        <Icon name="light-bulb" size={11} className="-lightbulb-o text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Innovation
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fa fa-cogs text-[11px]"></i>Technical excellence
+                        <Icon name="settings" size={11} className="-cogs text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Technical excellence
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fa fa-shield text-[11px]"></i>Integrity
+                        <Icon name="shield" size={11} className="-shield text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Integrity
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fa fa-street-view text-[11px]"></i>Client-centric
+                        <Icon name="users" size={11} className="-street-view text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Client-centric
                       </span>
                     </div>
                   </>
@@ -159,7 +160,7 @@ export default function HomeClient() {
               <h3 className="text-[18px] text-white font-bold text-left mb-4 uppercase">Our Designs Are</h3>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fa fa-street-view !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block"></i>
+                  <Icon name="users" size={16} className="-street-view !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Brand Conscious</span>
@@ -168,7 +169,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fa fa-lightbulb-o !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block"></i>
+                  <Icon name="light-bulb" size={16} className="-lightbulb-o !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Intuitive</span>
@@ -177,7 +178,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fa fa-laptop !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block"></i>
+                  <Icon name="tablet" size={16} className="-laptop !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Responsive</span>
@@ -186,7 +187,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fa fa-cogs !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block"></i>
+                  <Icon name="settings" size={16} className="-cogs !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Engineered, Not Templated</span>
@@ -221,9 +222,9 @@ export default function HomeClient() {
                     <span className="text-[14px] block mb-[6px]">White Lines, Co-founder</span>
                     
                     <div className="mb-[12px] flex justify-center gap-1">
-                      <i className="fab fa-facebook-square !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white"></i>
-                      <i className="fab fa-instagram !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white"></i>
-                      <i className="fab fa-linkedin-in !bg-transparent !text-td-purple !p-[3px] !text-[16px] hover:!text-white"></i>
+                      <Icon name="facebook" size={16} className="-facebook-square !text-td-purple !p-[3px] !text-[16px] hover:!text-white" />
+                      <Icon name="instagram" size={16} className="-instagram !text-td-purple !p-[3px] !text-[16px] hover:!text-white" />
+                      <Icon name="linkedin" size={16} className="-linkedin-in !text-td-purple !p-[3px] !text-[16px] hover:!text-white" />
                     </div>
                   </div>
                 </div>
@@ -269,7 +270,7 @@ export default function HomeClient() {
                     meaningfully better fit for "Branding" than the site's other
                     v4-style icons — kept as a deliberate exception rather than
                     forced into a worse icon just for prefix consistency. */}
-                <i className="fas fa-fingerprint text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="award" size={22} className="-fingerprint text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Branding</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -285,7 +286,7 @@ export default function HomeClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-desktop text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="monitor" size={22} className="-desktop text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Web design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -301,7 +302,7 @@ export default function HomeClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-pencil text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="edit-3" size={22} className="-pencil text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Graphic design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -317,7 +318,7 @@ export default function HomeClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-server text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="server" size={22} className="-server text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Hosting</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -333,7 +334,7 @@ export default function HomeClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-mobile text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="smartphone" size={22} className="-mobile text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">App development</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -348,7 +349,7 @@ export default function HomeClient() {
             </div>
 
             <div className="flex flex-col items-center justify-center text-center min-h-[300px] !bg-td-purple/10 p-5 rounded-[16px]">
-              <i className="fa fa-comments text-[26px] text-td-purple !bg-transparent !p-0 mb-2"></i>
+              <Icon name="message-circle" size={26} className="-comments text-[26px] text-td-purple !p-0 mb-2" />
               <p className="text-[15px] font-[600] text-td-purple mb-1">Not sure which you need?</p>
               <p className="text-[13px] text-td-purple/80 mb-4">Get a free consultation and we'll point you the right way.</p>
               <button onClick={() => setIsModalOpen(true)} className="text-[13px] px-5 py-2 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">Talk to us</button>

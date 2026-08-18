@@ -3,12 +3,19 @@ import { useState, FormEvent } from 'react';
 import HalfCircleTopRight from './HalfcircleTopRight';
 import HalfCircleBottomLeft from './HalfcircleBottomLeft';
 import FormStatus from './FormStatus';
+import Icon from './Icon';
 
 export default function ContactSnippet() {
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Honeypot — real visitors never see or fill this field.
   const [website, setWebsite] = useState('');
+  // Subject is controlled (unlike name/email/message below) because the
+  // follow-up questions shown depend on which one is selected.
+  const [subject, setSubject] = useState('');
+  const [budget, setBudget] = useState('');
+  const [timeline, setTimeline] = useState('');
+  const [affected, setAffected] = useState('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,9 +26,12 @@ export default function ContactSnippet() {
     const form = e.target as HTMLFormElement;
     const formData = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
-      topic: (form.elements.namedItem('subject') as HTMLSelectElement).value,
+      topic: subject,
       email: (form.elements.namedItem('email') as HTMLInputElement).value,
       message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
+      budget: subject === 'I want to start a new project' ? budget : '',
+      timeline: subject === 'I want to start a new project' ? timeline : '',
+      affected: subject === "I'm an existing client — I need support" ? affected : '',
       website, // honeypot — should always be empty for real submissions
     };
 
@@ -40,6 +50,10 @@ export default function ContactSnippet() {
         setStatus({ type: 'success', message: result.message });
         form.reset();
         setWebsite('');
+        setSubject('');
+        setBudget('');
+        setTimeline('');
+        setAffected('');
       } else {
         setStatus({ type: 'error', message: result.message });
       }
@@ -73,13 +87,56 @@ export default function ContactSnippet() {
 
           <div className="w-full mb-[25px]">
             <label htmlFor="subject" className="block text-left text-td-purple text-[14px] mb-[8px] font-[600]">Your Subject</label>
-            <select id="subject" required defaultValue="" className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
+            <select id="subject" required value={subject} onChange={e => setSubject(e.target.value)} className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
               <option value="" disabled>Select your subject</option>
+              <option value="I want to start a new project">I want to start a new project</option>
+              <option value="I'm an existing client — I need support">I'm an existing client — I need support</option>
+              <option value="Partnership or collaboration">Partnership or collaboration</option>
               <option value="General enquiry">General enquiry</option>
-              <option value="Feedback">Feedback</option>
-              <option value="Reporting a bug">Reporting a bug</option>
             </select>
           </div>
+
+          {/* Inline follow-up questions — shown based on the subject picked
+              above, rather than a separate modal. These exist specifically
+              to filter serious leads from time-wasters before the message
+              ever reaches an inbox: someone with a real project usually has
+              at least a rough answer, someone just poking around usually
+              doesn't bother. */}
+          {subject === 'I want to start a new project' && (
+            <>
+              <div className="w-full mb-[25px]">
+                <label htmlFor="budget" className="block text-left text-td-purple text-[14px] mb-[8px] font-[600]">Do you have a rough budget in mind?</label>
+                <select id="budget" required value={budget} onChange={e => setBudget(e.target.value)} className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
+                  <option value="" disabled>Select an option</option>
+                  <option value="Under R5,000">Under R5,000</option>
+                  <option value="R5,000 - R15,000">R5,000 – R15,000</option>
+                  <option value="R15,000+">R15,000+</option>
+                  <option value="Not sure yet, happy to get guidance">Not sure yet, happy to get guidance</option>
+                </select>
+              </div>
+              <div className="w-full mb-[25px]">
+                <label htmlFor="timeline" className="block text-left text-td-purple text-[14px] mb-[8px] font-[600]">When are you hoping to get started?</label>
+                <select id="timeline" required value={timeline} onChange={e => setTimeline(e.target.value)} className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
+                  <option value="" disabled>Select an option</option>
+                  <option value="ASAP">ASAP</option>
+                  <option value="Within the next month">Within the next month</option>
+                  <option value="Just exploring for now">Just exploring for now</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {subject === "I'm an existing client — I need support" && (
+            <div className="w-full mb-[25px]">
+              <label htmlFor="affected" className="block text-left text-td-purple text-[14px] mb-[8px] font-[600]">What's affected?</label>
+              <select id="affected" required value={affected} onChange={e => setAffected(e.target.value)} className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
+                <option value="" disabled>Select an option</option>
+                <option value="Website is down">Website is down</option>
+                <option value="Email isn't working">Email isn't working</option>
+                <option value="Something else">Something else</option>
+              </select>
+            </div>
+          )}
 
           <div className="w-full mb-[25px]">
             <label htmlFor="email" className="block text-left text-td-purple text-[14px] mb-[8px] font-[600]">Email address</label>
@@ -124,13 +181,13 @@ export default function ContactSnippet() {
           </div>
           <div className="flex flex-col space-y-4">
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <i className="fa fa-whatsapp !text-[17px] !font-[500] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> 081 327 6153
+              <Icon name="message-circle" size={17} className="-whatsapp !text-[17px] !font-[500] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> 081 327 6153
             </span>
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <i className="fa fa-phone !text-[13px] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> 081 327 6153
+              <Icon name="phone" size={13} className="-phone !text-[13px] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> 081 327 6153
             </span>
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <i className="fa fa-envelope !text-[13px] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> info@touchdomain.co.za
+              <Icon name="mail" size={13} className="-envelope !text-[13px] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> info@touchdomain.co.za
             </span>
           </div>
         </div>

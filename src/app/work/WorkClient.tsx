@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Icon from '../../components/Icon';
 import ContactSnippet from './../../components/ContactSnippet';
 import CaseStudyModal from './../../components/CaseStudyModal';
 import ConsultationModal from './../../components/ConsultationModal';
@@ -146,7 +147,7 @@ export default function WorkClient() {
                     meaningfully better fit for "Branding" than the site's other
                     v4-style icons — kept as a deliberate exception rather than
                     forced into a worse icon just for prefix consistency. */}
-                <i className="fas fa-fingerprint text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="award" size={22} className="-fingerprint text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Branding</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -162,7 +163,7 @@ export default function WorkClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-desktop text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="monitor" size={22} className="-desktop text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Web design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -178,7 +179,7 @@ export default function WorkClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-pencil text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="edit-3" size={22} className="-pencil text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Graphic design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -194,7 +195,7 @@ export default function WorkClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-server text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="server" size={22} className="-server text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Hosting</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -210,7 +211,7 @@ export default function WorkClient() {
 
             <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <i className="fa fa-mobile text-[22px] !bg-transparent !p-0"></i>
+                <Icon name="smartphone" size={22} className="-mobile text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">App development</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -225,7 +226,7 @@ export default function WorkClient() {
             </div>
 
             <div className="flex flex-col items-center justify-center text-center min-h-[300px] !bg-td-purple/10 p-5 rounded-[16px]">
-              <i className="fa fa-comments text-[26px] text-td-purple !bg-transparent !p-0 mb-2"></i>
+              <Icon name="message-circle" size={26} className="-comments text-[26px] text-td-purple !p-0 mb-2" />
               <p className="text-[15px] font-[600] text-td-purple mb-1">Not sure which you need?</p>
               <p className="text-[13px] text-td-purple/80 mb-4">Get a free consultation and we'll point you the right way.</p>
               <button onClick={() => setIsModalOpen(true)} className="text-[13px] px-5 py-2 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">Talk to us</button>

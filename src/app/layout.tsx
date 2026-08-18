@@ -101,8 +101,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* If you are keeping FontAwesome, you can drop the CDN link here */}
-        <script src="https://kit.fontawesome.com/76e3c9c22e.js" crossOrigin="anonymous" defer></script>
+        {/* FontAwesome kit removed — every icon site-wide now uses the inline
+            SVG Icon component (src/components/Icon.tsx) instead. FontAwesome's
+            icon glyphs were failing to render everywhere with no explainable
+            cause even under forced overrides; this script was pure dead
+            weight downloading for zero visual benefit once the migration
+            was complete. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

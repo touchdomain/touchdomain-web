@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import Icon from './Icon';
 
 export default function Footer() {
   // Dynamically update the copyright year so you never have to change it manually
@@ -56,13 +57,13 @@ export default function Footer() {
         <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Social Media</h3>
         {/* We use !bg-transparent and !p-[5px] to override the global icon styles in globals.css */}
         <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
-          <i className="fab fa-facebook-square !bg-transparent !p-[5px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch Domain
+          <Icon name="facebook" size={16} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch Domain
         </a>
         <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
-          <i className="fab fa-instagram !bg-transparent !p-[5px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch domain
+          <Icon name="instagram" size={16} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch domain
         </a>
         <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit flex items-center group">
-          <i className="fab fa-linkedin-in !bg-transparent !p-[5px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch domain
+          <Icon name="linkedin" size={16} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch domain
         </a>
       </div>
 

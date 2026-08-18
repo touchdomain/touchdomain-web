@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import Icon from './Icon';
 
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -60,14 +61,14 @@ export default function Navigation() {
             so it can never visually collide with nav links at tablet/small-laptop
             widths where there isn't much spare horizontal room. */}
         <div className="hidden md:flex items-center gap-[6px] lg:gap-[8px] xl:gap-[11px] text-white text-[13px] lg:text-[14px] xl:text-[16px] shrink-0">
-          <a href="mailto:info@touchdomain.co.za"><i className="fas fa-envelope"></i></a>
-          <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i></a>
-          <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-square"></i></a>
-          <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
+          <a href="mailto:info@touchdomain.co.za"><Icon name="mail" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
+          <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer"><Icon name="instagram" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
+          <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer"><Icon name="facebook" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
+          <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer"><Icon name="linkedin" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
         </div>
 
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-td-purple z-50 shrink-0">
-          <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} !bg-transparent !text-td-purple text-[24px]`}></i>
+          <Icon name={isMobileMenuOpen ? 'x' : 'menu'} size={24} className="text-td-purple" />
         </button>
       </div>
 
