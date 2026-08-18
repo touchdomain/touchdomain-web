@@ -46,7 +46,7 @@ const PRICING_MAP: Record<string, number> = {
   // Website Hosting — mutually exclusive tiers, selected via dropdown further down.
   'Hosting — Foundation': 89, 'Hosting — Growth': 159, 'Hosting — Priority': 249,
   // Email-only — an alternative to a full hosting tier, not stacked with it.
-  'Email — Starter': 49, 'Email — Team': 89, 'Email — Business': 149,
+  'Email — Starter': 35, 'Email — Team': 65, 'Email — Business': 99,
   'Monthly Content Retainer': 2800, 'Monthly SEO Retainer': 3200,
 
   // App Development — once-off, but priced "from" like Digital Dominator,
@@ -499,9 +499,9 @@ export default function QuoteClient() {
                           value={EMAIL_TIERS.find(t => retainerFeatures.includes(t)) || ''}
                         >
                           <option value="">No email plan needed</option>
-                          <option value="Email — Starter">Email Starter — R49/month (5 mailboxes)</option>
-                          <option value="Email — Team">Email Team — R89/month (15 mailboxes)</option>
-                          <option value="Email — Business">Email Business — R149/month (30 mailboxes)</option>
+                          <option value="Email — Starter">Email Starter — R35/month (5 mailboxes)</option>
+                          <option value="Email — Team">Email Team — R65/month (15 mailboxes)</option>
+                          <option value="Email — Business">Email Business — R99/month (30 mailboxes)</option>
                         </select>
                     </div>
                 </div>

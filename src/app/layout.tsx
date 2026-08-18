@@ -40,9 +40,14 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: "Touch Domain",
-    // TODO: point this at a real 1200x630 social-share image once one
-    // exists (e.g. /branding/og-image.png) — without it, shared links fall
-    // back to no preview image at all on platforms like WhatsApp and Slack.
+    images: [
+      {
+        url: "/branding/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Touch Domain — South African Digital Studio for SMEs",
+      },
+    ],
     locale: "en_ZA",
     type: "website",
   },
@@ -50,6 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+    images: ["/branding/og-image.png"],
   },
   icons: {
     icon: [

@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     // 1. Get the raw JSON data
     const body = await request.json();
-    const { name, email, topic, message, website } = body;
+    const { name, email, topic, message, budget, timeline, affected, website } = body;
 
     // Honeypot check — silently report success without sending mail or doing any work.
     if (website) {
@@ -34,6 +34,16 @@ export async function POST(request: Request) {
       },
     });
 
+    // Build the qualifying-answers block conditionally — only the fields
+    // relevant to the chosen subject will ever be populated, so this stays
+    // clean rather than printing empty lines for a Partnership or General
+    // enquiry that never asked these questions.
+    const qualifyingLines = [
+      budget ? `Budget: ${budget}` : null,
+      timeline ? `Timeline: ${timeline}` : null,
+      affected ? `What's affected: ${affected}` : null,
+    ].filter(Boolean).join('\n');
+
     // 4. Set up the admin notification email
     const adminMailOptions = {
       from: `"${name}" <${process.env.SMTP_USER}>`, // Sent via your authenticated server
@@ -44,7 +54,7 @@ export async function POST(request: Request) {
 Name: ${name}
 Email: ${email}
 Subject: ${topic || 'Not specified'}
-
+${qualifyingLines ? '\n' + qualifyingLines + '\n' : ''}
 Message:
 ${message}
       `,

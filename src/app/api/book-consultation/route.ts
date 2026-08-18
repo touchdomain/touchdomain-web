@@ -7,7 +7,7 @@ const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za'
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { consultationName, consultationEmail, consultationPhone, consultationDateTime, website } = body;
+    const { consultationName, consultationEmail, consultationPhone, consultationDateTime, consultationReason, consultationBudget, consultationTimeline, website } = body;
 
     // Honeypot check — silently report success without sending mail or doing any work.
     if (website) {
@@ -41,6 +41,10 @@ Name: ${consultationName}
 Email: ${consultationEmail}
 Phone: ${consultationPhone || 'Not provided'}
 Requested Date & Time: ${new Date(consultationDateTime).toLocaleString('en-ZA')}
+
+Reason for reaching out: ${consultationReason || 'Not provided'}
+Budget: ${consultationBudget || 'Not provided'}
+Timeline: ${consultationTimeline || 'Not provided'}
       `,
     };
 

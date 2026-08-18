@@ -298,7 +298,7 @@ export default function ServicesClient() {
     </p>
     <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-4 md:gap-6 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
-        title="Email Starter" price="49" period="/month" description="A Professional Inbox, Simply"
+        title="Email Starter" price="35" period="/month" description="A Professional Inbox, Simply"
         className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
         onOrder={handleOrderClick}
         buttonText="Get Email"
@@ -310,7 +310,7 @@ export default function ServicesClient() {
         ]}
       />
       <PricingCard 
-        title="Email Team" price="89" period="/month" description="For A Growing Team" isPopular={true}
+        title="Email Team" price="65" period="/month" description="For A Growing Team" isPopular={true}
         className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
         onOrder={handleOrderClick}
         buttonText="Get Email"
@@ -322,7 +322,7 @@ export default function ServicesClient() {
         ]}
       />
       <PricingCard 
-        title="Email Business" price="149" period="/month" description="For Established Teams"
+        title="Email Business" price="99" period="/month" description="For Established Teams"
         className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
         onOrder={handleOrderClick}
         buttonText="Get Email"
