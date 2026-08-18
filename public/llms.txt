@@ -1,0 +1,63 @@
+# Touch Domain
+
+> Touch Domain is a South African digital studio for small and growing businesses (SMEs). One team handles brand identity, web design, digital content, website hosting, email hosting, and custom app development — from initial concept through launch, and ongoing afterward. Based in South Africa, serving South African SMEs.
+
+## About
+
+Most agencies specialize in one thing — a logo, a website, or social content — and hand it off. Touch Domain does brand, build, content, hosting, and app development together, as one coherent identity, with the same team supporting a client after launch rather than disappearing once the invoice is paid.
+
+- Website: https://www.touchdomain.co.za
+- Email: info@touchdomain.co.za
+- Phone: 081 327 6153
+- Social: Facebook, Instagram, LinkedIn — all linked from the site footer
+
+## Services
+
+Full package details and current pricing: https://www.touchdomain.co.za/services
+
+### Brand Identity
+- Launchpad — R3,500 — logo design, logo variations, colour palette, typography, basic brand board, essential digital assets
+- Elevate & Expand — R7,500 — adds a comprehensive brand style guide, full stationery suite, social media kit, iconography, marketing collateral
+- Pinnacle Identity — R14,000 — adds a brand strategy workshop, extensive imagery guidelines, custom graphic elements, corporate presentation template, brand voice guidelines
+
+### Web Design
+- Digital Launchpad — R6,500 — custom website design, responsive development, initial SEO setup, contact form
+- Online Accelerator — R14,500 — up to 10 pages, advanced UI/UX, basic e-commerce, CMS setup, blog integration
+- Digital Dominator — from R28,000 — 15+ pages, advanced e-commerce, API integrations, performance optimization, advanced SEO
+
+### Digital Content
+- Storyteller Starter — R4,000 — social media graphics, animated GIFs, digital ad banners, image curation
+- Impact Maximizer — R8,500 — content calendar, social video, infographic design, custom iconography
+- Narrative Designer — R15,000 — full content strategy, explainer video, interactive content, motion graphics, branded templates
+
+### Website Hosting (billed monthly, cancel any time)
+- Foundation — R89/month — 2GB SSD, 5 email accounts, free SSL, free daily backups
+- Growth — R159/month — 5GB SSD, 15 email accounts
+- Priority — R249/month — 10GB SSD, 25 email accounts, priority support
+
+### Email Hosting (no website required, billed monthly)
+- Email Starter — R35/month — 5 mailboxes, 2GB each
+- Email Team — R65/month — 15 mailboxes, 5GB each
+- Email Business — R99/month — 30 mailboxes, 10GB each, priority support
+
+### App Development
+- App Essentials — R14,500 — installable, offline-ready Progressive Web App
+- App Growth — from R32,000 — custom web app with user accounts, database-backed dashboard, one core workflow
+- App Priority — from R55,000 — multi-user roles, payment integration, admin dashboard, third-party API integrations
+
+## Key Pages
+
+- Homepage: https://www.touchdomain.co.za/
+- Services & Pricing: https://www.touchdomain.co.za/services
+- About (mission, vision, values): https://www.touchdomain.co.za/about
+- FAQ: https://www.touchdomain.co.za/faq
+- Portfolio & Case Studies: https://www.touchdomain.co.za/work
+- Get a Custom Quote: https://www.touchdomain.co.za/quote
+- Contact: https://www.touchdomain.co.za/contact
+- Leave a Review: https://www.touchdomain.co.za/review
+
+## Optional
+
+- Sitemap: https://www.touchdomain.co.za/sitemap.xml
+- Terms & Conditions: https://www.touchdomain.co.za/terms
+- Privacy Policy: https://www.touchdomain.co.za/privacy

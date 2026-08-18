@@ -126,9 +126,9 @@ export default function ServicesClient() {
       />
     </div>
     <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
-      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
       Swipe to see more
-      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
     </p>
   </div>
 
@@ -179,9 +179,9 @@ export default function ServicesClient() {
       />
     </div>
     <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
-      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
       Swipe to see more
-      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
     </p>
   </div>
 
@@ -232,9 +232,9 @@ export default function ServicesClient() {
       />
     </div>
     <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
-      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
       Swipe to see more
-      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
     </p>
   </div>
 
@@ -286,9 +286,9 @@ export default function ServicesClient() {
       />
     </div>
     <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
-      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
       Swipe to see more
-      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
     </p>
 
     {/* Email — for anyone who just wants a professional inbox, no website required */}
@@ -335,9 +335,9 @@ export default function ServicesClient() {
       />
     </div>
     <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
-      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
       Swipe to see more
-      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
     </p>
   </div>
 
@@ -383,9 +383,9 @@ export default function ServicesClient() {
       />
     </div>
     <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
-      <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
       Swipe to see more
-      <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
     </p>
   </div>
 
@@ -444,9 +444,9 @@ export default function ServicesClient() {
           </div>
 
           <p className="md:hidden text-center text-gray-400 text-[12px] mt-3 relative z-10">
-            <i className="fas fa-arrow-left !bg-transparent !p-0 !text-[13px] mr-1 animate-swipeLeft"></i>
+            <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
             Swipe to see more
-            <i className="fas fa-arrow-right !bg-transparent !p-0 !text-[13px] ml-1 animate-swipeRight"></i>
+            <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
           </p>
 
           <HalfCircleBottomLeft />

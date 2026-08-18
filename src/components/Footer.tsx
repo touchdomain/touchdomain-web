@@ -37,6 +37,7 @@ export default function Footer() {
         <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Links</h3>
         <Link href="/about" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">About</Link>
         <Link href="/services" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Services</Link>
+        <Link href="/faq" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">FAQ</Link>
         <Link href="/work" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Portfolio</Link>
         <Link href="/contact" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Reach Us</Link>
         <Link href="/review" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Leave a Review</Link>
