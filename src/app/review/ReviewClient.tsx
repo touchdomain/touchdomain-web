@@ -82,7 +82,7 @@ export default function ReviewClient() {
               </div>
               <div>
                 <label htmlFor="projectType" className="block text-td-purple text-[14px] mb-[6px] font-[600]">What Did We Work On?</label>
-                <select id="projectType" name="projectType" defaultValue="" className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[15px] bg-slate-50 text-gray-700 outline-none focus:border-td-accent focus:bg-white transition-colors">
+                <select id="projectType" name="projectType" defaultValue="" className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
                   <option value="" disabled>Select one</option>
                   <option value="Branding">Branding</option>
                   <option value="Web Design">Web Design</option>

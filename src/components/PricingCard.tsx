@@ -44,7 +44,7 @@ export default function PricingCard({ title, price, description, isPopular, feat
         {features.map((feature, idx) => (
           // Pure CSS Group-Hover Tooltip 
           <li key={idx} className="relative flex items-start text-[14px] my-[6px] font-light group w-full cursor-help">
-            <Icon name="info" size={14} className="-info-circle !p-0 !text-td-accent !mr-[8px] !mt-[3px] !text-[14px] flex-shrink-0" />
+            <Icon name="info" size={14} className="!p-0 !text-td-accent !mr-[8px] !mt-[3px] !text-[14px] flex-shrink-0" />
             <span className="leading-snug">{feature.name}</span>
             
             {/* The Tooltip Box */}

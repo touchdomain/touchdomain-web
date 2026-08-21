@@ -76,7 +76,7 @@ function isBookingDateTimeValid(dateTimeString: string) {
 }
 
 export default function ConsultationModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
-    const [formData, setFormData] = useState({ name: '', email: '', phone: '', datetime: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '', datetime: '', reason: '', budget: '', timeline: '' });
     const [status, setStatus] = useState<{ type: 'error' | 'success' | null, message: string }>({ type: null, message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     // Honeypot — real visitors never see or fill this field.
@@ -103,6 +103,9 @@ export default function ConsultationModal({ isOpen, onClose }: { isOpen: boolean
                 consultationEmail: formData.email,
                 consultationPhone: formData.phone,
                 consultationDateTime: formData.datetime,
+                consultationReason: formData.reason,
+                consultationBudget: formData.budget,
+                consultationTimeline: formData.timeline,
                 website // honeypot — should always be empty for real submissions
             };
 
@@ -160,6 +163,35 @@ export default function ConsultationModal({ isOpen, onClose }: { isOpen: boolean
                         <div>
                             <label className="block text-sm font-medium text-td-purple mb-1">Phone Number</label>
                             <input type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full border-0 border-b-2 border-td-purple bg-white py-2 outline-none focus:border-td-accent transition-colors" placeholder="081 234 5678" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-td-purple mb-1">What's prompting you to reach out?</label>
+                            <select required value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
+                                <option value="" disabled>Select an option</option>
+                                <option value="Starting a new business">Starting a new business</option>
+                                <option value="My current website needs work">My current website needs work</option>
+                                <option value="I don't have a website yet">I don't have a website yet</option>
+                                <option value="Not sure yet, that's why I need a chat">Not sure yet, that's why I need a chat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-td-purple mb-1">Do you have a rough budget in mind?</label>
+                            <select required value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
+                                <option value="" disabled>Select an option</option>
+                                <option value="Under R5,000">Under R5,000</option>
+                                <option value="R5,000 - R15,000">R5,000 – R15,000</option>
+                                <option value="R15,000+">R15,000+</option>
+                                <option value="Not sure yet, happy to get guidance">Not sure yet, happy to get guidance</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-td-purple mb-1">When are you hoping to get started?</label>
+                            <select required value={formData.timeline} onChange={e => setFormData({...formData, timeline: e.target.value})} className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors">
+                                <option value="" disabled>Select an option</option>
+                                <option value="ASAP">ASAP</option>
+                                <option value="Within the next month">Within the next month</option>
+                                <option value="Just exploring for now">Just exploring for now</option>
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-td-purple mb-1">Preferred Date & Time</label>

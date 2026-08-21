@@ -75,7 +75,7 @@ export default function HomeClient() {
             <div className="w-full md:w-[60%] border border-td-purple/15 rounded-[24px] p-6 md:p-8 bg-white shadow-sm">
 
               <div className="flex items-center gap-[10px] mb-5">
-                <Icon name="compass" size={20} className="-compass text-td-purple text-[20px] !p-0" />
+                <Icon name="compass" size={20} className="text-td-purple text-[20px] !p-0" />
                 <span className="text-td-purple font-[700] text-[17px]">What Guides Us</span>
               </div>
 
@@ -108,16 +108,16 @@ export default function HomeClient() {
                     <p className="mb-[14px] text-[17px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
                     <div className="flex flex-wrap gap-2">
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="light-bulb" size={11} className="-lightbulb-o text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Innovation
+                        <Icon name="light-bulb" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Innovation
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="settings" size={11} className="-cogs text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Technical excellence
+                        <Icon name="settings" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Technical excellence
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="shield" size={11} className="-shield text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Integrity
+                        <Icon name="shield" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Integrity
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="users" size={11} className="-street-view text-[11px] bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />Client-centric
+                        <Icon name="users" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Client-centric
                       </span>
                     </div>
                   </>
@@ -160,7 +160,7 @@ export default function HomeClient() {
               <h3 className="text-[18px] text-white font-bold text-left mb-4 uppercase">Our Designs Are</h3>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <Icon name="users" size={16} className="-street-view !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
+                  <Icon name="users" size={20} className="!w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Brand Conscious</span>
@@ -169,7 +169,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <Icon name="light-bulb" size={16} className="-lightbulb-o !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
+                  <Icon name="light-bulb" size={20} className="!w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Intuitive</span>
@@ -178,7 +178,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <Icon name="tablet" size={16} className="-laptop !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
+                  <Icon name="tablet" size={20} className="!w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Responsive</span>
@@ -187,7 +187,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row">
                 <div className="ml-[5px] mr-[4px]">
-                  <Icon name="settings" size={16} className="-cogs !w-[31px] !h-[31px] text-[16px] !bg-td-accent rounded-full !p-[6px] text-center inline-block bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center" />
+                  <Icon name="settings" size={20} className="!w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center" />
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Engineered, Not Templated</span>
@@ -210,36 +210,38 @@ export default function HomeClient() {
           <div className="relative w-full">
             <div className="flex flex-row md:flex-row overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] justify-start md:justify-evenly items-stretch md:items-center p-0 pb-2 md:pb-0 mt-24 sm:mt-32 md:mt-[18rem] relative z-10 md:flex-wrap gap-x-5 md:gap-x-8 gap-y-0 max-w-7xl mx-auto px-4 scroll-smooth">
             
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="flex flex-col w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center">
+              <div className="flex flex-col w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center">
                 
                 <div className="flex flex-col items-center bg-td-accent text-white rounded-t-[35px] py-[1.5rem] relative flex-1">
                   <div className="absolute -top-[62px]">
-                    <Image src="/branding/DisplayPic.jpg" alt="Client" width={125} height={125} className="rounded-full border-[4px] border-td-purple w-[125px] h-[125px] object-cover" />
+                    <Image src="/branding/thatanyane-logo.svg" alt="Thatanyane Lokaleng Farming & Livestock" width={125} height={125} className="rounded-full border-[4px] border-td-purple w-[125px] h-[125px] object-cover bg-white" />
                   </div>
                   <div className="text-center mt-[70px]">
-                    <span className="text-[19px] font-[500] block mb-[6px]">"Thabo Mtsweni"</span>
-                    <span className="text-[14px] block mb-[6px]">White Lines, Co-founder</span>
-                    
-                    <div className="mb-[12px] flex justify-center gap-1">
-                      <Icon name="facebook" size={16} className="-facebook-square !text-td-purple !p-[3px] !text-[16px] hover:!text-white" />
-                      <Icon name="instagram" size={16} className="-instagram !text-td-purple !p-[3px] !text-[16px] hover:!text-white" />
-                      <Icon name="linkedin" size={16} className="-linkedin-in !text-td-purple !p-[3px] !text-[16px] hover:!text-white" />
-                    </div>
+                    <span className="text-[19px] font-[500] block mb-[6px]">"Sesky Makepe"</span>
+                    <span className="text-[14px] block mb-[6px]">Thatanyane Lokaleng Farming, Manager</span>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center justify-center bg-td-purple text-white rounded-b-[35px] text-center py-[1.5rem] px-4 flex-1">
                   <q className="mb-[1rem] text-[14px] text-center block">
-                    Not only did Touch Media deliver on what they promised but they exceeded my expectation. My friends are even asking who made the website for me.
+                    Before Touch Domain built our website, we didn't really have a proper place online where people could learn about what we do or get in touch with us easily. They took the time to understand our farming operation and what we wanted the business to stand for. The website came out clean, simple and professional, but still feels like it represents our farm.
                   </q>
                   <Link href="/work" className="inline-block text-[14px] px-[10px] py-[10px] bg-td-accent text-white rounded-[20px] border-[1.7px] border-transparent transition-all duration-300 hover:bg-white hover:border-td-purple hover:text-td-accent font-semibold">
                     View Project
                   </Link>
+
                 </div>
 
               </div>
-            ))}
+
+              <div className="flex flex-col items-center justify-center text-center w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center bg-td-purple/5 border border-td-purple/10 rounded-[35px] p-6">
+                <Icon name="message-circle" size={28} className="text-td-purple mb-3" />
+                <p className="text-[16px] font-[600] text-td-purple mb-2">Worked with us?</p>
+                <p className="text-[13px] text-gray-500 mb-4">We'd love to feature your story here — leave us a review and let us know.</p>
+                <Link href="/review" className="inline-block text-[14px] px-5 py-2.5 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">
+                  Leave a Review
+                </Link>
+              </div>
 
           </div>
           </div>
@@ -262,15 +264,15 @@ export default function HomeClient() {
           </p>
           <HalfCircleTopRight />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 relative z-10 max-w-7xl mx-auto px-4">
+          <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-6 items-stretch md:items-center relative z-10 max-w-7xl mx-auto px-4 pb-2 md:pb-0">
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
                 {/* fa-fingerprint has no clean FontAwesome v4 equivalent and is a
                     meaningfully better fit for "Branding" than the site's other
                     v4-style icons — kept as a deliberate exception rather than
                     forced into a worse icon just for prefix consistency. */}
-                <Icon name="award" size={22} className="-fingerprint text-[22px] !p-0" />
+                <Icon name="award" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Branding</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -284,9 +286,9 @@ export default function HomeClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="monitor" size={22} className="-desktop text-[22px] !p-0" />
+                <Icon name="monitor" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Web design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -300,9 +302,9 @@ export default function HomeClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="edit-3" size={22} className="-pencil text-[22px] !p-0" />
+                <Icon name="edit-3" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Graphic design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -316,9 +318,9 @@ export default function HomeClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="server" size={22} className="-server text-[22px] !p-0" />
+                <Icon name="server" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Hosting</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -332,9 +334,9 @@ export default function HomeClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="smartphone" size={22} className="-mobile text-[22px] !p-0" />
+                <Icon name="smartphone" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">App development</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -348,14 +350,20 @@ export default function HomeClient() {
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center text-center min-h-[300px] !bg-td-purple/10 p-5 rounded-[16px]">
-              <Icon name="message-circle" size={26} className="-comments text-[26px] text-td-purple !p-0 mb-2" />
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col items-center justify-center text-center min-h-[300px] !bg-td-purple/10 p-5 rounded-[16px]">
+              <Icon name="message-circle" size={26} className="text-[26px] text-td-purple !p-0 mb-2" />
               <p className="text-[15px] font-[600] text-td-purple mb-1">Not sure which you need?</p>
               <p className="text-[13px] text-td-purple/80 mb-4">Get a free consultation and we'll point you the right way.</p>
               <button onClick={() => setIsModalOpen(true)} className="text-[13px] px-5 py-2 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">Talk to us</button>
             </div>
 
           </div>
+
+    <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
+      Swipe to see more
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
+    </p>
 
           <HalfCircleBottomLeft />
         </section>

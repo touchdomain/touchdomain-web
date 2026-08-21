@@ -20,13 +20,13 @@ export default function ContactPage() {
             <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
               
               <div className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
-                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,2.9vw + 1.2rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,3rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
                   Reach Out
                 </h1>
-                <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,1.5vw + 0.7rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
+                <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
                   Your Direct Line to Our Team
                 </span>
-                <p className="text-gray-700 text-[clamp(0.9rem,0.35vw + 0.8rem,1.0625rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
+                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.25rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
                   We're always eager to hear from you. Whether you have a question about our services, need support with a project, or just want to explore possibilities, reaching out is the first step towards transforming your digital vision into reality. We're ready to listen and assist.
                 </p>
                 

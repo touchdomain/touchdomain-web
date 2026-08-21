@@ -26,13 +26,13 @@ export default function WorkClient() {
             <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
               
               <div className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
-                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,3rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
                   From Idea to Impact
                 </h1>
                 <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
                   Discover Our Capabilities
                 </span>
-                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.0625rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
+                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.25rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
                   At Touch Domain, we believe a remarkable online presence begins with exceptional design. We transform your core ideas into captivating digital experiences, ensuring your brand truly stands out. Discover how our expert web design, development, and graphic design services can elevate your vision and connect powerfully with your audience.
                 </p>
                 
@@ -139,15 +139,15 @@ export default function WorkClient() {
           </p>
           <HalfCircleTopRight />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 relative z-10 max-w-7xl mx-auto px-4">
+          <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-6 items-stretch md:items-center relative z-10 max-w-7xl mx-auto px-4 pb-2 md:pb-0">
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
                 {/* fa-fingerprint has no clean FontAwesome v4 equivalent and is a
                     meaningfully better fit for "Branding" than the site's other
                     v4-style icons — kept as a deliberate exception rather than
                     forced into a worse icon just for prefix consistency. */}
-                <Icon name="award" size={22} className="-fingerprint text-[22px] !p-0" />
+                <Icon name="award" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Branding</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -161,9 +161,9 @@ export default function WorkClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="monitor" size={22} className="-desktop text-[22px] !p-0" />
+                <Icon name="monitor" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Web design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -177,9 +177,9 @@ export default function WorkClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="edit-3" size={22} className="-pencil text-[22px] !p-0" />
+                <Icon name="edit-3" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Graphic design</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -193,9 +193,9 @@ export default function WorkClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="server" size={22} className="-server text-[22px] !p-0" />
+                <Icon name="server" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">Hosting</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -209,9 +209,9 @@ export default function WorkClient() {
               </div>
             </div>
 
-            <div className="flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Icon name="smartphone" size={22} className="-mobile text-[22px] !p-0" />
+                <Icon name="smartphone" size={22} className="text-[22px] !p-0" />
                 <span className="text-[19px] font-[600]">App development</span>
               </div>
               <div className="flex-1 flex items-center">
@@ -225,14 +225,20 @@ export default function WorkClient() {
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center text-center min-h-[300px] !bg-td-purple/10 p-5 rounded-[16px]">
-              <Icon name="message-circle" size={26} className="-comments text-[26px] text-td-purple !p-0 mb-2" />
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col items-center justify-center text-center min-h-[300px] !bg-td-purple/10 p-5 rounded-[16px]">
+              <Icon name="message-circle" size={26} className="text-[26px] text-td-purple !p-0 mb-2" />
               <p className="text-[15px] font-[600] text-td-purple mb-1">Not sure which you need?</p>
               <p className="text-[13px] text-td-purple/80 mb-4">Get a free consultation and we'll point you the right way.</p>
               <button onClick={() => setIsModalOpen(true)} className="text-[13px] px-5 py-2 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">Talk to us</button>
             </div>
 
           </div>
+
+    <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
+      Swipe to see more
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
+    </p>
 
           <HalfCircleBottomLeft />
         </section>

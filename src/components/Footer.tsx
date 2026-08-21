@@ -57,13 +57,13 @@ export default function Footer() {
         <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Social Media</h3>
         {/* We use !bg-transparent and !p-[5px] to override the global icon styles in globals.css */}
         <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
-          <Icon name="facebook" size={16} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch Domain
+          <Icon name="facebook" size={18} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch Domain
         </a>
         <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
-          <Icon name="instagram" size={16} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch domain
+          <Icon name="instagram" size={18} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch domain
         </a>
         <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit flex items-center group">
-          <Icon name="linkedin" size={16} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch domain
+          <Icon name="linkedin" size={18} className="!text-white group-hover:!text-td-accent w-[25px] transition-colors" /> Touch domain
         </a>
       </div>
 

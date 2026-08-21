@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -7,7 +7,21 @@ import Icon from './Icon';
 
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+
+  // Desktop nav stays transparent while overlapping the hero, then picks up
+  // a solid background once the visitor scrolls past it - matches the
+  // original design intent, now actually achievable since the header is
+  // fixed at every breakpoint instead of just on mobile. Checked once on
+  // mount too, in case the page loads already scrolled (e.g. a deep link
+  // with a hash anchor).
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 40);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -21,17 +35,17 @@ export default function Navigation() {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <header className="fixed md:absolute top-0 left-0 w-full z-[99999] h-[55px] md:h-[65px] lg:h-[75px] xl:h-[85px] flex items-center bg-white md:bg-transparent shadow-[0_4px_12px_rgba(0,0,0,0.08)] md:shadow-none">
+    <header className={`fixed top-0 left-0 w-full z-[99999] h-[55px] md:h-[65px] lg:h-[75px] xl:h-[85px] flex items-center bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-colors duration-300 ${isScrolled ? 'md:bg-white md:shadow-[0_4px_12px_rgba(0,0,0,0.08)]' : 'md:bg-transparent md:shadow-none'}`}>
       <div className="w-full max-w-[97%] 2xl:max-w-[98%] mx-auto px-[0px] relative flex items-center justify-between h-full gap-2 ml-0">
         
         <div className="flex items-center min-w-0">
-          <Link href="/" className="mt-[5%] mr-[1%] flex items-center shrink-0">
-            <div className="relative w-[110px] h-[53px] md:w-[125px] md:h-[60px] lg:w-[135px] lg:h-[70px] xl:w-[165px] xl:h-[79px]">
+          <Link href="/" className="mt-[2%] mr-[1%] flex items-center shrink-0">
+            <div className="relative w-[110px] h-[53px] md:w-[125px] md:h-[60px] lg:w-[135px] lg:h-[70px] xl:w-[150px] xl:h-[68px]">
               <Image src="/branding/logo-nav.png" alt="Touch Domain Logo" fill className="object-contain" />
             </div>
           </Link>
 
-          <nav className="hidden md:flex flex-row pt-[6.5%] m-0 items-center">
+          <nav className="hidden md:flex flex-row pt-[2%] m-0 items-center">
             {navLinks.map(link => (
               <Link
                 key={link.href}
@@ -61,10 +75,18 @@ export default function Navigation() {
             so it can never visually collide with nav links at tablet/small-laptop
             widths where there isn't much spare horizontal room. */}
         <div className="hidden md:flex items-center gap-[6px] lg:gap-[8px] xl:gap-[11px] text-white text-[13px] lg:text-[14px] xl:text-[16px] shrink-0">
-          <a href="mailto:info@touchdomain.co.za"><Icon name="mail" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
-          <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer"><Icon name="instagram" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
-          <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer"><Icon name="facebook" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
-          <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer"><Icon name="linkedin" size={14} className="bg-td-accent text-white p-[8px] rounded-full inline-flex items-center justify-center transition-all duration-300" /></a>
+          <a href="mailto:info@touchdomain.co.za">
+            <Icon name="mail" size={32} className="bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110" />
+          </a>
+          <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer">
+            <Icon name="instagram" size={32} className="bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110" />
+          </a>
+          <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer">
+            <Icon name="facebook" size={32} className="bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110" />
+          </a>
+          <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer">
+            <Icon name="linkedin" size={32} className="bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110" />
+          </a>
         </div>
 
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-td-purple z-50 shrink-0">

@@ -4,6 +4,7 @@ import HalfCircleTopRight from './HalfcircleTopRight';
 import HalfCircleBottomLeft from './HalfcircleBottomLeft';
 import FormStatus from './FormStatus';
 import Icon from './Icon';
+import FAQCta from './FAQCta';
 
 export default function ContactSnippet() {
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
@@ -74,7 +75,7 @@ export default function ContactSnippet() {
         We're here to answer questions and provide support. Let us know how we can help, explore our contact options.
       </p>
       <HalfCircleTopRight />
-      <div className="flex flex-col md:flex-row justify-around items-center mt-20 sm:mt-28 md:mt-[13rem] mx-4 sm:mx-8 mb-16 md:mb-[7rem] relative z-10 max-w-7xl md:mx-auto gap-12 lg:gap-0">
+      <div className="flex flex-col md:flex-row justify-around items-center mt-16 sm:mt-20 md:mt-24 mx-4 sm:mx-8 mb-16 md:mb-[7rem] relative z-10 max-w-7xl md:mx-auto gap-12 lg:gap-0">
         
 
         {/* CRISP ELEVATION: rounded-2xl, shadow-xl, and border */}
@@ -174,20 +175,21 @@ export default function ContactSnippet() {
         </form>
 
         <div className="w-full lg:w-[35%]">
-          <div className="mb-[24px]">
+          <FAQCta message="Before you reach out, your question might already be answered." className="max-w-none mx-0" />
+          <div className="mb-[24px] mt-6">
             <p className="text-[18px] font-[500] leading-relaxed text-left text-td-dark">
               Would you like a free consultation? If there is anything you would like to clarify, feel free to send us a message!
             </p>
           </div>
           <div className="flex flex-col space-y-4">
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <Icon name="message-circle" size={17} className="-whatsapp !text-[17px] !font-[500] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> 081 327 6153
+              <Icon name="message-circle" size={32} className="!bg-td-purple !text-white !p-[7px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> 081 327 6153
             </span>
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <Icon name="phone" size={13} className="-phone !text-[13px] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> 081 327 6153
+              <Icon name="phone" size={32} className="!bg-td-purple !text-white !p-[7px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> 081 327 6153
             </span>
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <Icon name="mail" size={13} className="-envelope !text-[13px] !bg-td-purple !text-white !p-[10px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> info@touchdomain.co.za
+              <Icon name="mail" size={32} className="!bg-td-purple !text-white !p-[7px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors" /> info@touchdomain.co.za
             </span>
           </div>
         </div>

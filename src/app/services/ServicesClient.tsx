@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Icon from '../../components/Icon';
+import FAQCta from '../../components/FAQCta';
 import OrderModal from './../../components/OrderModal';
 import PricingCard from './../../components/PricingCard';
 import ContactSnippet from './../../components/ContactSnippet';
@@ -35,13 +36,13 @@ export default function ServicesClient() {
             <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
               
               <div className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
-                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,3rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
                   Your Audience Is Online
                 </h1>
                 <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
                   Let's Elevate Your Digital Visibility
                 </span>
-                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.0625rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
+                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.25rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
                   In today's interconnected world, your potential customers are actively searching for what you offer, right now. It's not enough to simply have an online presence; you need to be seen, remembered, and chosen. We're here to ensure your brand cuts through the noise, connecting powerfully with your ideal audience and transforming passive browsers into engaged clients.
                 </p>
                 
@@ -400,6 +401,8 @@ export default function ServicesClient() {
   />
 </div>
 
+          <FAQCta message="Not sure what's included, or how billing works? Check our FAQ before choosing a package." />
+
           <HalfCircleBottomLeft />
         </section>
 
@@ -415,32 +418,34 @@ export default function ServicesClient() {
             
             <div className="flex flex-row md:flex-row overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] justify-start md:justify-evenly items-stretch md:items-center p-0 pb-2 md:pb-0 mt-24 sm:mt-32 md:mt-[18rem] relative z-10 md:flex-wrap gap-x-5 md:gap-x-8 gap-y-0 max-w-7xl mx-auto px-4 scroll-smooth">
             
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="flex flex-col w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center">
+              <div className="flex flex-col w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center">
                 <div className="flex flex-col items-center bg-td-accent text-white rounded-t-[35px] py-[1.5rem] relative flex-1">
                   <div className="absolute -top-[62px]">
-                    <Image src="/branding/DisplayPic.jpg" alt="Client" width={125} height={125} className="rounded-full border-[4px] border-td-purple w-[125px] h-[125px] object-cover" />
+                    <Image src="/branding/thatanyane-logo.svg" alt="Thatanyane Lokaleng Farming & Livestock" width={125} height={125} className="rounded-full border-[4px] border-td-purple w-[125px] h-[125px] object-cover bg-white" />
                   </div>
                   <div className="text-center mt-[70px]">
-                    <span className="text-[19px] font-[500] block mb-[6px]">"Thabo Mtsweni"</span>
-                    <span className="text-[14px] block mb-[6px]">White Lines, Co-founder</span>
-                    <div className="mb-[12px] flex justify-center gap-1">
-                      <Icon name="facebook" size={16} className="-facebook-square !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors" />
-                      <Icon name="instagram" size={16} className="-instagram !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors" />
-                      <Icon name="linkedin" size={16} className="-linkedin-in !text-td-purple !p-[3px] !text-[16px] hover:!text-white transition-colors" />
-                    </div>
+                    <span className="text-[19px] font-[500] block mb-[6px]">"Sesky Makepe"</span>
+                    <span className="text-[14px] block mb-[6px]">Thatanyane Lokaleng Farming, Manager</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-center justify-center bg-td-purple text-white rounded-b-[35px] text-center py-[1.5rem] px-4 flex-1">
                   <q className="mb-[1rem] text-[14px] text-center block">
-                    Not only did Touch Media deliver on what they promised but they exceeded my expectation. My friends are even asking who made the website for me.
+                    Before Touch Domain built our website, we didn't really have a proper place online where people could learn about what we do or get in touch with us easily. They took the time to understand our farming operation and what we wanted the business to stand for. The website came out clean, simple and professional, but still feels like it represents our farm.
                   </q>
                   <Link href="/work" className="inline-block text-[14px] px-[10px] py-[10px] bg-td-accent text-white rounded-[20px] border-[1.7px] border-transparent transition-all duration-300 hover:bg-white hover:border-td-purple hover:text-td-accent font-semibold">
                     View Project
                   </Link>
                 </div>
               </div>
-            ))}
+
+              <div className="flex flex-col items-center justify-center text-center w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center bg-td-purple/5 border border-td-purple/10 rounded-[35px] p-6">
+                <Icon name="message-circle" size={28} className="text-td-purple mb-3" />
+                <p className="text-[16px] font-[600] text-td-purple mb-2">Worked with us?</p>
+                <p className="text-[13px] text-gray-500 mb-4">We'd love to feature your story here — leave us a review and let us know.</p>
+                <Link href="/review" className="inline-block text-[14px] px-5 py-2.5 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">
+                  Leave a Review
+                </Link>
+              </div>
           </div>
           </div>
 

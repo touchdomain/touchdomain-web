@@ -50,11 +50,11 @@ export default function HeroSlider() {
     <>
       <section className="relative block h-screen overflow-x-hidden bg-white w-full pt-[100px] pb-0 md:pt-0 md:pb-0">
         
-        {/* Right 45% Background Image Overlay — desktop/tablet only, competes with text at narrow widths */}
-        <div className="hidden md:block absolute top-0 right-0 w-[45%] h-full bg-[url('/branding/hero-background.png')] bg-cover bg-center z-0"></div>
+        {/* Right 40% Background Image Overlay — desktop/tablet only, competes with text at narrow widths */}
+        <div className="hidden md:block absolute top-0 right-0 w-[40%] h-full bg-[url('/branding/hero-background.png')] bg-cover bg-center z-0"></div>
 
         {/* Right Side Number Box Indicator */}
-        <div className="hidden md:flex absolute right-0 top-[46%] -translate-y-1/2 w-[40px] flex-col items-center text-white z-10 text-[22px] font-medium">
+        <div className="hidden md:flex absolute right-0 top-[42%] -translate-y-1/2 w-[40px] flex-col items-center text-white z-10 text-[22px] font-medium">
           <span>0{currentSlide + 1}</span>
           <div className="w-[40px] h-[1px] bg-white my-2"></div>
           <span className="opacity-50">03</span>
@@ -62,8 +62,8 @@ export default function HeroSlider() {
 
         {/* Slider Content Wrapper */}
         <div className="relative md:absolute md:top-1/2 md:-translate-y-1/2 w-full h-full md:h-auto z-10 flex flex-col md:flex-row justify-start md:justify-center">
-          <div className="w-full h-full md:h-auto md:max-w-[93%] md:mx-auto px-0 flex flex-col md:block">
-            <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
+          <div className="w-full h-full md:h-auto md:max-w-[95%] md:mx-auto px-0 flex flex-col md:block">
+            <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[4.5%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
               
               {/* Text Block */}
               <div key={`text-${currentSlide}`} className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
@@ -74,7 +74,7 @@ export default function HeroSlider() {
                 <span className="text-td-accent font-[700] uppercase tracking-widest text-[11px] xs:text-[12px] mb-2 ml-0 md:ml-[5px]">
                   South African Digital Studio for SMEs
                 </span>
-                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,3rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
                   {slides[currentSlide].title}
                 </h1>
                 <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">

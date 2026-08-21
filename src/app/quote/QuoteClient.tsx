@@ -4,6 +4,8 @@ import React, { useState, FormEvent, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FormStatus from './../../components/FormStatus';
+import FAQCta from './../../components/FAQCta';
+import Icon from './../../components/Icon';
 
 // Configure your base prices here (in ZAR)
 const PRICING_MAP: Record<string, number> = {
@@ -55,6 +57,23 @@ const PRICING_MAP: Record<string, number> = {
   'App Essentials': 14500, 'App Growth': 32000, 'App Priority': 55000,
 };
 
+
+// Same pure-CSS group-hover tooltip mechanism already used and proven in
+// PricingCard.tsx, adapted for a form field label instead of a feature
+// list item. Kept local to this file since no other form on the site
+// currently needs per-field explanations at this density.
+function FieldLabel({ text, tooltip }: { text: string; tooltip: string }) {
+  return (
+    <label className="form-label text-sm font-semibold flex items-center gap-[6px] group relative cursor-help w-fit">
+      {text}
+      <Icon name="info" size={13} className="text-td-accent flex-shrink-0" />
+      <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block w-[220px] bg-white text-td-purple font-medium text-xs p-3 rounded-lg shadow-xl z-50 pointer-events-none border-b-4 border-td-accent normal-case">
+        {tooltip}
+        <div className="absolute top-full left-4 border-4 border-transparent border-t-white"></div>
+      </div>
+    </label>
+  );
+}
 
 export default function QuoteClient() {
   const [selections, setSelections] = useState<Record<string, string>>({});
@@ -192,13 +211,13 @@ export default function QuoteClient() {
             <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
               
               <div className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
-                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,3rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
                   Get Your Custom Package
                 </h1>
                 <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
                   Tailored Solutions for Your Vision
                 </span>
-                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.0625rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
+                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.25rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
                   Ready to bring your digital aspirations to life? Every great online presence begins with a clear plan. Here, you can easily select the precise services your brand needs to thrive. Let's build a customized solution that perfectly aligns with your vision and budget, ensuring you get exactly what's required to make an impact.
                 </p>
                 
@@ -249,8 +268,8 @@ export default function QuoteClient() {
                 
                 <div className="grid grid-cols-1 phone-lg:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     <div>
-                        <label className="form-label text-sm font-semibold">Website Type</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Website Type')} value={selections['Website Type'] || ''}>
+                        <FieldLabel text="Website Type" tooltip="The kind of site that best fits your business — this shapes the layout and features included." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Website Type')} value={selections['Website Type'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Informational">Informational</option>
                             <option value="E-commerce Store">E-commerce Store</option>
@@ -259,8 +278,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Number of Pages</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Number of Pages')} value={selections['Number of Pages'] || ''}>
+                        <FieldLabel text="Number of Pages" tooltip="How many distinct pages you need, not counting individual blog posts or products." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Number of Pages')} value={selections['Number of Pages'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Up to 5 Pages">Up to 5 Pages</option>
                             <option value="6-10 Pages">6-10 Pages</option>
@@ -269,16 +288,16 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Copy Writing</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Copy Writing')} value={selections['Copy Writing'] || ''}>
+                        <FieldLabel text="Copy Writing" tooltip="Whether you'll supply your own website text, or want our team to write it for you." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Copy Writing')} value={selections['Copy Writing'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Stock Images</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Stock Images')} value={selections['Stock Images'] || ''}>
+                        <FieldLabel text="Stock Images" tooltip="Professional stock photography for your site, if you don't have your own images ready." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Stock Images')} value={selections['Stock Images'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Yes, I need stock images">Yes, I need stock images</option>
                             <option value="No">No, I have my own images</option>
@@ -303,24 +322,24 @@ export default function QuoteClient() {
 
                 <div className="grid grid-cols-1 phone-lg:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     <div>
-                        <label className="form-label text-sm font-semibold">Primary Logo</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Primary Logo')} value={selections['Primary Logo'] || ''}>
+                        <FieldLabel text="Primary Logo" tooltip="Your main brand mark — the logo used across your website, signage, and marketing." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Primary Logo')} value={selections['Primary Logo'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="2 Initial Concepts">2 Initial Concepts</option>
                             <option value="3 Initial Concepts">3 Initial Concepts</option>
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Social Media Profile Pack</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Social Media Pack')} value={selections['Social Media Pack'] || ''}>
+                        <FieldLabel text="Social Media Profile Pack" tooltip="Correctly-sized profile and cover images, ready for your social accounts." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Social Media Pack')} value={selections['Social Media Pack'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="2 Platforms">2 Platforms</option>
                             <option value="4 Platforms">4 Platforms</option>
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Custom Iconography</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Iconography')} value={selections['Iconography'] || ''}>
+                        <FieldLabel text="Custom Iconography" tooltip="A matching set of icons designed for your brand, not generic stock icons." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Iconography')} value={selections['Iconography'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="5 Custom Icons">5 Custom Icons</option>
                             <option value="10 Custom Icons">10 Custom Icons</option>
@@ -328,8 +347,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Digital Marketing Template</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Marketing Template')} value={selections['Marketing Template'] || ''}>
+                        <FieldLabel text="Digital Marketing Template" tooltip="A reusable template for social posts or digital ads, matching your brand." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Marketing Template')} value={selections['Marketing Template'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Social Post Template">Social Post Template</option>
                             <option value="Digital Ad Banner Template">Digital Ad Banner Template</option>
@@ -337,8 +356,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Presentation Template</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Presentation Template')} value={selections['Presentation Template'] || ''}>
+                        <FieldLabel text="Presentation Template" tooltip="A branded slide deck template for client or internal presentations." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Presentation Template')} value={selections['Presentation Template'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="No Presentation Template">No Presentation Template</option>
                             <option value="Master Slide Template">Master Slide Template</option>
@@ -365,8 +384,8 @@ export default function QuoteClient() {
 
                 <div className="grid grid-cols-1 phone-lg:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     <div>
-                        <label className="form-label text-sm font-semibold">Custom Static Graphic Pack</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Static Graphics')} value={selections['Static Graphics'] || ''}>
+                        <FieldLabel text="Custom Static Graphic Pack" tooltip="A set of branded graphics for social media or marketing use." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Static Graphics')} value={selections['Static Graphics'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="5 Custom Designs">5 Custom Designs</option>
                             <option value="10 Custom Designs">10 Custom Designs</option>
@@ -374,8 +393,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Animated GIF Pack</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'GIF Pack')} value={selections['GIF Pack'] || ''}>
+                        <FieldLabel text="Animated GIF Pack" tooltip="Short, looping animated graphics for social media or web use." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'GIF Pack')} value={selections['GIF Pack'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="2 Short-Form GIFs">2 Short-Form GIFs</option>
                             <option value="5 Short-Form GIFs">5 Short-Form GIFs</option>
@@ -383,8 +402,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Short-Form Social Video</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Social Video')} value={selections['Social Video'] || ''}>
+                        <FieldLabel text="Short-Form Social Video" tooltip="Brief, platform-ready video content for social media." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Social Video')} value={selections['Social Video'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="1 Video (up to 30 seconds)">1 Video (up to 30 seconds)</option>
                             <option value="3 Videos (up to 30 seconds each)">3 Videos (up to 30 seconds each)</option>
@@ -392,16 +411,16 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Infographic Design</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Infographic')} value={selections['Infographic'] || ''}>
+                        <FieldLabel text="Infographic Design" tooltip="Visual breakdowns of information, data, or a process, in your brand style." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Infographic')} value={selections['Infographic'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Basic Infographic (Single-page)">Basic</option>
                             <option value="Complex Infographic (Multi-section/Interactive)">Complex</option>
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Caption Writing</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Captions')} value={selections['Captions'] || ''}>
+                        <FieldLabel text="Caption Writing" tooltip="Written captions to accompany your social media posts." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Captions')} value={selections['Captions'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Captions for 5 Posts">5 Posts</option>
                             <option value="Captions for 10 Posts">10 Posts</option>
@@ -409,8 +428,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Digital Ad Banner</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Ad Banners')} value={selections['Ad Banners'] || ''}>
+                        <FieldLabel text="Digital Ad Banner" tooltip="Sized ad creative ready for online advertising platforms." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Ad Banners')} value={selections['Ad Banners'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="3 Ad Banner Sizes/Variations">3 Variations</option>
                             <option value="5 Ad Banner Sizes/Variations">5 Variations</option>
@@ -418,8 +437,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Explainer Video</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Explainer Video')} value={selections['Explainer Video'] || ''}>
+                        <FieldLabel text="Explainer Video" tooltip="A short video walking viewers through what you offer and why it matters." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Explainer Video')} value={selections['Explainer Video'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Up to 60 Seconds">Up to 60 Seconds</option>
                             <option value="60-90 Seconds">60-90 Seconds</option>
@@ -427,8 +446,8 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <label className="form-label text-sm font-semibold">Motion Graphics</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'Motion Graphics')} value={selections['Motion Graphics'] || ''}>
+                        <FieldLabel text="Motion Graphics" tooltip="Animated visual elements for video or web use." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Motion Graphics')} value={selections['Motion Graphics'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Up to 30 Seconds Animation">Up to 30 Seconds</option>
                             <option value="30-60 Seconds Animation">30-60 Seconds</option>
@@ -454,8 +473,8 @@ export default function QuoteClient() {
 
                 <div className="grid grid-cols-1 phone-lg:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
                     <div>
-                        <label className="form-label text-sm font-semibold">App Tier</label>
-                        <select className="form-select w-full p-2 border rounded" onChange={(e) => handleSelectChange(e, 'App Development')} value={selections['App Development'] || ''}>
+                        <FieldLabel text="App Tier" tooltip="Which level of app development fits your project — from an installable web app to a fully custom platform." />
+                        <select className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'App Development')} value={selections['App Development'] || ''}>
                             <option value="">No app needed</option>
                             <option value="App Essentials">App Essentials — from R14,500 (installable PWA)</option>
                             <option value="App Growth">App Growth — from R32,000 (custom web app)</option>
@@ -478,7 +497,7 @@ export default function QuoteClient() {
                         </label>
                         <select
                           id="hostingTierSelect"
-                          className="form-select w-full text-sm border-gray-300 rounded-md"
+                          className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors"
                           onChange={handleHostingChange}
                           value={HOSTING_TIERS.find(t => retainerFeatures.includes(t)) || ''}
                         >
@@ -494,7 +513,7 @@ export default function QuoteClient() {
                         </label>
                         <select
                           id="emailTierSelect"
-                          className="form-select w-full text-sm border-gray-300 rounded-md"
+                          className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors"
                           onChange={handleEmailChange}
                           value={EMAIL_TIERS.find(t => retainerFeatures.includes(t)) || ''}
                         >
@@ -540,10 +559,12 @@ export default function QuoteClient() {
 
                 {monthlyTotal > 0 && (
                   <div className="bg-td-purple/5 border border-td-accent/30 rounded-lg p-4 mb-8 flex justify-between items-center">
-                    <span className="text-sm font-semibold text-td-purple">Estimated Monthly Retainer</span>
+                    <span className="text-sm font-semibold text-td-purple">Estimated Monthly Total</span>
                     <span className="text-xl font-bold text-td-purple">R {monthlyTotal.toLocaleString('en-ZA')} <span className="text-sm font-normal text-gray-500">/ month</span></span>
                   </div>
                 )}
+
+                <FAQCta message="Not sure what's included in a plan or retainer? Check our FAQ." className="max-w-none mx-0 !py-3 !px-4 !gap-3 text-[13px]" />
 
                 <hr className="my-8 border-gray-300" />
 
@@ -553,7 +574,7 @@ export default function QuoteClient() {
                         <h4 className="text-lg font-semibold text-gray-600">Your Estimated Project Total <span className="text-sm font-normal">(Once-Off)</span></h4>
                         <p className="est-price text-4xl font-bold text-td-purple">R {total.toLocaleString('en-ZA')}</p>
                         {monthlyTotal > 0 && (
-                          <p className="text-sm text-td-accent font-semibold mt-2">+ R {monthlyTotal.toLocaleString('en-ZA')} / month ongoing support</p>
+                          <p className="text-sm text-td-accent font-semibold mt-2">+ R {monthlyTotal.toLocaleString('en-ZA')} / month</p>
                         )}
                     </div>
                     
