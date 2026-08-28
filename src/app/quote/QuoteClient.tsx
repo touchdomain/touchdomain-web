@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import FormStatus from './../../components/FormStatus';
 import FAQCta from './../../components/FAQCta';
-import Icon from './../../components/Icon';
 
 // Configure your base prices here (in ZAR)
 const PRICING_MAP: Record<string, number> = {
@@ -66,7 +65,7 @@ function FieldLabel({ text, tooltip }: { text: string; tooltip: string }) {
   return (
     <label className="form-label text-sm font-semibold flex items-center gap-[6px] group relative cursor-help w-fit">
       {text}
-      <Icon name="info" size={13} className="text-td-accent flex-shrink-0" />
+      <i className="!bg-transparent !p-0 fas fa-circle-info text-[13px] text-td-accent flex-shrink-0"></i>
       <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block w-[220px] bg-white text-td-purple font-medium text-xs p-3 rounded-lg shadow-xl z-50 pointer-events-none border-b-4 border-td-accent normal-case">
         {tooltip}
         <div className="absolute top-full left-4 border-4 border-transparent border-t-white"></div>

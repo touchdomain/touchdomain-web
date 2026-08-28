@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Icon from './Icon';
 
 interface FAQCtaProps {
   message?: string;
@@ -18,7 +17,7 @@ export default function FAQCta({ message = "Have a question we haven't covered h
   return (
     <div className={`max-w-xl mx-auto my-6 bg-td-purple/5 border border-td-purple/10 rounded-[16px] px-6 py-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 ${className}`}>
       <div className="w-[42px] h-[42px] rounded-full bg-td-purple/10 flex items-center justify-center flex-shrink-0">
-        <Icon name="message-circle" size={19} className="text-td-purple" />
+        <i className="!bg-transparent !p-0 fas fa-comment text-[19px] text-td-purple"></i>
       </div>
       <p className="text-td-purple text-[14.5px] font-[500] text-center sm:text-left flex-1">{message}</p>
       <Link

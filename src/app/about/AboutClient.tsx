@@ -25,14 +25,14 @@ export default function AboutClient() {
             <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
               
               <div className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
-                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,3rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,2.9vw + 1.2rem,4rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
                   We Are About You
                 </h1>
-                <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
+                <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,1.5vw + 0.7rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
                   Here Is Our Story
                 </span>
-                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.25rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
-                  Just as we craft visually striking websites that captivate from the start, our story at Touch Domain began with a vision to revolutionize online engagement. We specialize in bringing brands to life digitally through expert web design, development, and compelling graphic design — build the custom apps that take you beyond a website — then host it all and stick around long after launch. We partner closely with you to create custom solutions that not only meet your unique needs but also tell your distinct brand story in a captivating online experience.
+                <p className="text-gray-700 text-[clamp(0.9rem,0.55vw + 0.77rem,1.25rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
+                  We bring brands to life — through web design, custom apps, and the hosting that keeps it all running long after launch. We partner closely with you to build something that doesn't just meet your needs, but tells your story.
                 </p>
                 
                 <div className="mt-4 ml-0 md:ml-[5px]">
@@ -108,16 +108,16 @@ export default function AboutClient() {
                     <p className="mb-[16px]">We firmly believe that in today's digital landscape, every business, regardless of size or industry, deserves the opportunity to not just exist online, but to operate flawlessly and truly thrive. Too often, we see a vast chasm between a business's untapped potential and their current digital and technical reality.</p>
                     <div className="flex flex-wrap gap-2">
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="light-bulb" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Innovation
+                        <Icon name="light-bulb" size={16} className="bg-td-accent text-white p-[6px] rounded-full inline-flex items-center justify-center" />Innovation
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="settings" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Technical excellence
+                        <Icon name="settings" size={16} className="bg-td-accent text-white p-[6px] rounded-full inline-flex items-center justify-center" />Technical excellence
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="shield" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Integrity
+                        <Icon name="shield" size={16} className="bg-td-accent text-white p-[6px] rounded-full inline-flex items-center justify-center" />Integrity
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <Icon name="users" size={20} className="bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center" />Client-centric
+                        <Icon name="users" size={16} className="bg-td-accent text-white p-[6px] rounded-full inline-flex items-center justify-center" />Client-centric
                       </span>
                     </div>
                   </>

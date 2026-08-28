@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import Icon from '../../components/Icon';
 import HalfCircleTopRight from '../../components/HalfcircleTopRight';
 import HalfCircleBottomLeft from '../../components/HalfcircleBottomLeft';
 import { faqItems } from './faqData';
@@ -31,7 +30,7 @@ export default function FAQClient() {
                   className="w-full flex items-center justify-between gap-4 py-5 text-left"
                 >
                   <span className="text-td-purple font-[600] text-[16px]">{item.question}</span>
-                  <Icon name="chevron-down" size={14} className={`text-td-accent transition-transform duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                  <i className={`!bg-transparent !p-0 fas fa-chevron-down text-[14px] text-td-accent transition-transform duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}></i>
                 </button>
                 <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden">

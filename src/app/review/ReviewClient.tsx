@@ -1,7 +1,6 @@
 'use client';
 import { useState, FormEvent } from 'react';
 import FormStatus from './../../components/FormStatus';
-import Icon from '../../components/Icon';
 
 export default function ReviewClient() {
   const [rating, setRating] = useState(5);
@@ -105,7 +104,7 @@ export default function ReviewClient() {
                     className="text-[32px] leading-none transition-colors"
                     aria-label={`${star} star${star > 1 ? 's' : ''}`}
                   >
-                    <Icon name="star" size={20} filled={star <= (hoverRating || rating)} className={`${star <= (hoverRating || rating) ? 'text-td-accent' : 'text-gray-200'}`} />
+                    <i className={`!bg-transparent !p-0 ${star <= (hoverRating || rating) ? 'fas' : 'far'} fa-star text-[20px] ${star <= (hoverRating || rating) ? 'text-td-accent' : 'text-gray-200'}`}></i>
                   </button>
                 ))}
               </div>

@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import Icon from '../../components/Icon';
 import FAQCta from '../../components/FAQCta';
 import OrderModal from './../../components/OrderModal';
 import PricingCard from './../../components/PricingCard';
@@ -416,7 +415,7 @@ export default function ServicesClient() {
           <HalfCircleTopRight />
           <div className="relative w-full">
             
-            <div className="flex flex-row md:flex-row overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] justify-start md:justify-evenly items-stretch md:items-center p-0 pb-2 md:pb-0 mt-24 sm:mt-32 md:mt-[18rem] relative z-10 md:flex-wrap gap-x-5 md:gap-x-8 gap-y-0 max-w-7xl mx-auto px-4 scroll-smooth">
+            <div className="flex flex-row md:flex-row overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] justify-start md:justify-center items-stretch md:items-center p-0 pb-2 md:pb-0 mt-24 sm:mt-32 md:mt-[18rem] relative z-10 md:flex-wrap gap-x-5 md:gap-x-8 gap-y-0 max-w-3xl mx-auto px-4 scroll-smooth">
             
               <div className="flex flex-col w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center">
                 <div className="flex flex-col items-center bg-td-accent text-white rounded-t-[35px] py-[1.5rem] relative flex-1">
@@ -439,7 +438,7 @@ export default function ServicesClient() {
               </div>
 
               <div className="flex flex-col items-center justify-center text-center w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center bg-td-purple/5 border border-td-purple/10 rounded-[35px] p-6">
-                <Icon name="message-circle" size={28} className="text-td-purple mb-3" />
+                <i className="!bg-transparent !p-0 fas fa-comment text-[28px] text-td-purple mb-3"></i>
                 <p className="text-[16px] font-[600] text-td-purple mb-2">Worked with us?</p>
                 <p className="text-[13px] text-gray-500 mb-4">We'd love to feature your story here — leave us a review and let us know.</p>
                 <Link href="/review" className="inline-block text-[14px] px-5 py-2.5 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">
