@@ -7,10 +7,13 @@ import "./globals.css";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
-// This replaces the Google Fonts link in your HTML
-const roboto = Roboto({ 
+// Self-hosted by next/font — the single source of Roboto for the site.
+// Applied via roboto.className on <body>, which cascades to everything.
+// Do NOT also @import Roboto from Google Fonts in globals.css: that loads
+// the family a second time over the network and blocks first render.
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: ['100', '300', '400', '500', '700', '900']
+  weight: ['100', '300', '400', '500', '700', '900'],
 });
 
 const SITE_URL = "https://www.touchdomain.co.za";

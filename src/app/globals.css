@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Paste any @import rules for Google Fonts here */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+/* Roboto is self-hosted via next/font in layout.tsx and applied through
+   roboto.className on <body>. Do not add a Google Fonts @import here — it
+   loads the family a second time over the network and blocks first render. */
 
 /* Put keyframes outside of the layers */
 @keyframes fadeIn { 
