@@ -182,13 +182,13 @@ export default function ContactSnippet() {
           </div>
           <div className="flex flex-col space-y-4">
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <i className="fab fa-whatsapp text-[32px] !bg-td-purple !text-white !p-[7px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> 081 327 6153
+              <i className="fab fa-whatsapp text-[25px] !bg-td-purple !text-white !p-[8px] !mt-0 !mr-[12px] group-hover:!bg-td-accent rounded-full transition-colors"></i> 081 327 6153
             </span>
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <i className="fas fa-phone text-[32px] !bg-td-purple !text-white !p-[7px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> 081 327 6153
+              <i className="fas fa-phone text-[20px] !bg-td-purple !text-white !p-[9px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> 081 327 6153
             </span>
             <span className="group block text-[15px] font-[500] text-td-dark hover:text-gray-500 cursor-pointer transition-colors w-fit flex items-center">
-              <i className="fas fa-envelope text-[32px] !bg-td-purple !text-white !p-[7px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> info@touchdomain.co.za
+              <i className="fas fa-envelope text-[20px] !bg-td-purple !text-white !p-[9px] !mt-0 !mr-[12px] group-hover:!bg-td-accent transition-colors"></i> info@touchdomain.co.za
             </span>
           </div>
         </div>

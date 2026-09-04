@@ -75,7 +75,7 @@ export default function ServicesClient() {
             Your vision deserves an extraordinary online home. From brand identity to web design, custom apps, content, and the hosting that keeps it all live — explore the full suite of services designed to take your idea from concept to something real, and keep it running.
           </p>
           <HalfCircleTopRight />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 md:mt-[8rem] relative z-10 flex flex-col gap-16 md:gap-24">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-20 md:mt-24 relative z-10 flex flex-col gap-16 md:gap-24">
             
     
             
@@ -85,10 +85,10 @@ export default function ServicesClient() {
     <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
       Your visual identity, built to earn trust before you've said a word — logo, colour, typography, and the guidelines to keep it all consistent.
     </p>
-    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-4 md:gap-6 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+    <div className="flex flex-row overflow-x-auto md:flex-wrap md:overflow-visible md:justify-center snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-2.5 md:gap-1 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Launchpad" price="3,500" description="Igniting Your Brand's Digital Journey"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick} 
         features={[
           { name: "Primary Logo Design", tooltip: "Crafting a unique and versatile logo that encapsulates your brand's essence." },
@@ -101,7 +101,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Elevate & Expand" price="7,500" description="Amplify your Brand Reach" isPopular={true}
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mx-0 md:mx-[18px]"
         onOrder={handleOrderClick}
         features={[
           { name: "The Launchpad Package", tooltip: "Everything in The Launchpad Package." },
@@ -114,7 +114,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Pinnacle Identity" price="14,000" description="Forging an Unforgettable Brand Legacy"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
           { name: "Elevate & Expand Package", tooltip: "Everything in The Elevate & Expand Package." },
@@ -139,10 +139,10 @@ export default function ServicesClient() {
     <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
       A site engineered to load fast, work on any device, and actually turn visitors into enquiries — not just look good in a screenshot.
     </p>
-    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-4 md:gap-6 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+    <div className="flex flex-row overflow-x-auto md:flex-wrap md:overflow-visible md:justify-center snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-2.5 md:gap-1 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Digital Launchpad" price="6,500" description="Building Your Online Foundation with Impact"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
           { name: "Custom Website Design", tooltip: "Up to 5 Pages tailored to reflect your brand's unique identity." },
@@ -154,7 +154,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Online Accelerator" price="14,500" description="Amplify Presence, Cultivate Engagement" isPopular={true}
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mx-0 md:mx-[18px]"
         onOrder={handleOrderClick}
         features={[
           { name: "The Digital Launchpad", tooltip: "Everything in The Digital Launchpad package." },
@@ -167,7 +167,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Digital Dominator" price="28,000+" description="Elevate Online Experiences, Drive Growth"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
           { name: "The Online Accelerator", tooltip: "Everything in The Online Accelerator package." },
@@ -192,10 +192,10 @@ export default function ServicesClient() {
     <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
       The graphics, video, and copy that keep your brand alive between projects — because a great website still needs something to say.
     </p>
-    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-4 md:gap-6 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+    <div className="flex flex-row overflow-x-auto md:flex-wrap md:overflow-visible md:justify-center snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-2.5 md:gap-1 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Storyteller Starter" price="4,000" description="Engagement Through Compelling Visuals"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
           { name: "Social Media Graphics", tooltip: "5 visually striking static designs optimized for social platforms." },
@@ -207,7 +207,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Impact Maximizer" price="8,500" description="Dynamic Content, Clear Message" isPopular={true}
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mx-0 md:mx-[18px]"
         onOrder={handleOrderClick}
         features={[
           { name: "The Storyteller Starter", tooltip: "Everything in The Storyteller Starter package." },
@@ -220,7 +220,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Narrative Designer" price="15,000" description="Crafting Cross-Platform Experiences"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
           { name: "The Impact Maximizer", tooltip: "Everything in The Impact Maximizer package." },
@@ -245,10 +245,10 @@ export default function ServicesClient() {
     <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
       Built and hosted by the same team, so there's one person to call, not three. Billed monthly, cancel any time.
     </p>
-    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-4 md:gap-6 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+   <div className="flex flex-row overflow-x-auto md:flex-wrap md:overflow-visible md:justify-center snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-2.5 md:gap-1 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Foundation" price="89" period="/month" description="Reliable Hosting For Your Launch"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         buttonText="Get Hosted"
         features={[
@@ -261,7 +261,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Growth" price="159" period="/month" description="Room To Scale, Built For Business" isPopular={true}
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mx-0 md:mx-[18px]"
         onOrder={handleOrderClick}
         buttonText="Get Hosted"
         features={[
@@ -274,7 +274,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Priority" price="249" period="/month" description="Priority Performance For Serious Sites"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         buttonText="Get Hosted"
         features={[
@@ -297,10 +297,10 @@ export default function ServicesClient() {
     <p className="text-center text-gray-500 text-[13.5px] max-w-xl mx-auto mb-8">
       No website yet, or already hosted elsewhere? Get a professional @yourdomain inbox on its own.
     </p>
-    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-4 md:gap-6 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+    <div className="flex flex-row overflow-x-auto md:flex-wrap md:overflow-visible md:justify-center snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-2.5 md:gap-1 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="Email Starter" price="35" period="/month" description="A Professional Inbox, Simply"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         buttonText="Get Email"
         features={[
@@ -312,7 +312,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Email Team" price="65" period="/month" description="For A Growing Team" isPopular={true}
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mx-0 md:mx-[18px]"
         onOrder={handleOrderClick}
         buttonText="Get Email"
         features={[
@@ -324,7 +324,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="Email Business" price="99" period="/month" description="For Established Teams"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         buttonText="Get Email"
         features={[
@@ -348,10 +348,10 @@ export default function ServicesClient() {
     <p className="text-center text-gray-500 text-[14px] max-w-xl mx-auto -mt-6 mb-10">
       From an installable, offline-ready web app to a fully custom platform with real business logic behind it.
     </p>
-    <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-4 md:gap-6 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
+    <div className="flex flex-row overflow-x-auto md:flex-wrap md:overflow-visible md:justify-center snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-2.5 md:gap-1 items-stretch md:items-center pb-2 md:pb-0 px-1 md:px-0">
       <PricingCard 
         title="App Essentials" price="14,500" description="Installable, Offline-Ready, Yours"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
           { name: "Progressive Web App Build", tooltip: "Your site becomes installable straight from the browser, no app store needed." },
@@ -362,7 +362,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="App Growth" price="32,000" description="Real Functionality, Built For You" isPopular={true}
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mx-0 md:mx-[18px]"
         onOrder={handleOrderClick}
         features={[
           { name: "User Accounts & Authentication", tooltip: "Visitors can sign up, log in, and have their own space." },
@@ -373,7 +373,7 @@ export default function ServicesClient() {
       />
       <PricingCard 
         title="App Priority" price="55,000" description="Complex Logic, Built To Scale"
-        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto"
+        className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
           { name: "Multi-User Roles & Permissions", tooltip: "Different people see and can do different things, exactly as your business requires." },
@@ -390,7 +390,6 @@ export default function ServicesClient() {
     </p>
   </div>
 
-  {/* Drop the modal right here at the bottom of the container */}
   <OrderModal 
       isOpen={isModalOpen} 
       onClose={() => setIsModalOpen(false)} 
@@ -400,10 +399,10 @@ export default function ServicesClient() {
   />
 </div>
 
-          <FAQCta message="Not sure what's included, or how billing works? Check our FAQ before choosing a package." />
+<FAQCta message="Not sure what's included, or how billing works? Check our FAQ before choosing a package." />
 
-          <HalfCircleBottomLeft />
-        </section>
+<HalfCircleBottomLeft />
+</section>
 
         {/* ── Testimonials Section ── */}
         <section id="testimonials" className="section-wrapper overflow-hidden">
