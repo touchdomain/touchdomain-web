@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { CaseStudy } from './../data/caseStudies';
 
 interface CaseStudyModalProps {
@@ -8,21 +9,54 @@ interface CaseStudyModalProps {
 }
 
 export default function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Escape to close, plus lock body scroll while open and move focus to the
+  // close button — the three things a keyboard/screen-reader user expects
+  // from a dialog that clicking the small "×" alone doesn't provide.
+  useEffect(() => {
+    if (!project) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    closeButtonRef.current?.focus();
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [project, onClose]);
+
   if (!project) return null;
 
   return (
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden relative">
-        
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="case-study-title"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
           <div>
             <span className="inline-block bg-td-purple text-white text-[10.5px] font-[700] uppercase tracking-wide px-3 py-1 rounded-full mb-2">
               {project.category}
             </span>
-            <h3 className="text-lg font-bold text-td-purple leading-tight">{project.clientName}</h3>
+            <h3 id="case-study-title" className="text-lg font-bold text-td-purple leading-tight">{project.clientName}</h3>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors text-2xl leading-none shrink-0 ml-3">&times;</button>
+          <button ref={closeButtonRef} onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-red-500 transition-colors text-2xl leading-none shrink-0 ml-3">&times;</button>
         </div>
 
         {/* Body */}

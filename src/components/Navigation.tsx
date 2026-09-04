@@ -40,7 +40,7 @@ export default function Navigation() {
         <div className="flex items-center min-w-0">
           <Link href="/" className="mt-[2%] mr-[1%] flex items-center shrink-0">
             <div className="relative w-[110px] h-[53px] md:w-[125px] md:h-[60px] lg:w-[135px] lg:h-[70px] xl:w-[150px] xl:h-[68px]">
-              <Image src="/branding/logo-nav.png" alt="Touch Domain Logo" fill className="object-contain" />
+              <Image src="/branding/logo-nav.png" alt="Touch Domain Logo" fill sizes="150px" className="object-contain" />
             </div>
           </Link>
 
@@ -49,8 +49,9 @@ export default function Navigation() {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive(link.href) ? 'page' : undefined}
                 className={`block px-[6px] lg:px-[7px] py-[10px] font-[600] text-[13px] lg:text-[14px] xl:text-[15px] transition-colors whitespace-nowrap ${
-                  isActive(link.href) ? 'text-td-accent' : 'text-[#707070] hover:text-td-accent'
+                  isActive(link.href) ? 'text-td-purple' : 'text-[#707070] hover:text-td-accent'
                 }`}
               >
                 {link.label}
@@ -59,9 +60,10 @@ export default function Navigation() {
 
             <Link
               href="/quote"
+              aria-current={isActive('/quote') ? 'page' : undefined}
               className={`ml-[7px] px-[12px] lg:px-[13px] py-[8px] rounded-[20px] font-[600] text-[13px] lg:text-[14px] xl:text-[15px] border-[1.7px] transition-all duration-300 inline-block whitespace-nowrap ${
                 isActive('/quote')
-                  ? 'bg-transparent border-td-accent text-td-accent'
+                  ? 'bg-transparent border-td-purple text-td-purple'
                   : 'bg-td-purple border-transparent text-white hover:bg-transparent hover:border-td-accent hover:text-td-accent'
               }`}
             >
@@ -74,22 +76,22 @@ export default function Navigation() {
             so it can never visually collide with nav links at tablet/small-laptop
             widths where there isn't much spare horizontal room. */}
         <div className="hidden md:flex items-center gap-[6px] lg:gap-[8px] xl:gap-[11px] text-white text-[13px] lg:text-[14px] xl:text-[16px] shrink-0">
-          <a href="mailto:info@touchdomain.co.za">
-            <i className="fas fa-envelope text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110"></i>
+          <a href="mailto:info@touchdomain.co.za" aria-label="Email us">
+            <i aria-hidden="true" className="fas fa-envelope text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:text-white hover:scale-110"></i>
           </a>
-          <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer">
-            <i className="fab fa-instagram text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110"></i>
+          <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer" aria-label="Touch Domain on Instagram">
+            <i aria-hidden="true" className="fab fa-instagram text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:text-white hover:scale-110"></i>
           </a>
-          <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer">
-            <i className="fab fa-facebook text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110"></i>
+          <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer" aria-label="Touch Domain on Facebook">
+            <i aria-hidden="true" className="fab fa-facebook text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:text-white hover:scale-110"></i>
           </a>
-          <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer">
-            <i className="fab fa-linkedin text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:scale-110"></i>
+          <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer" aria-label="Touch Domain on LinkedIn">
+            <i aria-hidden="true" className="fab fa-linkedin text-[16px] bg-td-accent text-white p-[7px] rounded-full inline-flex items-center justify-center transition-all duration-300 hover:bg-td-purple hover:text-white hover:scale-110"></i>
           </a>
         </div>
 
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-td-purple z-50 shrink-0">
-          <i className={`!bg-transparent !p-0 fas ${isMobileMenuOpen ? 'fa-xmark' : 'fa-bars'} text-[24px] text-td-purple`}></i>
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'} aria-expanded={isMobileMenuOpen} className="md:hidden text-td-purple z-50 shrink-0">
+          <i aria-hidden="true" className={`!bg-transparent !p-0 fas ${isMobileMenuOpen ? 'fa-xmark' : 'fa-bars'} text-[24px] text-td-purple`}></i>
         </button>
       </div>
 
@@ -101,7 +103,8 @@ export default function Navigation() {
                key={link.href}
                href={link.href}
                onClick={closeMenu}
-               className={`block py-2 text-center font-[600] ${isActive(link.href) ? 'text-td-accent' : 'text-[#707070]'}`}
+               aria-current={isActive(link.href) ? 'page' : undefined}
+               className={`block py-2 text-center font-[600] ${isActive(link.href) ? 'text-td-purple' : 'text-[#707070]'}`}
              >
                {link.label}
              </Link>
@@ -109,8 +112,9 @@ export default function Navigation() {
            <Link
              href="/quote"
              onClick={closeMenu}
+             aria-current={isActive('/quote') ? 'page' : undefined}
              className={`block py-2 mt-2 text-center rounded-full font-semibold ${
-               isActive('/quote') ? 'bg-transparent border-2 border-td-accent text-td-accent' : 'bg-td-purple text-white'
+               isActive('/quote') ? 'bg-transparent border-2 border-td-purple text-td-purple' : 'bg-td-purple text-white'
              }`}
            >
              Get a Quote

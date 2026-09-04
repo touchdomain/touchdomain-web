@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Roboto } from "next/font/google";
 import PageLoader from '../components/PageLoader';
 // @ts-ignore: side-effect import for global styles
@@ -101,13 +102,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script src="https://kit.fontawesome.com/76e3c9c22e.js" crossOrigin="anonymous" defer></script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
       <body className={roboto.className}>
+        {/* FontAwesome kit — loaded via next/script with the default
+            afterInteractive strategy so its client-side <i>→<svg> DOM
+            rewrite runs only after React has hydrated, rather than racing
+            hydration and triggering "Extra attributes from the server"
+            mismatch warnings. */}
+        <Script src="https://kit.fontawesome.com/76e3c9c22e.js" crossOrigin="anonymous" />
         <PageLoader />
         <Navigation />
         

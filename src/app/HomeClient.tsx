@@ -107,16 +107,16 @@ export default function HomeClient() {
                     <p className="mb-[14px] text-[17px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
                     <div className="flex flex-wrap gap-2">
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-lightbulb text-[20px] bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center"></i>Innovation
+                        <i className="fas fa-lightbulb text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Innovation
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-gear text-[20px] bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center"></i>Technical excellence
+                        <i className="fas fa-gear text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Technical excellence
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-shield text-[20px] bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center"></i>Integrity
+                        <i className="fas fa-shield text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Integrity
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-street-view text-[20px] bg-td-accent text-white p-[3px] rounded-full inline-flex items-center justify-center"></i>Client-centric
+                        <i className="fas fa-street-view text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Client-centric
                       </span>
                     </div>
                   </>
@@ -159,7 +159,7 @@ export default function HomeClient() {
               <h3 className="text-[18px] text-white font-bold text-left mb-4 uppercase">Our Designs Are</h3>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-street-view text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-street-view text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Brand Conscious</span>
@@ -168,7 +168,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-lightbulb text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-lightbulb text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Intuitive</span>
@@ -177,7 +177,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-tablet text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-tablet text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Responsive</span>
@@ -186,7 +186,7 @@ export default function HomeClient() {
               </div>
               <div className="flex flex-row">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-gear text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-gear text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Engineered, Not Templated</span>
@@ -236,7 +236,7 @@ export default function HomeClient() {
               <div className="flex flex-col items-center justify-center text-center w-[82vw] xs:w-[300px] md:w-full md:max-w-[330px] min-h-[397px] mx-auto shrink-0 snap-center bg-td-purple/5 border border-td-purple/10 rounded-[35px] p-6">
                 <i className="!bg-transparent !p-0 fas fa-comment text-[28px] text-td-purple mb-3"></i>
                 <p className="text-[16px] font-[600] text-td-purple mb-2">Worked with us?</p>
-                <p className="text-[13px] text-gray-500 mb-4">We'd love to feature your story here — leave us a review and let us know.</p>
+                <p className="text-[13px] text-gray-600 mb-4">We'd love to feature your story here — leave us a review and let us know.</p>
                 <Link href="/review" className="inline-block text-[14px] px-5 py-2.5 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">
                   Leave a Review
                 </Link>

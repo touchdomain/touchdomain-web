@@ -13,11 +13,12 @@ export default function Footer() {
         <Link href="/" className="block w-[80%] md:w-[200px]">
           <div className="relative w-full h-[40px]">
             {/* Ensure brand.png is in your public/branding/ folder */}
-            <Image 
-              src="/branding/brand.png" 
-              alt="Touch Domain" 
-              fill 
-              className="object-contain object-left" 
+            <Image
+              src="/branding/brand.png"
+              alt="Touch Domain"
+              fill
+              sizes="200px"
+              className="object-contain object-left"
             />
           </div>
         </Link>
@@ -55,14 +56,14 @@ export default function Footer() {
       <div className="flex flex-col items-center md:items-start w-full md:w-auto">
         <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Social Media</h3>
         {/* We use !bg-transparent and !p-[5px] to override the global icon styles in globals.css */}
-        <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
-          <i className="!bg-transparent !p-0 fab fa-facebook text-[18px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch Domain
+        <a href="https://web.facebook.com/profile.php?id=61592261381746" target="_blank" rel="noopener noreferrer" aria-label="Touch Domain on Facebook" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
+          <i aria-hidden="true" className="!bg-transparent !p-0 fab fa-facebook text-[18px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch Domain
         </a>
-        <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
-          <i className="!bg-transparent !p-0 fab fa-instagram text-[18px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch domain
+        <a href="https://www.instagram.com/touchdomain/" target="_blank" rel="noopener noreferrer" aria-label="Touch Domain on Instagram" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit flex items-center group">
+          <i aria-hidden="true" className="!bg-transparent !p-0 fab fa-instagram text-[18px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch domain
         </a>
-        <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit flex items-center group">
-          <i className="!bg-transparent !p-0 fab fa-linkedin text-[18px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch domain
+        <a href="https://www.linkedin.com/company/touchdomain/?viewAsMember=true" target="_blank" rel="noopener noreferrer" aria-label="Touch Domain on LinkedIn" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit flex items-center group">
+          <i aria-hidden="true" className="!bg-transparent !p-0 fab fa-linkedin text-[18px] !text-white group-hover:!text-td-accent w-[25px] transition-colors"></i> Touch domain
         </a>
       </div>
 

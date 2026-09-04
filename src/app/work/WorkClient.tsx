@@ -78,11 +78,12 @@ export default function WorkClient() {
                 
                 {/* Project Image */}
                 <div className="relative w-full h-[200px] bg-slate-100">
-                  <Image 
-                    src={project.image} 
-                    alt={project.clientName} 
-                    fill 
-                    className="object-cover" 
+                  <Image
+                    src={project.image}
+                    alt={project.clientName}
+                    fill
+                    sizes="(max-width: 768px) 85vw, 350px"
+                    className="object-cover"
                   />
                   <span className="absolute top-3 left-3 bg-td-purple text-white text-[11px] font-[700] uppercase tracking-wide px-3 py-1 rounded-full">
                     {project.category}
@@ -122,7 +123,7 @@ export default function WorkClient() {
             <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
           </p>
 
-          <p className="text-center text-gray-400 text-[13px] max-w-2xl mx-auto mb-16 md:mb-[7rem] relative z-10">
+          <p className="text-center text-gray-600 text-[13px] max-w-2xl mx-auto mb-16 md:mb-[7rem] relative z-10">
             Have we worked together? We'd love to feature it here — <Link href="/review" className="text-td-accent underline hover:text-td-purple">leave us a review</Link> and let us know.
           </p>
 
