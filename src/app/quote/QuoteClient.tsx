@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FormStatus from './../../components/FormStatus';
@@ -37,41 +37,28 @@ export default function QuoteClient() {
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [features, setFeatures] = useState<string[]>([]);
   const [retainerFeatures, setRetainerFeatures] = useState<string[]>([]);
-  const [total, setTotal] = useState<number>(0);
-  const [monthlyTotal, setMonthlyTotal] = useState<number>(0);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Once-off project total — design, branding, content and their feature
+  // All three totals are derived straight from the selections during render —
+  // no effect, no stale-state window.
+  //
+  // Once-off project total: design, branding, content and their feature
   // checkboxes, each priced à la carte (base + markup, see itemPrice). The
-  // App Development tier is deliberately excluded here and surfaced on its
-  // own line (appTotal below): it's quoted "from", billed at base, and its
-  // scope varies too much to sit inside a firm project number.
-  useEffect(() => {
-    let currentTotal = 0;
-    Object.entries(selections).forEach(([category, val]) => {
-      if (category === 'App Development') return;
-      currentTotal += itemPrice(val);
-    });
-    features.forEach(feature => {
-      currentTotal += itemPrice(feature);
-    });
-    setTotal(currentTotal);
-  }, [selections, features]);
+  // App Development tier is deliberately excluded and surfaced on its own
+  // line (appTotal): it's quoted "from", billed at base, and its scope
+  // varies too much to sit inside a firm project number.
+  const total =
+    Object.entries(selections).reduce(
+      (sum, [category, val]) => (category === 'App Development' ? sum : sum + itemPrice(val)),
+      0,
+    ) + features.reduce((sum, feature) => sum + itemPrice(feature), 0);
 
-  // App development — a once-off cost billed at base price, shown on its own
-  // line rather than folded into the project total.
   const appTotal = priceOf(selections['App Development']);
 
-  // Ongoing Support total — calculated separately since it's a recurring
-  // monthly cost, not part of the once-off project estimate above.
-  useEffect(() => {
-    let currentMonthly = 0;
-    retainerFeatures.forEach(item => {
-      currentMonthly += priceOf(item);
-    });
-    setMonthlyTotal(currentMonthly);
-  }, [retainerFeatures]);
+  // Ongoing Support total — a recurring monthly cost, kept separate from the
+  // once-off project estimate above.
+  const monthlyTotal = retainerFeatures.reduce((sum, item) => sum + priceOf(item), 0);
 
   // A care plan already bundles one or more of the standalone monthly
   // retainers (see RETAINER_INCLUDES); those get removed from the estimate
