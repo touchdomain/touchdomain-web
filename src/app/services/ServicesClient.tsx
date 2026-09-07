@@ -199,7 +199,6 @@ export default function ServicesClient() {
         onOrder={handleOrderClick}
         features={[
           { name: "Social Media Graphics", tooltip: "5 visually striking static designs optimized for social platforms." },
-          { name: "Responsive Web Development", tooltip: "Your site will look and function flawlessly across all devices." },
           { name: "Animated GIFs", tooltip: "2 short-form, engaging, looping animations perfect for social or email." },
           { name: "Basic Digital Ad Banners", tooltip: "3 eye-catching variations for online advertising campaigns." },
           { name: "Image Curation & Optimization", tooltip: "Selection of high-quality stock images or optimization of your photos." }
