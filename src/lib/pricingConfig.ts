@@ -55,7 +55,7 @@ export const PRICING_MAP: Record<string, number> = {
   'App Essentials': 14500, 'App Growth': 32000, 'App Priority': 55000,
 };
 
-// Look up a price by option value; unknown / empty keys price at 0.
+// Look up a base price by option value; unknown / empty keys price at 0.
 export const priceOf = (key: string | undefined | null): number =>
   (key && PRICING_MAP[key]) || 0;
 
@@ -78,6 +78,32 @@ export const CARE_PLANS = ['Care Plan — Basic', 'Care Plan — Growth', 'Care 
 export const RETAINER_INCLUDES: Record<string, string[]> = {
   'Care Plan — Growth': ['Monthly Content Retainer'],
   'Care Plan — Scale': ['Monthly Content Retainer', 'Monthly SEO Retainer'],
+};
+
+// À-la-carte markup. Picking individual design / branding / content pieces
+// costs more than committing to a package that bundles the same scope, so
+// each once-off item in the quote builder is priced at base + this markup.
+// The app tiers and every monthly recurring plan (hosting, email, care
+// plans, standalone retainers) are exempt — they aren't sold inside a
+// package to begin with, so there's no bundle discount to claw back.
+export const A_LA_CARTE_MARKUP = 0.1; // 10%
+
+const MARKUP_EXEMPT = new Set<string>([
+  ...APP_TIERS,
+  ...HOSTING_TIERS,
+  ...EMAIL_TIERS,
+  ...CARE_PLANS,
+  'Monthly Content Retainer',
+  'Monthly SEO Retainer',
+]);
+
+// Price of a single once-off item as sold à la carte in the quote builder:
+// base price plus the markup, rounded to the nearest R10 to keep estimates
+// tidy. Exempt items and unknown keys return their base price unchanged.
+export const itemPrice = (key: string | undefined | null): number => {
+  const base = priceOf(key);
+  if (!base || (key && MARKUP_EXEMPT.has(key))) return base;
+  return Math.round((base * (1 + A_LA_CARTE_MARKUP)) / 10) * 10;
 };
 
 // Pure reducer for the Ongoing Support checkbox group. Selecting a care plan

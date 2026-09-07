@@ -7,6 +7,7 @@ import FormStatus from './../../components/FormStatus';
 import FAQCta from './../../components/FAQCta';
 import {
   priceOf,
+  itemPrice,
   applyRetainerToggle,
   HOSTING_TIERS,
   EMAIL_TIERS,
@@ -42,23 +43,24 @@ export default function QuoteClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Once-off project total — design, branding, content and their feature
-  // checkboxes. The App Development tier is deliberately excluded here and
-  // surfaced on its own line (appTotal below): it's quoted "from" and its
+  // checkboxes, each priced à la carte (base + markup, see itemPrice). The
+  // App Development tier is deliberately excluded here and surfaced on its
+  // own line (appTotal below): it's quoted "from", billed at base, and its
   // scope varies too much to sit inside a firm project number.
   useEffect(() => {
     let currentTotal = 0;
     Object.entries(selections).forEach(([category, val]) => {
       if (category === 'App Development') return;
-      currentTotal += priceOf(val);
+      currentTotal += itemPrice(val);
     });
     features.forEach(feature => {
-      currentTotal += priceOf(feature);
+      currentTotal += itemPrice(feature);
     });
     setTotal(currentTotal);
   }, [selections, features]);
 
-  // App development — a once-off cost, shown on its own line rather than
-  // folded into the project total.
+  // App development — a once-off cost billed at base price, shown on its own
+  // line rather than folded into the project total.
   const appTotal = priceOf(selections['App Development']);
 
   // Ongoing Support total — calculated separately since it's a recurring
