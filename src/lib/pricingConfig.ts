@@ -13,9 +13,11 @@
 // deliberately modest for the SME market.
 
 export const PRICING_MAP: Record<string, number> = {
-  // Web selects
-  'Informational': 4500, 'E-commerce Store': 9000, 'Portfolio/Personal': 3800, 'Blog/Content Hub': 5000,
-  'Up to 5 Pages': 1500, '6-10 Pages': 3000, '11-20 Pages': 5500, '20+ Pages': 8000,
+  // Web selects — the website type includes a standard set of ~5 core pages
+  // (home, about, services, contact, …); the "Additional Pages" tier only
+  // charges for pages beyond that.
+  'Informational': 6000, 'E-commerce Store': 10500, 'Portfolio/Personal': 5300, 'Blog/Content Hub': 6500,
+  '6-10 Pages': 1500, '11-20 Pages': 4000, '20+ Pages': 6500,
   'Yes': 1200, // Copywriting
   'Yes, I need stock images': 600,
 

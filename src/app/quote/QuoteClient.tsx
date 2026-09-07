@@ -237,7 +237,7 @@ export default function QuoteClient() {
                 
                 <div className="grid grid-cols-1 phone-lg:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     <div>
-                        <FieldLabel  htmlFor="q-website-type" text="Website Type" tooltip="The kind of site that best fits your business — this shapes the layout and features included." className="text-td-purple" />
+                        <FieldLabel  htmlFor="q-website-type" text="Website Type" tooltip="The kind of site that best fits your business. This shapes the layout and features, and includes a standard set of core pages (home, about, services, contact, and so on)." className="text-td-purple" />
                         <select id="q-website-type" className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Website Type')} value={selections['Website Type'] || ''}>
                             <option value="">Choose an option</option>
                             <option value="Informational">Informational</option>
@@ -247,13 +247,12 @@ export default function QuoteClient() {
                         </select>
                     </div>
                     <div>
-                        <FieldLabel htmlFor="q-number-of-pages" text="Number of Pages" tooltip="How many distinct pages you need, not counting individual blog posts or products." className="text-td-purple"  />
-                        <select id="q-number-of-pages" className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Number of Pages')} value={selections['Number of Pages'] || ''}>
-                            <option value="">Choose an option</option>
-                            <option value="Up to 5 Pages">Up to 5 Pages</option>
-                            <option value="6-10 Pages">6-10 Pages</option>
-                            <option value="11-20 Pages">11-20 Pages</option>
-                            <option value="20+ Pages">20+ Pages</option>
+                        <FieldLabel htmlFor="q-additional-pages" text="Additional Pages" tooltip="Your website type already includes a standard set of core pages. This is only for extra pages beyond that — not counting individual blog posts or products." className="text-td-purple"  />
+                        <select id="q-additional-pages" className="w-full border-none rounded-t-md border-b-[2px] border-td-purple px-4 py-3 text-[16px] bg-slate-50 text-gray-700 outline-none focus:ring-0 focus:border-td-accent focus:bg-white hover:bg-slate-100 transition-colors" onChange={(e) => handleSelectChange(e, 'Additional Pages')} value={selections['Additional Pages'] || ''}>
+                            <option value="">Standard set is enough</option>
+                            <option value="6-10 Pages">A few more — 6 to 10 pages total</option>
+                            <option value="11-20 Pages">Larger site — 11 to 20 pages total</option>
+                            <option value="20+ Pages">Big site — 20+ pages total</option>
                         </select>
                     </div>
                     <div>

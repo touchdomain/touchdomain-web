@@ -145,7 +145,7 @@ export default function ServicesClient() {
         className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto mt-0 md:mt-8 md:mx-0"
         onOrder={handleOrderClick}
         features={[
-          { name: "Custom Website Design", tooltip: "Up to 5 Pages tailored to reflect your brand's unique identity." },
+          { name: "Custom Website Design (Up to 5 Pages)", tooltip: "Five core pages — typically home, about, services, and contact — tailored to reflect your brand's unique identity." },
           { name: "Responsive Web Development", tooltip: "Functions flawlessly across all devices (desktop, tablet, mobile)." },
           { name: "Basic Content Integration", tooltip: "Placement of your provided text and images." },
           { name: "Initial SEO Setup", tooltip: "Fundamental search engine optimization to help discoverability." },
