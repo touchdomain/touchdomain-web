@@ -1,9 +1,10 @@
 export const generateBrandedEmail = (title: string, content: string) => {
   const currentYear = new Date().getFullYear();
   
-  // Falls back to the live deployed logo if APP_LOGO_URL isn't set — email clients
-  // need an absolute, publicly reachable URL (they can't load local/relative paths).
-  const logoUrl = process.env.APP_LOGO_URL || 'https://touchdomain.co.za/branding/logo-nav.png';
+  // Falls back to the live deployed white logo if APP_LOGO_URL isn't set —
+  // email clients need an absolute, publicly reachable URL (no local/relative
+  // paths), and the header band is dark purple so the logo must be white.
+  const logoUrl = process.env.APP_LOGO_URL || 'https://touchdomain.co.za/branding/touch-domain-logo-white.png';
 
   return `
   <!DOCTYPE html>

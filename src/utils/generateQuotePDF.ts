@@ -36,9 +36,8 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
   // purple header band rather than floating on white below a thin strip).
   let logoImage = null;
   try {
-    // Real vector logo (actual custom lettering, not a font approximation),
-    // recolored white for use on the solid purple header band.
-    const logoPath = path.join(process.cwd(), 'public', 'branding', 'logo-real-white.png');
+    // White logo for the solid purple header band.
+    const logoPath = path.join(process.cwd(), 'public', 'branding', 'touch-domain-logo-white.png');
     const logoBytes = fs.readFileSync(logoPath);
     logoImage = await pdfDoc.embedPng(logoBytes);
   } catch (err) {
