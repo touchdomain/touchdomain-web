@@ -22,7 +22,7 @@ export const faqItems = [
   },
   {
     question: "What's included in your website hosting?",
-    answer: "Every hosting tier includes free SSL, free daily backups, and a set number of email accounts under your own domain. Higher tiers add more storage, more mailboxes, and priority support response."
+    answer: "Every hosting tier includes free SSL, free weekly backups, and a set number of email accounts under your own domain. Higher tiers add more storage, more mailboxes, and priority support response."
   },
   {
     question: "Do you build mobile apps?",
@@ -46,6 +46,6 @@ export const faqItems = [
   },
   {
     question: "What happens if my site goes down?",
-    answer: "If we're hosting it, that's on us to sort out, and there's one team to call rather than juggling a separate designer, host, and email provider. Hosting plans include daily backups specifically so a problem doesn't mean losing your content."
+    answer: "If we're hosting it, that's on us to sort out, and there's one team to call rather than juggling a separate designer, host, and email provider. Hosting plans include weekly backups specifically so a problem doesn't mean losing your content."
   },
 ];

@@ -254,7 +254,7 @@ export default function ServicesClient() {
           { name: "2GB SSD Storage", tooltip: "Ample room for a focused brochure or informational website." },
           { name: "5 Email Accounts", tooltip: "Professional @yourdomain addresses for you and your team." },
           { name: "Free SSL Certificate", tooltip: "Every visitor connects securely, automatically — no extra cost." },
-          { name: "Free Daily Backups", tooltip: "Your site is backed up every day, so nothing is ever truly lost." },
+          { name: "Free Weekly Backups", tooltip: "Your site is backed up every week, so nothing is ever truly lost." },
           { name: "Standard Support", tooltip: "Email support with a response time you can rely on." }
         ]}
       />
@@ -267,7 +267,7 @@ export default function ServicesClient() {
           { name: "5GB SSD Storage", tooltip: "Comfortable headroom for e-commerce, blogs, and growing content." },
           { name: "15 Email Accounts", tooltip: "Enough professional addresses for a full small team." },
           { name: "Free SSL Certificate", tooltip: "Every visitor connects securely, automatically — no extra cost." },
-          { name: "Free Daily Backups", tooltip: "Your site is backed up every day, so nothing is ever truly lost." },
+          { name: "Free Weekly Backups", tooltip: "Your site is backed up every week, so nothing is ever truly lost." },
           { name: "Standard Support", tooltip: "Email support with a response time you can rely on." }
         ]}
       />
@@ -280,7 +280,7 @@ export default function ServicesClient() {
           { name: "10GB SSD Storage", tooltip: "Generous space for content-heavy or higher-traffic sites." },
           { name: "25 Email Accounts", tooltip: "Room for your whole team, with space left to grow." },
           { name: "Free SSL Certificate", tooltip: "Every visitor connects securely, automatically — no extra cost." },
-          { name: "Free Daily Backups", tooltip: "Your site is backed up every day, so nothing is ever truly lost." },
+          { name: "Free Weekly Backups", tooltip: "Your site is backed up every week, so nothing is ever truly lost." },
           { name: "Priority Support Response", tooltip: "Jump the queue when something needs our attention fast." }
         ]}
       />

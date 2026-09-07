@@ -200,7 +200,7 @@ export default function WorkClient() {
               </div>
               <div className="flex-1 flex items-center">
                 <p className="text-[14px] leading-relaxed">
-                  Built and hosted by the same team, so there's one person to call, not three — secure daily backups, real email under your own domain, billed monthly, cancel any time.
+                  Built and hosted by the same team, so there's one person to call, not three — secure weekly backups, real email under your own domain, billed monthly, cancel any time.
                 </p>
               </div>
               <div className="flex gap-2 pt-4">
