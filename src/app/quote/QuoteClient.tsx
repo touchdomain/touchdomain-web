@@ -5,56 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import FormStatus from './../../components/FormStatus';
 import FAQCta from './../../components/FAQCta';
-
-// Configure your base prices here (in ZAR)
-const PRICING_MAP: Record<string, number> = {
-  // Web Selects
-  'Informational': 2500, 'E-commerce Store': 8500, 'Portfolio/Personal': 2000, 'Blog/Content Hub': 3500,
-  'Up to 5 Pages': 1000, '6-10 Pages': 2000, '11-20 Pages': 3500, '20+ Pages': 5000,
-  'Yes': 1500, // Copywriting
-  'Yes, I need stock images': 800,
-  
-  // Web Checkboxes
-  'Website Security': 500, 'On-Page Optimization': 1200, 'Advanced SEO': 2500, 'Payment Gateway': 1500, 'Booking System': 1800, 
-  'User Account Functionality': 2500, 'Custom Functionality': 3000, 'CRM System': 4000,
-
-  // Brand Selects
-  '2 Initial Concepts': 1500, '3 Initial Concepts': 2200,
-  '2 Platforms': 800, '4 Platforms': 1400,
-  '5 Custom Icons': 600, '10 Custom Icons': 1000, '15 Custom Icons': 1400,
-  'Social Post Template': 500, 'Digital Ad Banner Template': 600, 'Email Marketing Template': 800,
-  'Master Slide Template': 800, '5-10 Slide Template': 1500, '10-20 Slide Template': 2500,
-  
-  // Brand Checkboxes
-  'Logo Variations': 500, 'Color Palette Definition': 400, 'Typography Selection': 400, 'Basic Brand Board': 800, 
-  'Letterhead Design': 400, 'Brand Voice': 1200, 'Graphic Patterns': 600, 'Email Signature Design': 300,
-
-  // Digital Selects
-  '5 Custom Designs': 1200, '10 Custom Designs': 2200, '20 Custom Designs': 4000,
-  '2 Short-Form GIFs': 800, '5 Short-Form GIFs': 1800, '10 Short-Form GIFs': 3200,
-  '1 Video (up to 30 seconds)': 1500, '3 Videos (up to 30 seconds each)': 4000, '5 Videos (up to 30 seconds each)': 6000,
-  'Basic Infographic (Single-page)': 1200, 'Complex Infographic (Multi-section/Interactive)': 2500,
-  'Captions for 5 Posts': 500, 'Captions for 10 Posts': 900, 'Captions for 20 Posts': 1600,
-  '3 Ad Banner Sizes/Variations': 900, '5 Ad Banner Sizes/Variations': 1400, 'Custom Ad Banner Set': 2000,
-  'Up to 60 Seconds': 3500, '60-90 Seconds': 4500, '90-120 Seconds': 5500,
-  'Up to 30 Seconds Animation': 2000, '30-60 Seconds Animation': 3500, 'Custom Animation': 5000,
-
-  // Digital Checkboxes
-  'Profile Image Optimization': 300, 'Newsletter Header Design': 500, 'Animated Logo Reveal': 1500,
-
-  // Ongoing Support (billed monthly, kept separate from the once-off project total)
-  'Care Plan — Basic': 1800, 'Care Plan — Growth': 3500, 'Care Plan — Scale': 6500,
-  // Website Hosting — mutually exclusive tiers, selected via dropdown further down.
-  'Hosting — Foundation': 89, 'Hosting — Growth': 159, 'Hosting — Priority': 249,
-  // Email-only — an alternative to a full hosting tier, not stacked with it.
-  'Email — Starter': 35, 'Email — Team': 65, 'Email — Business': 99,
-  'Monthly Content Retainer': 2800, 'Monthly SEO Retainer': 3200,
-
-  // App Development — once-off, but priced "from" like Digital Dominator,
-  // since real custom scope varies too much for a fixed number. The
-  // calculator uses the starting price as its estimate.
-  'App Essentials': 14500, 'App Growth': 32000, 'App Priority': 55000,
-};
+import {
+  priceOf,
+  applyRetainerToggle,
+  HOSTING_TIERS,
+  EMAIL_TIERS,
+  CARE_PLANS,
+  RETAINER_INCLUDES,
+} from './../../lib/pricingConfig';
 
 
 // Same pure-CSS group-hover tooltip mechanism already used and proven in
@@ -83,29 +41,41 @@ export default function QuoteClient() {
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Dynamic Calculator
+  // Once-off project total — design, branding, content and their feature
+  // checkboxes. The App Development tier is deliberately excluded here and
+  // surfaced on its own line (appTotal below): it's quoted "from" and its
+  // scope varies too much to sit inside a firm project number.
   useEffect(() => {
     let currentTotal = 0;
-    // Add dropdown selections
-    Object.values(selections).forEach(val => {
-      if (PRICING_MAP[val]) currentTotal += PRICING_MAP[val];
+    Object.entries(selections).forEach(([category, val]) => {
+      if (category === 'App Development') return;
+      currentTotal += priceOf(val);
     });
-    // Add checked features
     features.forEach(feature => {
-      if (PRICING_MAP[feature]) currentTotal += PRICING_MAP[feature];
+      currentTotal += priceOf(feature);
     });
     setTotal(currentTotal);
   }, [selections, features]);
+
+  // App development — a once-off cost, shown on its own line rather than
+  // folded into the project total.
+  const appTotal = priceOf(selections['App Development']);
 
   // Ongoing Support total — calculated separately since it's a recurring
   // monthly cost, not part of the once-off project estimate above.
   useEffect(() => {
     let currentMonthly = 0;
     retainerFeatures.forEach(item => {
-      if (PRICING_MAP[item]) currentMonthly += PRICING_MAP[item];
+      currentMonthly += priceOf(item);
     });
     setMonthlyTotal(currentMonthly);
   }, [retainerFeatures]);
+
+  // A care plan already bundles one or more of the standalone monthly
+  // retainers (see RETAINER_INCLUDES); those get removed from the estimate
+  // and disabled in the UI while that plan is selected.
+  const activeCarePlan = retainerFeatures.find(f => CARE_PLANS.includes(f));
+  const bundledRetainers = activeCarePlan ? RETAINER_INCLUDES[activeCarePlan] ?? [] : [];
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, category: string) => {
     setSelections(prev => ({ ...prev, [category]: e.target.value }));
@@ -120,9 +90,7 @@ export default function QuoteClient() {
 
   const handleRetainerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
-    setRetainerFeatures(prev =>
-      checked ? [...prev, value] : prev.filter(f => f !== value)
-    );
+    setRetainerFeatures(prev => applyRetainerToggle(prev, value, checked));
   };
 
   // Hosting and Email tiers are mutually exclusive with EACH OTHER too, not
@@ -131,8 +99,6 @@ export default function QuoteClient() {
   // redundant, and vice versa. Both still feed into the same
   // retainerFeatures array (and therefore the same monthly total) as
   // everything else in this section.
-  const HOSTING_TIERS = ['Hosting — Foundation', 'Hosting — Growth', 'Hosting — Priority'];
-  const EMAIL_TIERS = ['Email — Starter', 'Email — Team', 'Email — Business'];
   const handleHostingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setRetainerFeatures(prev => {
@@ -155,9 +121,10 @@ export default function QuoteClient() {
 
     const form = e.target as HTMLFormElement;
     
-    // Combine selects and checkboxes for the PDF payload
+    // Combine selects and checkboxes for the PDF payload. Drop dropdowns left
+    // on "Choose an option" (empty value) so they don't render as blank lines.
     const combinedSelections = {
-        ...selections,
+        ...Object.fromEntries(Object.entries(selections).filter(([, v]) => v)),
         'Additional Features': features.length > 0 ? features.join(', ') : 'None',
         'Ongoing Support': retainerFeatures.length > 0 ? retainerFeatures.join(', ') : 'None'
     };
@@ -165,6 +132,7 @@ export default function QuoteClient() {
     const quoteData = {
       selections: combinedSelections,
       estimatedTotal: total.toLocaleString('en-ZA'),
+      estimatedApp: appTotal.toLocaleString('en-ZA'),
       estimatedMonthly: monthlyTotal.toLocaleString('en-ZA'),
       clientName: (form.querySelector('#clientNameInput') as HTMLInputElement).value,
       clientEmail: (form.querySelector('#clientEmailInput') as HTMLInputElement).value,
@@ -468,7 +436,7 @@ export default function QuoteClient() {
                 {/* App Development Section */}
                 <h4 className="text-xl font-bold text-td-purple mt-10">App Development <span className="text-sm font-normal text-gray-500">(Optional)</span></h4>
                 <hr className="my-3 border-gray-200" />
-                <p className="text-sm text-gray-600 mb-4">From an installable, offline-ready web app to a fully custom platform with real business logic behind it — priced separately since scope varies widely.</p>
+                <p className="text-sm text-gray-600 mb-4">From an installable, offline-ready web app to a fully custom platform with real business logic behind it. Quoted &ldquo;from&rdquo; and shown on its own line below, since real app scope varies too widely for a firm number here.</p>
 
                 <div className="grid grid-cols-1 phone-lg:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
                     <div>
@@ -539,8 +507,11 @@ export default function QuoteClient() {
                     { name: 'Care Plan — Scale', tooltip: 'Everything in Growth, plus an ongoing SEO retainer and monthly performance reporting.' },
                     { name: 'Monthly Content Retainer', tooltip: 'A recurring batch of social graphics and captions delivered every month.' },
                     { name: 'Monthly SEO Retainer', tooltip: 'Ongoing on-page and technical SEO work to keep improving search visibility.' },
-                  ].map(item => (
-                    <div className="form-check" key={item.name}>
+                  ].map(item => {
+                    const isBundled = bundledRetainers.includes(item.name);
+                    const planName = activeCarePlan?.replace('Care Plan — ', '');
+                    return (
+                    <div className={`form-check ${isBundled ? 'opacity-50' : ''}`} key={item.name}>
                       <input
                         className="form-check-input mr-2"
                         type="checkbox"
@@ -548,12 +519,15 @@ export default function QuoteClient() {
                         id={item.name.replace(/\s+/g, '')}
                         onChange={handleRetainerChange}
                         checked={retainerFeatures.includes(item.name)}
+                        disabled={isBundled}
                       />
-                      <label className="form-check-label text-sm" htmlFor={item.name.replace(/\s+/g, '')} title={item.tooltip}>
+                      <label className="form-check-label text-sm" htmlFor={item.name.replace(/\s+/g, '')} title={isBundled ? `Already included in the ${planName} care plan` : item.tooltip}>
                         {item.name}
+                        {isBundled && <span className="block text-[11px] text-gray-400 font-normal">included in the {planName} plan</span>}
                       </label>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {monthlyTotal > 0 && (
@@ -570,8 +544,20 @@ export default function QuoteClient() {
                 {/* Checkout / Client Details */}
                 <div id="price" className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                     <div className="est-total text-center mb-6">
-                        <h4 className="text-lg font-semibold text-gray-600">Your Estimated Project Total <span className="text-sm font-normal">(Once-Off)</span></h4>
-                        <p className="est-price text-4xl font-bold text-td-purple">R {total.toLocaleString('en-ZA')}</p>
+                        {total === 0 && appTotal > 0 ? (
+                          <>
+                            <h4 className="text-lg font-semibold text-gray-600">Your Estimated App Build <span className="text-sm font-normal">(From, Once-Off)</span></h4>
+                            <p className="est-price text-4xl font-bold text-td-purple">R {appTotal.toLocaleString('en-ZA')}</p>
+                          </>
+                        ) : (
+                          <>
+                            <h4 className="text-lg font-semibold text-gray-600">Your Estimated Project Total <span className="text-sm font-normal">(Once-Off)</span></h4>
+                            <p className="est-price text-4xl font-bold text-td-purple">R {total.toLocaleString('en-ZA')}</p>
+                            {appTotal > 0 && (
+                              <p className="text-sm text-td-accent font-semibold mt-2">+ R {appTotal.toLocaleString('en-ZA')} for the app build (quoted from)</p>
+                            )}
+                          </>
+                        )}
                         {monthlyTotal > 0 && (
                           <p className="text-sm text-td-accent font-semibold mt-2">+ R {monthlyTotal.toLocaleString('en-ZA')} / month</p>
                         )}

@@ -8,6 +8,7 @@ interface QuoteData {
   clientPhone: string;
   selections: Record<string, string>;
   estimatedTotal: number | string;
+  estimatedApp?: number | string;
   estimatedMonthly?: number | string;
 }
 
@@ -51,6 +52,7 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
   // content instead, capped at a full A4 (where the existing pagination logic
   // below takes over for genuinely long quotes).
   const selectionCount = data.selections ? Object.keys(data.selections).length : 0;
+  const hasApp = !!(data.estimatedApp && Number(String(data.estimatedApp).replace(/,/g, '')) > 0);
   const hasMonthly = !!(data.estimatedMonthly && Number(String(data.estimatedMonthly).replace(/,/g, '')) > 0);
   const estimatedContentHeight =
     HEADER_HEIGHT +          // header band
@@ -61,6 +63,7 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
     (selectionCount * 20) +  // one line per selection
     45 +                     // divider + spacing before totals
     22 +                     // total line
+    (hasApp ? 20 : 0) +      // optional app-development line
     (hasMonthly ? 20 : 0) +  // optional monthly line
     100 +                    // disclaimer box
     FOOTER_HEIGHT +
@@ -188,6 +191,13 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
   const totalWidth = helveticaBold.widthOfTextAtSize(totalText, 14);
   page.drawText(totalText, { x: PAGE_WIDTH - leftMargin - totalWidth, y: cursorY, size: 14, font: helveticaBold, color: hexToRgb('#452c63') });
   cursorY -= 22;
+
+  if (hasApp) {
+    const appText = `App Development (quoted from): R ${data.estimatedApp}`;
+    const appWidth = helvetica.widthOfTextAtSize(appText, 12);
+    page.drawText(appText, { x: PAGE_WIDTH - leftMargin - appWidth, y: cursorY, size: 12, font: helvetica, color: hexToRgb('#9972ab') });
+    cursorY -= 20;
+  }
 
   if (hasMonthly) {
     const monthlyText = `Optional Monthly Retainer: R ${data.estimatedMonthly} / month`;

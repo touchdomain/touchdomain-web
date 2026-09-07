@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     
-    const { clientName, clientEmail, clientPhone, selections, estimatedTotal, estimatedMonthly, website } = body;
+    const { clientName, clientEmail, clientPhone, selections, estimatedTotal, estimatedApp, estimatedMonthly, website } = body;
 
     // Honeypot check — silently report success without sending mail or doing any work.
     if (website) {
@@ -34,6 +34,7 @@ export async function POST(request: Request) {
       clientPhone,
       selections,
       estimatedTotal,
+      estimatedApp,
       estimatedMonthly
     });
 
