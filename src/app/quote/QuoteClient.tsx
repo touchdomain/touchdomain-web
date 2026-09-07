@@ -563,8 +563,13 @@ export default function QuoteClient() {
                         {monthlyTotal > 0 && (
                           <p className="text-sm text-td-accent font-semibold mt-2">+ R {monthlyTotal.toLocaleString('en-ZA')} / month</p>
                         )}
+                        {total > 0 && (
+                          <p className="text-[11px] text-gray-400 mt-3 max-w-md mx-auto">
+                            Individual items are priced à la carte; a <Link href="/services" className="underline hover:text-td-accent">package</Link> works out cheaper.
+                          </p>
+                        )}
                     </div>
-                    
+
                     <h3 className="text-xl font-bold mb-2">Ready To Get Started?</h3>
                     <p className="text-sm text-gray-600 mb-6">
                         This quotation is an estimation based on your initial selections. The final price may vary based on your specific requirements. 

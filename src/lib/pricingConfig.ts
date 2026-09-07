@@ -41,8 +41,8 @@ export const PRICING_MAP: Record<string, number> = {
   'Profile Image Optimization': 300, 'Newsletter Header Design': 500, 'Animated Logo Reveal': 1500,
 
   // Ongoing support — recurring monthly
-  'Care Plan — Basic': 1800, 'Care Plan — Growth': 3500, 'Care Plan — Scale': 6500,
-  'Monthly Content Retainer': 2800, 'Monthly SEO Retainer': 3200,
+  'Care Plan — Basic': 800, 'Care Plan — Growth': 1525, 'Care Plan — Scale': 2368,
+  'Monthly Content Retainer': 1325, 'Monthly SEO Retainer': 2658,
 
   // Website hosting — recurring monthly
   'Hosting — Foundation': 89, 'Hosting — Growth': 159, 'Hosting — Priority': 249,
