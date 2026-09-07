@@ -77,10 +77,11 @@ export default function AboutClient() {
             <div className="w-full md:w-[60%] border border-td-purple/15 rounded-[24px] p-6 md:p-8 bg-white shadow-sm">
 
               <div className="flex items-center gap-[10px] mb-5">
-                <i className="!bg-transparent fas fa-compass text-td-purple text-[20px] !p-0"></i>
+                <i className="!bg-transparent fas fa-compass text-[20px] text-td-purple text-[20px] !p-0"></i>
                 <span className="text-td-purple font-[700] text-[17px]">What Guides Us</span>
               </div>
 
+              {/*Pill tab bar*/}
               <nav role="tablist" aria-label="Mission, Vision, and Values" className="inline-flex !bg-td-purple/8 rounded-full p-1 mb-4" style={{ backgroundColor: '#372A6624' }}>
                 <button
                   role="tab"
@@ -102,59 +103,56 @@ export default function AboutClient() {
                 >Values</button>
               </nav>
 
+              {/* Tinted card wrapper so this side has the same visual weight as "Our Designs Are" */}
               <div role="tabpanel" className="mt-2">
                 {activeTab === 'mission' && (
                   <>
-                    <p className="mb-[12px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
-                    <p className="mb-[16px]">We firmly believe that in today's digital landscape, every business, regardless of size or industry, deserves the opportunity to not just exist online, but to operate flawlessly and truly thrive. Too often, we see a vast chasm between a business's untapped potential and their current digital and technical reality.</p>
+                    <p className="mb-[14px] text-[17px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
                     <div className="flex flex-wrap gap-2">
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-lightbulb bg-td-accent text-white text-[16px] p-[6px] rounded-full inline-flex items-center justify-center"></i>Innovation
+                        <i className="fas fa-lightbulb text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Innovation
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-gear bg-td-accent text-white text-[16px] p-[6px] rounded-full inline-flex items-center justify-center"></i>Technical excellence
+                        <i className="fas fa-gear text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Technical excellence
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-shield bg-td-accent text-white text-[16px] p-[6px] rounded-full inline-flex items-center justify-center"></i>Integrity
+                        <i className="fas fa-shield text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Integrity
                       </span>
                       <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
-                        <i className="fas fa-street-view bg-td-accent text-white text-[16px] p-[6px] rounded-full inline-flex items-center justify-center"></i>Client-centric
+                        <i className="fas fa-street-view text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Client-centric
                       </span>
                     </div>
                   </>
                 )}
 
                 {activeTab === 'vision' && (
-                  <>
-                    <p className="mb-[12px]">To empower businesses with comprehensive digital engineering and creative solutions that unlock their full potential, elevate their brand presence, and drive sustained, unprecedented growth, enabling them to lead in their industries and thrive in the dynamic digital landscape.</p>
-                    <p className="mb-[12px]">Our vision extends far beyond simply building websites; we aim to be the catalyst that propels businesses into new realms of digital achievement. We see a future where our clients are not just participants in the online world, but confident leaders setting benchmarks for engagement and innovation.</p>
-                  </>
+                  <p className="mb-[12px] text-[17px]">To empower businesses with comprehensive digital engineering and creative solutions that unlock their full potential, elevate their brand presence, and drive sustained, unprecedented growth, enabling them to lead in their industries and thrive in the dynamic digital landscape.</p>
                 )}
 
                 {activeTab === 'values' && (
                   <div className="text-[15px]">
-                    <div className="flex justify-center flex-col lg:flex-row lg:gap-x-10">
+                    <div className="flex justify-center flex-col md:flex-row md:gap-x-10">
                       <div className="flex-1">
-                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">1</span></div> Client-Centric Collaboration</h5>
-                        <p className="ml-[30px] mb-[12px]">At the heart of our approach lies a commitment to Client-Centric Collaboration. We don't just work for you; we work with you, forging strong partnerships built on open communication and shared goals. Your vision is paramount, and by working hand-in-hand, we ensure the final digital experience truly reflects your unique identity and objectives, leading to impactful and resonant results.</p>
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">1</span></div> Client-Centric Collaboration</h5>
+                        <p className="ml-[30px] mb-[12px]">We believe in building strong, collaborative partnerships with our clients.</p>
                       </div>
                       <div className="flex-1">
-                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">2</span></div> Innovation</h5>
-                        <p className="ml-[30px] mb-[12px]">Fueling our creative process is a deep-seated culture of Innovation. We're not content with the status quo; instead, we actively embrace new technologies and explore imaginative solutions to overcome challenges and elevate the digital experiences we craft. This constant drive to evolve ensures that your brand benefits from the most cutting-edge and effective online strategies, keeping you ahead of the curve.</p>
-                      </div>
-                    </div>
-                    <div className="flex justify-center flex-col lg:flex-row lg:gap-x-10">
-                      <div className="flex-1">
-                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">3</span></div> Integrity</h5>
-                        <p className="ml-[30px] mb-[12px]">Integrity is the bedrock of our operations at Touch Domain. We believe in conducting every aspect of our business with unwavering ethical standards, ensuring complete honesty, transparency, and fairness in all our interactions. This commitment to strong moral principles fosters trust and reliability, building a solid foundation for lasting partnerships and the delivery of dependable digital solutions.</p>
-                      </div>
-                      <div className="flex-1">
-                        <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">4</span></div> Continuous Learning</h5>
-                        <p className="ml-[30px] mb-[12px]">In the ever-evolving digital landscape, our commitment to Continuous Learning is paramount. We recognize that staying ahead means actively pursuing knowledge and mastering the latest trends and technologies. This dedication to growth ensures that we consistently deliver cutting-edge solutions and strategic insights that empower your brand to not just adapt, but to thrive in the dynamic online world.</p>
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">2</span></div> Innovation</h5>
+                        <p className="ml-[30px] mb-[12px]">We embrace a culture of continuous innovation, constantly seeking new and creative ways to solve problems and improve our services.</p>
                       </div>
                     </div>
-                    <h5 className="flex items-center text-[16px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">5</span></div> Accountability</h5>
-                    <p className="ml-[30px] mb-[12px]">At Touch Domain, Accountability is a cornerstone of our service. We embrace complete ownership of every project we undertake, standing firmly behind our work and taking full responsibility for our actions. This commitment ensures that we are dedicated to delivering exceptional results and fostering a relationship of trust and reliability with our clients, knowing that we are always answerable for our performance.</p>
+                    <div className="flex justify-center flex-col md:flex-row md:gap-x-10">
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">3</span></div> Integrity</h5>
+                        <p className="ml-[30px] mb-[12px]">We conduct our business with the highest ethical standards, demonstrating honesty, transparency, and fairness in all our interactions.</p>
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">4</span></div> Continuous Learning</h5>
+                        <p className="ml-[30px] mb-[12px]">We are dedicated to ongoing learning and development, recognizing that the digital landscape is constantly evolving.</p>
+                      </div>
+                    </div>
+                    <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">5</span></div> Accountability</h5>
+                    <p className="ml-[30px] mb-[12px]">We take ownership of our work and are accountable for our actions.</p>
                   </div>
                 )}
               </div>
@@ -164,7 +162,7 @@ export default function AboutClient() {
               <h3 className="text-[18px] text-white font-bold text-left mb-4 uppercase">Our Designs Are</h3>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-street-view text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-street-view text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Brand Conscious</span>
@@ -173,7 +171,7 @@ export default function AboutClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-lightbulb text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-lightbulb text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Intuitive</span>
@@ -182,7 +180,7 @@ export default function AboutClient() {
               </div>
               <div className="flex flex-row mb-3">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-tablet text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-tablet text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Responsive</span>
@@ -191,7 +189,7 @@ export default function AboutClient() {
               </div>
               <div className="flex flex-row">
                 <div className="ml-[5px] mr-[4px]">
-                  <i className="fas fa-gear text-[20px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[6px] text-center inline-flex items-center justify-center"></i>
+                  <i className="fas fa-gear text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
                 </div>
                 <div>
                   <span className="text-[14px] font-[700] block">Engineered, Not Templated</span>

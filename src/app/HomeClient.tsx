@@ -78,7 +78,7 @@ export default function HomeClient() {
                 <span className="text-td-purple font-[700] text-[17px]">What Guides Us</span>
               </div>
 
-              {/* Pill tab bar — replaces the outlined-box tabs */}
+              {/*Pill tab bar*/}
               <nav role="tablist" aria-label="Mission, Vision, and Values" className="inline-flex !bg-td-purple/8 rounded-full p-1 mb-4" style={{ backgroundColor: '#372A6624' }}>
                 <button
                   role="tab"
