@@ -4,41 +4,48 @@
 // checkbox `value` strings in QuoteClient — an option whose value isn't a
 // key in PRICING_MAP silently prices at R0, so keep the two in sync when
 // adding or renaming anything.
+//
+// The once-off design / branding / content items are calibrated against the
+// fixed packages on /services: rebuilding a package's core contents à la
+// carte (with the +10% markup, see itemPrice) lands roughly 10–25% above
+// the package price, so a package is always the better deal. Hosting, email
+// and the app tiers are copied verbatim from /services. Prices are kept
+// deliberately modest for the SME market.
 
 export const PRICING_MAP: Record<string, number> = {
   // Web selects
-  'Informational': 2500, 'E-commerce Store': 8500, 'Portfolio/Personal': 2000, 'Blog/Content Hub': 3500,
-  'Up to 5 Pages': 1000, '6-10 Pages': 2000, '11-20 Pages': 3500, '20+ Pages': 5000,
-  'Yes': 1500, // Copywriting
-  'Yes, I need stock images': 800,
+  'Informational': 4500, 'E-commerce Store': 9000, 'Portfolio/Personal': 3800, 'Blog/Content Hub': 5000,
+  'Up to 5 Pages': 1500, '6-10 Pages': 3000, '11-20 Pages': 5500, '20+ Pages': 8000,
+  'Yes': 1200, // Copywriting
+  'Yes, I need stock images': 600,
 
   // Web checkboxes
-  'Website Security': 500, 'On-Page Optimization': 1200, 'Advanced SEO': 2500, 'Payment Gateway': 1500, 'Booking System': 1800,
-  'User Account Functionality': 2500, 'Custom Functionality': 3000, 'CRM System': 4000,
+  'Website Security': 600, 'On-Page Optimization': 1300, 'Advanced SEO': 2200, 'Payment Gateway': 1800, 'Booking System': 2000,
+  'User Account Functionality': 2500, 'Custom Functionality': 2800, 'CRM System': 3200,
 
   // Brand selects
-  '2 Initial Concepts': 1500, '3 Initial Concepts': 2200,
-  '2 Platforms': 800, '4 Platforms': 1400,
-  '5 Custom Icons': 600, '10 Custom Icons': 1000, '15 Custom Icons': 1400,
-  'Social Post Template': 500, 'Digital Ad Banner Template': 600, 'Email Marketing Template': 800,
-  'Master Slide Template': 800, '5-10 Slide Template': 1500, '10-20 Slide Template': 2500,
+  '2 Initial Concepts': 1700, '3 Initial Concepts': 2600,
+  '2 Platforms': 500, '4 Platforms': 900,
+  '5 Custom Icons': 600, '10 Custom Icons': 1100, '15 Custom Icons': 1500,
+  'Social Post Template': 450, 'Digital Ad Banner Template': 500, 'Email Marketing Template': 650,
+  'Master Slide Template': 700, '5-10 Slide Template': 1400, '10-20 Slide Template': 2200,
 
   // Brand checkboxes
-  'Logo Variations': 500, 'Color Palette Definition': 400, 'Typography Selection': 400, 'Basic Brand Board': 800,
-  'Letterhead Design': 400, 'Brand Voice': 1200, 'Graphic Patterns': 600, 'Email Signature Design': 300,
+  'Logo Variations': 450, 'Color Palette Definition': 400, 'Typography Selection': 400, 'Basic Brand Board': 550,
+  'Letterhead Design': 450, 'Brand Voice': 900, 'Graphic Patterns': 550, 'Email Signature Design': 300,
 
   // Digital selects
-  '5 Custom Designs': 1200, '10 Custom Designs': 2200, '20 Custom Designs': 4000,
-  '2 Short-Form GIFs': 800, '5 Short-Form GIFs': 1800, '10 Short-Form GIFs': 3200,
-  '1 Video (up to 30 seconds)': 1500, '3 Videos (up to 30 seconds each)': 4000, '5 Videos (up to 30 seconds each)': 6000,
-  'Basic Infographic (Single-page)': 1200, 'Complex Infographic (Multi-section/Interactive)': 2500,
+  '5 Custom Designs': 1800, '10 Custom Designs': 3200, '20 Custom Designs': 5800,
+  '2 Short-Form GIFs': 800, '5 Short-Form GIFs': 1700, '10 Short-Form GIFs': 3000,
+  '1 Video (up to 30 seconds)': 2000, '3 Videos (up to 30 seconds each)': 4800, '5 Videos (up to 30 seconds each)': 7000,
+  'Basic Infographic (Single-page)': 1300, 'Complex Infographic (Multi-section/Interactive)': 2500,
   'Captions for 5 Posts': 500, 'Captions for 10 Posts': 900, 'Captions for 20 Posts': 1600,
-  '3 Ad Banner Sizes/Variations': 900, '5 Ad Banner Sizes/Variations': 1400, 'Custom Ad Banner Set': 2000,
-  'Up to 60 Seconds': 3500, '60-90 Seconds': 4500, '90-120 Seconds': 5500,
-  'Up to 30 Seconds Animation': 2000, '30-60 Seconds Animation': 3500, 'Custom Animation': 5000,
+  '3 Ad Banner Sizes/Variations': 800, '5 Ad Banner Sizes/Variations': 1200, 'Custom Ad Banner Set': 1800,
+  'Up to 60 Seconds': 3800, '60-90 Seconds': 4800, '90-120 Seconds': 6000,
+  'Up to 30 Seconds Animation': 2200, '30-60 Seconds Animation': 3600, 'Custom Animation': 5000,
 
   // Digital checkboxes
-  'Profile Image Optimization': 300, 'Newsletter Header Design': 500, 'Animated Logo Reveal': 1500,
+  'Profile Image Optimization': 300, 'Newsletter Header Design': 500, 'Animated Logo Reveal': 1400,
 
   // Ongoing support — recurring monthly
   'Care Plan — Basic': 800, 'Care Plan — Growth': 1525, 'Care Plan — Scale': 2368,
