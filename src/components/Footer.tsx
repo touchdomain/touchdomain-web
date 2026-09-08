@@ -48,8 +48,10 @@ export default function Footer() {
       {/* ── Information Column ── */}
       <div className="flex flex-col items-center md:items-start w-full md:w-auto">
         <h3 className="text-white text-[1.17em] font-bold mb-3 capitalize text-center md:text-left">Information</h3>
-        <Link href="/terms" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Terms & conditions</Link>
-        <Link href="/privacy" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit">Privacy policy</Link>
+        <Link href="/terms" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Terms &amp; Conditions</Link>
+        <Link href="/privacy" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">Privacy Policy</Link>
+        <Link href="/paia-manual" className="block text-white hover:text-td-accent transition-colors text-[14px] mb-1 w-fit">PAIA Manual</Link>
+        <Link href="/ecta-disclosure" className="block text-white hover:text-td-accent transition-colors text-[14px] w-fit">ECTA Disclosure</Link>
       </div>
 
       {/* ── Social Media Column ── */}

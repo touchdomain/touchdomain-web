@@ -29,6 +29,8 @@ const sections = [
     links: [
       { href: '/terms', label: 'Terms & Conditions' },
       { href: '/privacy', label: 'Privacy Policy' },
+      { href: '/paia-manual', label: 'PAIA Manual' },
+      { href: '/ecta-disclosure', label: 'ECTA Disclosure' },
     ],
   },
 ];

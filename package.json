@@ -33,6 +33,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "stylelint": "stylelint \"**/*.css\""
+    "stylelint": "stylelint \"**/*.css\"",
+    "gen:legal": "node scripts/generate-legal-pdfs.mjs"
   }
 }
