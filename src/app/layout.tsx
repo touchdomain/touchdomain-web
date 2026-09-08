@@ -76,20 +76,26 @@ export const metadata: Metadata = {
 
 // LocalBusiness / ProfessionalService structured data — helps Google
 // understand what Touch Domain actually is (a South African digital
-// studio), independent of whatever page someone lands on first.
-// NOTE: address is deliberately omitted rather than guessed — add your real
-// registered business address here once you're ready to include it; that
-// would meaningfully strengthen local search relevance beyond what this
-// covers today.
+// studio), independent of whatever page someone lands on first. The
+// registered address matches the legal documents (src/data/legal.mjs).
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   "name": "Touch Domain",
+  "legalName": "TOUCHDOMAIN (Pty) Ltd",
   "description": SITE_DESCRIPTION,
   "url": SITE_URL,
   "telephone": "+27813276153",
   "email": "info@touchdomain.co.za",
   "areaServed": "South Africa",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "96 Makgathe Street, Ipelegeng",
+    "addressLocality": "Schweizer-Reneke",
+    "postalCode": "2780",
+    "addressRegion": "North West",
+    "addressCountry": "ZA",
+  },
   "sameAs": [
     "https://web.facebook.com/profile.php?id=61592261381746",
     "https://www.instagram.com/touchdomain/",
