@@ -40,26 +40,48 @@ export const generateBrandedEmail = (title: string, content: string) => {
                           </td>
                       </tr>
 
-                      <!-- ─── FOOTER ─── -->
+                      <!-- ─── FOOTER / SIGNATURE ─── -->
                       <tr>
-                          <td style="background-color: #f9f9f9; padding: 30px 40px; border-top: 1px solid #eeeeee; text-align: center;">
-                              <p style="margin: 0 0 10px 0; font-size: 14px; color: #666666; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                                  Touch Domain
-                              </p>
-                              <p style="margin: 0 0 15px 0; font-size: 13px; color: #9972ab;">
-                                  Crafting Brands. Engineering Digital Experiences.
-                              </p>
-                              <p style="margin: 0; font-size: 12px; color: #aaaaaa;">
-                                  <a href="https://touchdomain.co.za" style="color: #9972ab; text-decoration: none;">touchdomain.co.za</a> 
-                                  &nbsp;|&nbsp; 
-                                  <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color: #9972ab; text-decoration: none;">${CUSTOMER_CONTACT_EMAIL}</a>
-                              </p>
-                              <p style="margin: 15px 0 0 0; font-size: 11px; color: #cccccc;">
-                                  &copy; ${currentYear} Touch Domain. All rights reserved.
-                              </p>
+                          <td style="background-color: #ffffff; padding: 28px 40px 32px 40px; border-top: 1px solid #eeeeee;">
+                              <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
+                                <tr>
+                                  <td style="padding-right:16px;border-right:2px solid #9972ab;" valign="middle" width="56">
+                                    <img src="https://touchdomain.co.za/branding/email/signature-mark.png" width="40" height="43" alt="Touch Domain" style="display:block;border:0;">
+                                  </td>
+                                  <td style="padding-left:16px;" valign="middle">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                      <tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#452c63;padding-bottom:2px;">Your Helper</td></tr>
+                                      <tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#2a1b3d;line-height:1.7;">
+                                        <a href="tel:+27813276153" style="color:#2a1b3d;text-decoration:none;">+27 81 327 6153</a><br>
+                                        <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color:#2a1b3d;text-decoration:none;">${CUSTOMER_CONTACT_EMAIL}</a><br>
+                                        <a href="https://touchdomain.co.za" style="color:#9972ab;text-decoration:none;">www.touchdomain.co.za</a>
+                                      </td></tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td colspan="2" style="padding-top:14px;">
+                                    <a href="https://touchdomain.co.za/quote" style="font-family:Arial,Helvetica,sans-serif;font-size:11.5px;font-weight:bold;letter-spacing:.03em;color:#ffffff;background-color:#452c63;padding:8px 16px;border-radius:4px;text-decoration:none;display:inline-block;">GET A FREE QUOTE &rarr;</a>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td colspan="2" style="padding-top:14px;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;letter-spacing:.05em;">
+                                    <a href="https://web.facebook.com/profile.php?id=61592261381746" style="color:#9972ab;text-decoration:none;">FACEBOOK</a>
+                                    <span style="color:#d9d0e3;">&nbsp;&middot;&nbsp;</span>
+                                    <a href="https://www.instagram.com/touchdomain/" style="color:#9972ab;text-decoration:none;">INSTAGRAM</a>
+                                    <span style="color:#d9d0e3;">&nbsp;&middot;&nbsp;</span>
+                                    <a href="https://www.linkedin.com/company/touchdomain/" style="color:#9972ab;text-decoration:none;">LINKEDIN</a>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td colspan="2" style="padding-top:18px;font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#b8adc6;">
+                                    &copy; ${currentYear} TOUCHDOMAIN (Pty) Ltd &nbsp;&middot;&nbsp; 96 Makgathe Street, Ipelegeng, Schweizer-Reneke, 2780
+                                  </td>
+                                </tr>
+                              </table>
                           </td>
                       </tr>
-                      
+
                   </table>
               </td>
           </tr>
