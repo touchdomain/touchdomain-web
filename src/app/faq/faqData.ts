@@ -45,6 +45,14 @@ export const faqItems = [
     answer: "Yes — this is a core part of how we work. Because we also host what we build, we stay involved after launch rather than handing over a finished site and disappearing. Ongoing Care Plan retainers are also available if you want us actively maintaining and updating your site over time."
   },
   {
+    question: "What's included in a Care Plan?",
+    answer: "Care Plans cover ongoing site maintenance after launch, in three tiers. Basic covers site oversight, security updates, and minor content edits each month. Growth includes everything in Basic, plus regular social content support (roughly two posts a week). Scale includes everything in Growth, plus an ongoing SEO retainer and monthly performance reporting."
+  },
+  {
+    question: "What are the Content and SEO retainers, and how are they different from a Care Plan?",
+    answer: "These are standalone monthly retainers for businesses that want ongoing content or SEO work without full site maintenance. The Content Retainer delivers a recurring batch of social graphics and captions each month. The SEO Retainer covers ongoing on-page and technical SEO work. Note that Care Plan Scale already includes an SEO retainer — you wouldn't need both."
+  },
+  {
     question: "What happens if my site goes down?",
     answer: "If we're hosting it, that's on us to sort out, and there's one team to call rather than juggling a separate designer, host, and email provider. Hosting plans include weekly backups specifically so a problem doesn't mean losing your content."
   },
