@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
-import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
-
-const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
+import { CUSTOMER_CONTACT_EMAIL, LEAD_NOTIFY_EMAIL } from './../../../lib/mailer';
 
 export async function POST(request: Request) {
   try {
@@ -49,7 +47,7 @@ export async function POST(request: Request) {
     const adminMailOptions = {
       from: `"${name}" <${process.env.SMTP_USER}>`, // Sent via your authenticated server
       replyTo: email, // Allows you to hit 'Reply' and email the customer directly
-      to: ADMIN_NOTIFY_EMAIL, // Where you want to receive the messages
+      to: LEAD_NOTIFY_EMAIL, // Where you want to receive the messages
       subject: `New Enquiry: ${topic || 'General'}`,
       text: `
 Name: ${name}

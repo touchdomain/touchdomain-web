@@ -2,11 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
 import { generateOrderPDFBuffer } from './../../../utils/generateOrderPDF';
-import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
-
-// Falls back to the hardcoded address if ADMIN_NOTIFY_EMAIL isn't set, so this
-// keeps working even before the env var is added to .env.local / hosting config.
-const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
+import { CUSTOMER_CONTACT_EMAIL, LEAD_NOTIFY_EMAIL } from './../../../lib/mailer';
 
 export async function POST(request: Request) {
   try {
@@ -37,7 +33,7 @@ export async function POST(request: Request) {
     const adminMailOptions = {
       from: `"Touch Domain Orders" <${process.env.SMTP_USER}>`,
       replyTo: clientEmail,
-      to: ADMIN_NOTIFY_EMAIL,
+      to: LEAD_NOTIFY_EMAIL,
       subject: `New Service Order: ${serviceName}`,
       text: `New order received.\n\nService: ${serviceName}\nEstimated Price: R ${servicePrice || 'TBD'}\nName: ${clientName}\nEmail: ${clientEmail}\nPhone: ${clientPhone}`,
     };

@@ -43,18 +43,23 @@ environment settings for production. See `.env.example` for a template.
 | `SMTP_USER` | **Yes** | — | SMTP username. Also used as the `From:` address on every outgoing mail, so it must be a real, send-authorised mailbox on your domain. |
 | `SMTP_PASSWORD` | **Yes** | — | SMTP password |
 | `SMTP_PORT` | No | `465` | The transport is hard-coded to `secure: true`, so this **must be an implicit-TLS/SSL port** (typically `465`). Plain / STARTTLS ports will not connect. |
-| `ADMIN_EMAIL` | No | `helper@touchdomain.co.za` | Inbox that receives lead notifications (quote requests, contact enquiries, orders, reviews, consultation bookings). Set this explicitly in production. |
-| `APP_LOGO_URL` | No | `https://touchdomain.co.za/branding/logo-nav.png` | Absolute URL of the logo embedded in branded HTML emails (`src/utils/emailTemplate.ts`). Must be publicly reachable by mail clients. |
+| `APP_LOGO_URL` | No | `https://touchdomain.co.za/branding/touch-domain-logo-white.png` | Absolute URL of the white logo embedded in branded HTML emails (`src/utils/emailTemplate.ts`). Must be publicly reachable by mail clients. |
+
+Lead notifications and the customer-facing contact address are **not**
+environment variables — both are `helper@touchdomain.co.za`, hardcoded in
+`src/lib/mailer.ts` (`LEAD_NOTIFY_EMAIL` / `CUSTOMER_CONTACT_EMAIL`).
+`admin@touchdomain.co.za` is reserved for account-security actions and must
+never receive form traffic.
 
 None of these are exposed to the browser (no `NEXT_PUBLIC_` prefix) — they
 are only read inside server-side route handlers.
 
 ### Verifying email after deploy
 
-1. Set all `SMTP_*` vars and `ADMIN_EMAIL` in the production environment.
+1. Set all `SMTP_*` vars in the production environment.
 2. Submit the contact form once with a real address.
-3. Confirm the notification lands in `ADMIN_EMAIL` and the auto-responder
-   lands in the address you submitted.
+3. Confirm the notification lands in `helper@touchdomain.co.za` and the
+   auto-responder lands in the address you submitted.
 4. A `500 "Server failed to send email"` response means the SMTP
    credentials or port are wrong.
 

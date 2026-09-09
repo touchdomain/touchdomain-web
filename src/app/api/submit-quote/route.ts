@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
 import { generateQuotePDFBuffer } from './../../../utils/generateQuotePDF';
-import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
-
-const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
+import { CUSTOMER_CONTACT_EMAIL, LEAD_NOTIFY_EMAIL } from './../../../lib/mailer';
 
 export async function POST(request: Request) {
   try {
@@ -43,7 +41,7 @@ export async function POST(request: Request) {
     const adminMailOptions = {
       from: `"Touch Domain Website" <${process.env.SMTP_USER}>`,
       replyTo: clientEmail, 
-      to: ADMIN_NOTIFY_EMAIL, 
+      to: LEAD_NOTIFY_EMAIL,
       subject: `New Custom Quote Request from ${clientName || 'a Visitor'}`,
       text: `You have received a new custom quote request.\n\nDetails:\n${JSON.stringify(body, null, 2)}`,
     };

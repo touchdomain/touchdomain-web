@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
-import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
-
-const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
+import { CUSTOMER_CONTACT_EMAIL, LEAD_NOTIFY_EMAIL } from './../../../lib/mailer';
 
 export async function POST(request: Request) {
   try {
@@ -33,7 +31,7 @@ export async function POST(request: Request) {
     const mailOptions = {
       from: `"${consultationName}" <${process.env.SMTP_USER}>`,
       replyTo: consultationEmail,
-      to: ADMIN_NOTIFY_EMAIL, 
+      to: LEAD_NOTIFY_EMAIL,
       subject: `New Consultation Booking: ${consultationName}`,
       text: `
 You have a new consultation request!
