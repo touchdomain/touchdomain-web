@@ -43,7 +43,7 @@ environment settings for production. See `.env.example` for a template.
 | `SMTP_USER` | **Yes** | — | SMTP username. Also used as the `From:` address on every outgoing mail, so it must be a real, send-authorised mailbox on your domain. |
 | `SMTP_PASSWORD` | **Yes** | — | SMTP password |
 | `SMTP_PORT` | No | `465` | The transport is hard-coded to `secure: true`, so this **must be an implicit-TLS/SSL port** (typically `465`). Plain / STARTTLS ports will not connect. |
-| `APP_LOGO_URL` | No | `https://touchdomain.co.za/branding/touch-domain-logo-white.png` | Absolute URL of the white logo embedded in branded HTML emails (`src/utils/emailTemplate.ts`). Must be publicly reachable by mail clients. |
+| `APP_LOGO_URL` | No | `https://www.touchdomain.co.za/branding/touch-domain-logo-white.png` | Override for the white logo in branded HTML emails (`src/utils/emailTemplate.ts`). Leave unset. If set, it **must** use the `www` host — the apex 308-redirects and email image proxies (Gmail) don't follow redirects, so the logo renders as broken alt text. |
 
 Lead notifications and the customer-facing contact address are **not**
 environment variables — both are `helper@touchdomain.co.za`, hardcoded in

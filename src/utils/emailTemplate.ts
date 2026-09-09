@@ -1,12 +1,18 @@
 import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
 
+// Canonical host. The apex (touchdomain.co.za) 308-redirects to www, and
+// many email clients — Gmail's image proxy in particular — do NOT follow
+// redirects on <img src>, so an apex image URL renders as broken / alt
+// text only. Everything here uses the www host directly.
+const SITE = 'https://www.touchdomain.co.za';
+
 export const generateBrandedEmail = (title: string, content: string) => {
   const currentYear = new Date().getFullYear();
 
-  // Falls back to the live deployed white logo if APP_LOGO_URL isn't set —
-  // email clients need an absolute, publicly reachable URL (no local/relative
+  // Email clients need an absolute, publicly reachable URL (no local/relative
   // paths), and the header band is dark purple so the logo must be white.
-  const logoUrl = process.env.APP_LOGO_URL || 'https://touchdomain.co.za/branding/touch-domain-logo-white.png';
+  // If APP_LOGO_URL is set it must also be a www / non-redirecting URL.
+  const logoUrl = process.env.APP_LOGO_URL || `${SITE}/branding/touch-domain-logo-white.png`;
 
   return `
   <!DOCTYPE html>
@@ -22,12 +28,12 @@ export const generateBrandedEmail = (title: string, content: string) => {
               <td align="center">
                   <!-- Main Email Container -->
                   <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                      
+
                       <!-- ─── HEADER ─── -->
                       <tr>
                           <td align="center" style="background-color: #452c63; padding: 30px 20px;">
-                              <a href="https://touchdomain.co.za" target="_blank" style="text-decoration: none;">
-                                  <img src="${logoUrl}" alt="Touch Domain Logo" width="180" style="display: block; border: 0; max-width: 100%; height: auto;" />
+                              <a href="${SITE}" target="_blank" style="text-decoration: none;">
+                                  <img src="${logoUrl}" alt="Touch Domain" width="180" style="display: block; border: 0; max-width: 100%; height: auto;" />
                               </a>
                           </td>
                       </tr>
@@ -46,7 +52,7 @@ export const generateBrandedEmail = (title: string, content: string) => {
                               <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
                                 <tr>
                                   <td style="padding-right:16px;border-right:2px solid #9972ab;" valign="middle" width="56">
-                                    <img src="https://touchdomain.co.za/branding/email/signature-mark.png" width="40" height="43" alt="Touch Domain" style="display:block;border:0;">
+                                    <img src="${SITE}/branding/email/signature-mark.png" width="40" height="43" alt="Touch Domain" style="display:block;border:0;">
                                   </td>
                                   <td style="padding-left:16px;" valign="middle">
                                     <table cellpadding="0" cellspacing="0" border="0">
@@ -54,14 +60,14 @@ export const generateBrandedEmail = (title: string, content: string) => {
                                       <tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#2a1b3d;line-height:1.7;">
                                         <a href="tel:+27813276153" style="color:#2a1b3d;text-decoration:none;">+27 81 327 6153</a><br>
                                         <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color:#2a1b3d;text-decoration:none;">${CUSTOMER_CONTACT_EMAIL}</a><br>
-                                        <a href="https://touchdomain.co.za" style="color:#9972ab;text-decoration:none;">www.touchdomain.co.za</a>
+                                        <a href="${SITE}" style="color:#9972ab;text-decoration:none;">www.touchdomain.co.za</a>
                                       </td></tr>
                                     </table>
                                   </td>
                                 </tr>
                                 <tr>
                                   <td colspan="2" style="padding-top:14px;">
-                                    <a href="https://touchdomain.co.za/quote" style="font-family:Arial,Helvetica,sans-serif;font-size:11.5px;font-weight:bold;letter-spacing:.03em;color:#ffffff;background-color:#452c63;padding:8px 16px;border-radius:4px;text-decoration:none;display:inline-block;">GET A FREE QUOTE &rarr;</a>
+                                    <a href="${SITE}/quote" style="font-family:Arial,Helvetica,sans-serif;font-size:11.5px;font-weight:bold;letter-spacing:.03em;color:#ffffff;background-color:#452c63;padding:8px 16px;border-radius:4px;text-decoration:none;display:inline-block;">GET A FREE QUOTE &rarr;</a>
                                   </td>
                                 </tr>
                                 <tr>
