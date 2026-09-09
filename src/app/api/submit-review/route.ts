@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
+import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
 
 const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
 
@@ -71,12 +72,13 @@ Consent to be featured as a full case study: ${consentToCaseStudy ? 'YES' : 'NO'
         <br/>
         <p>Appreciate you,</p>
         <p><strong>The Touch Domain Team</strong><br/>
-        <a href="mailto:${ADMIN_NOTIFY_EMAIL}" style="color: #9972ab;">${ADMIN_NOTIFY_EMAIL}</a></p>
+        <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color: #9972ab;">${CUSTOMER_CONTACT_EMAIL}</a></p>
     `;
     const finalBrandedHTML = generateBrandedEmail('Thank You For Your Feedback', clientMessageHTML);
 
     const clientMailOptions = {
       from: `"Touch Domain" <${process.env.SMTP_USER}>`,
+      replyTo: CUSTOMER_CONTACT_EMAIL,
       to: clientEmail,
       subject: `Thank you for your feedback`,
       text: `Hi ${clientName},\n\nThank you — genuinely. Taking the time to write this means a lot, and it helps other businesses trust us the same way you did.\n\nWe've received your feedback and, with your permission, we'll be featuring it on our site.\n\nAppreciate you,\nThe Touch Domain Team`,

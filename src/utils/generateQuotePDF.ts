@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
+import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
 
 interface QuoteData {
   clientName: string;
@@ -105,7 +106,7 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
 
   const drawFooter = (p: typeof page) => {
     p.drawRectangle({ x: 0, y: 0, width: PAGE_WIDTH, height: FOOTER_HEIGHT, color: hexToRgb('#452c63') });
-    const footText = 'touchdomain.co.za   |   info@touchdomain.co.za   |   081 327 6153';
+    const footText = `touchdomain.co.za   |   ${CUSTOMER_CONTACT_EMAIL}   |   081 327 6153`;
     const footWidth = helvetica.widthOfTextAtSize(footText, 9);
     p.drawText(footText, { x: (PAGE_WIDTH - footWidth) / 2, y: (FOOTER_HEIGHT - 9) / 2, size: 9, font: helvetica, color: rgb(1, 1, 1) });
   };

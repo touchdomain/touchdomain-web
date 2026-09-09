@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
 import { generateQuotePDFBuffer } from './../../../utils/generateQuotePDF';
+import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
 
 const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
 
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
         <br/>
         <p>Speak soon,</p>
         <p><strong>The Touch Domain Team</strong><br/>
-        <a href="mailto:${ADMIN_NOTIFY_EMAIL}" style="color: #9972ab;">${ADMIN_NOTIFY_EMAIL}</a></p>
+        <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color: #9972ab;">${CUSTOMER_CONTACT_EMAIL}</a></p>
     `;
 
     const finalBrandedHTML = generateBrandedEmail('Your Custom Quote Is Attached', clientMessageHTML);
@@ -64,7 +65,8 @@ export async function POST(request: Request) {
     // Email to the VISITOR with the PDF Attachment
     const clientMailOptions = {
       from: `"Touch Domain" <${process.env.SMTP_USER}>`,
-      to: clientEmail, 
+      replyTo: CUSTOMER_CONTACT_EMAIL,
+      to: clientEmail,
       subject: `Your Custom Touch Domain Quote`,
       text: `Hi ${clientName || 'there'},\n\nNice — you've just built out a custom plan for your project, and we've got it. Your estimated quotation is attached, laid out exactly the way you configured it. We'll be in touch shortly to turn this into a final, tailored quote.\n\nSpeak soon,\nThe Touch Domain Team`,
       html: finalBrandedHTML,

@@ -1,6 +1,8 @@
+import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
+
 export const generateBrandedEmail = (title: string, content: string) => {
   const currentYear = new Date().getFullYear();
-  
+
   // Falls back to the live deployed white logo if APP_LOGO_URL isn't set —
   // email clients need an absolute, publicly reachable URL (no local/relative
   // paths), and the header band is dark purple so the logo must be white.
@@ -50,7 +52,7 @@ export const generateBrandedEmail = (title: string, content: string) => {
                               <p style="margin: 0; font-size: 12px; color: #aaaaaa;">
                                   <a href="https://touchdomain.co.za" style="color: #9972ab; text-decoration: none;">touchdomain.co.za</a> 
                                   &nbsp;|&nbsp; 
-                                  <a href="mailto:helper@touchdomain.co.za" style="color: #9972ab; text-decoration: none;">helper@touchdomain.co.za</a>
+                                  <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color: #9972ab; text-decoration: none;">${CUSTOMER_CONTACT_EMAIL}</a>
                               </p>
                               <p style="margin: 15px 0 0 0; font-size: 11px; color: #cccccc;">
                                   &copy; ${currentYear} Touch Domain. All rights reserved.

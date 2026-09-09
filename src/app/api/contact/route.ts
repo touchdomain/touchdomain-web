@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
+import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
 
 const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
 
@@ -74,16 +75,17 @@ ${message}
         <br/>
         <p>Best regards,</p>
         <p><strong>The Touch Domain Team</strong><br/>
-        <a href="mailto:${ADMIN_NOTIFY_EMAIL}" style="color: #9972ab;">${ADMIN_NOTIFY_EMAIL}</a></p>
+        <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color: #9972ab;">${CUSTOMER_CONTACT_EMAIL}</a></p>
     `;
 
     const finalBrandedHTML = generateBrandedEmail('Got It — We Have Your Message', clientMessageHTML);
 
     const clientMailOptions = {
       from: `"Touch Domain" <${process.env.SMTP_USER}>`,
+      replyTo: CUSTOMER_CONTACT_EMAIL,
       to: email,
       subject: `We've got your message`,
-      text: `Hi ${name},\n\nGot it — your message just landed in our inbox, and a real person on our team will read it, not a bot.\n\nFor your records, here's what you sent us:\n${message}\n\nWe'll be back in your inbox shortly.\n\nBest regards,\nThe Touch Domain Team\n${ADMIN_NOTIFY_EMAIL}`,
+      text: `Hi ${name},\n\nGot it — your message just landed in our inbox, and a real person on our team will read it, not a bot.\n\nFor your records, here's what you sent us:\n${message}\n\nWe'll be back in your inbox shortly.\n\nBest regards,\nThe Touch Domain Team\n${CUSTOMER_CONTACT_EMAIL}`,
       html: finalBrandedHTML,
     };
 

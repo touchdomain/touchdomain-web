@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
 import { generateOrderPDFBuffer } from './../../../utils/generateOrderPDF';
+import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
 
 // Falls back to the hardcoded address if ADMIN_NOTIFY_EMAIL isn't set, so this
 // keeps working even before the env var is added to .env.local / hosting config.
@@ -50,14 +51,15 @@ export async function POST(request: Request) {
         <br/>
         <p>Looking forward to building this with you,</p>
         <p><strong>The Touch Domain Team</strong><br/>
-        <a href="mailto:${ADMIN_NOTIFY_EMAIL}" style="color: #9972ab;">${ADMIN_NOTIFY_EMAIL}</a></p>
+        <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color: #9972ab;">${CUSTOMER_CONTACT_EMAIL}</a></p>
     `;
 
     const finalBrandedHTML = generateBrandedEmail('Welcome to Touch Domain', clientMessageHTML);
 
     const clientMailOptions = {
       from: `"Touch Domain" <${process.env.SMTP_USER}>`,
-      to: clientEmail, 
+      replyTo: CUSTOMER_CONTACT_EMAIL,
+      to: clientEmail,
       subject: `Order Confirmed: ${serviceName}`,
       html: finalBrandedHTML,
       attachments: [

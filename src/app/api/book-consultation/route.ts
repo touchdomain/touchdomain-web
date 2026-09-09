@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from './../../../utils/emailTemplate';
+import { CUSTOMER_CONTACT_EMAIL } from './../../../lib/mailer';
 
 const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_EMAIL || 'helper@touchdomain.co.za';
 
@@ -61,7 +62,7 @@ Timeline: ${consultationTimeline || 'Not provided'}
         <br/>
         <p>Talk soon,</p>
         <p><strong>The Touch Domain Team</strong><br/>
-        <a href="mailto:${ADMIN_NOTIFY_EMAIL}" style="color: #9972ab;">${ADMIN_NOTIFY_EMAIL}</a></p>
+        <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color: #9972ab;">${CUSTOMER_CONTACT_EMAIL}</a></p>
     `;
 
     // 3. Wrap it in the branded template
@@ -70,10 +71,11 @@ Timeline: ${consultationTimeline || 'Not provided'}
     // 4. Email to the VISITOR (Auto-Responder)
     const clientMailOptions = {
       from: `"Touch Domain" <${process.env.SMTP_USER}>`,
-      to: consultationEmail, 
+      replyTo: CUSTOMER_CONTACT_EMAIL,
+      to: consultationEmail,
       subject: `You're booked in with Touch Domain`,
-      text: `Hi ${consultationName || 'there'},\n\nYou're booked in. Here's what we've got on our end:\n\nEmail: ${consultationEmail}\nPhone: ${consultationPhone || 'Not provided'}\nRequested Date & Time: ${new Date(consultationDateTime).toLocaleString('en-ZA')}\n\nWe'll call you at that time to talk through what you're building and how we can help. If a video call or email suits you better, just reply here and let us know.\n\nTalk soon,\nThe Touch Domain Team\n${ADMIN_NOTIFY_EMAIL}`,
-      html: finalBrandedHTML 
+      text: `Hi ${consultationName || 'there'},\n\nYou're booked in. Here's what we've got on our end:\n\nEmail: ${consultationEmail}\nPhone: ${consultationPhone || 'Not provided'}\nRequested Date & Time: ${new Date(consultationDateTime).toLocaleString('en-ZA')}\n\nWe'll call you at that time to talk through what you're building and how we can help. If a video call or email suits you better, just reply here and let us know.\n\nTalk soon,\nThe Touch Domain Team\n${CUSTOMER_CONTACT_EMAIL}`,
+      html: finalBrandedHTML
     };
 
     // 5. Fire emails concurrently; only the admin leg can fail the request —
