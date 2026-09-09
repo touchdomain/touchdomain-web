@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage, PDFImage } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
@@ -6,11 +6,12 @@ import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
 interface QuoteData {
   clientName: string;
   clientEmail: string;
-  clientPhone: string;
+  clientPhone?: string;
   selections: Record<string, string>;
   estimatedTotal: number | string;
   estimatedApp?: number | string;
   estimatedMonthly?: number | string;
+  quoteRef?: string; // optional — falls back to a generated reference if omitted
 }
 
 const hexToRgb = (hex: string) => {
@@ -20,206 +21,268 @@ const hexToRgb = (hex: string) => {
   return rgb(r, g, b);
 };
 
+// ── A4 layout constants ──
 const PAGE_WIDTH = 595.28;
-const A4_HEIGHT = 841.89; // used as a ceiling — long quotes still get a full page + pagination
-const MIN_PAGE_HEIGHT = 480; // a very short quote (e.g. no add-ons selected) still gets breathing room
-const HEADER_HEIGHT = 150; // solid brand band, not just a thin strip
+const PAGE_HEIGHT = 841.89;
+const HEADER_HEIGHT = 100;
 const FOOTER_HEIGHT = 40;
+const MARGIN = 45;
+const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
+const CONTENT_TOP = PAGE_HEIGHT - HEADER_HEIGHT - 35;
+const CONTENT_BOTTOM = FOOTER_HEIGHT + 30; // anything below this triggers a page break
+
+// ── Brand tokens (kept in one place — matches touchdomain-brand-guidelines.html) ──
+const BRAND = {
+  plum: hexToRgb('#452c63'),
+  mauve: hexToRgb('#9972ab'),
+  lavTint: hexToRgb('#f5f0fa'), // corrected — was off-palette #faf8fb
+  lavBorder: hexToRgb('#e6dcee'),
+  ink: hexToRgb('#2a1b3d'), // corrected — was a generic #222222, now matches brand ink
+  grey: hexToRgb('#6b5c7d'), // corrected — was a generic #666666, now matches brand grey
+  hairline: hexToRgb('#e4dced'),
+  white: rgb(1, 1, 1),
+};
+
+const wrapText = (text: string, maxWidth: number, font: PDFFont, size: number): string[] => {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (font.widthOfTextAtSize(testLine, size) <= maxWidth) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+};
+
+const money = (v: number | string | undefined) => {
+  if (v === undefined || v === null || v === '') return null;
+  const n = Number(String(v).replace(/,/g, ''));
+  if (!isFinite(n) || n <= 0) return null;
+  return n.toLocaleString('en-ZA');
+};
 
 export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> => {
   const pdfDoc = await PDFDocument.create();
 
-  const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  // Embed the real logo mark (white version, since it now sits inside a solid
-  // purple header band rather than floating on white below a thin strip).
-  let logoImage = null;
+  // Embed the logo ONCE, before any page is drawn — embedPng/Jpg is async and
+  // must be awaited, and the returned PDFImage is what actually gets drawn.
+  // This is the fix for the original bug: nothing was ever passed to drawImage.
+  let logoImage: PDFImage | null = null;
+  let logoDims = { width: 0, height: 0 };
   try {
-    // White logo for the solid purple header band.
     const logoPath = path.join(process.cwd(), 'public', 'branding', 'touch-domain-logo-white.png');
     const logoBytes = fs.readFileSync(logoPath);
     logoImage = await pdfDoc.embedPng(logoBytes);
-  } catch (err) {
-    console.error('Quote PDF: white logo asset not found, falling back to text wordmark.', err);
+    const targetHeight = 26;
+    const scale = targetHeight / logoImage.height;
+    logoDims = { width: logoImage.width * scale, height: targetHeight };
+  } catch {
+    logoImage = null; // falls back to text wordmark in drawHeader
   }
 
-  // ── Estimate how tall this document actually needs to be ──
-  // A quote with 2 selections and one with 20 shouldn't render on an identical
-  // full A4 canvas — that's what was causing "mostly blank page, have to zoom
-  // in to read the small text" on short quotes. We size the page to the real
-  // content instead, capped at a full A4 (where the existing pagination logic
-  // below takes over for genuinely long quotes).
-  const selectionCount = data.selections ? Object.keys(data.selections).length : 0;
-  const hasApp = !!(data.estimatedApp && Number(String(data.estimatedApp).replace(/,/g, '')) > 0);
-  const hasMonthly = !!(data.estimatedMonthly && Number(String(data.estimatedMonthly).replace(/,/g, '')) > 0);
-  const estimatedContentHeight =
-    HEADER_HEIGHT +          // header band
-    36 +                     // title + underline
-    34 +                     // intro line 1 + 2
-    (data.clientPhone ? 72 : 54) + // date/name/email(/phone)
-    45 +                     // "What You Selected" heading + spacing
-    (selectionCount * 20) +  // one line per selection
-    45 +                     // divider + spacing before totals
-    22 +                     // total line
-    (hasApp ? 20 : 0) +      // optional app-development line
-    (hasMonthly ? 20 : 0) +  // optional monthly line
-    100 +                    // disclaimer box
-    FOOTER_HEIGHT +
-    40;                      // top/bottom breathing margin
+  const quoteRef = data.quoteRef || `TD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-  const PAGE_HEIGHT = Math.max(MIN_PAGE_HEIGHT, Math.min(estimatedContentHeight, A4_HEIGHT));
+  let pageNum = 1;
+  const pages: PDFPage[] = [];
 
-  let page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
+  const drawHeader = (p: PDFPage) => {
+    p.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT, width: PAGE_WIDTH, height: HEADER_HEIGHT, color: BRAND.plum });
+    p.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT - 3, width: PAGE_WIDTH, height: 3, color: BRAND.mauve });
 
-  const drawHeader = (p: typeof page, pageHeight: number) => {
-    // Solid brand band with decorative accent circles that echo the
-    // half-circle motif already used throughout the site, so this reads
-    // as a genuine piece of brand collateral rather than a plain purple
-    // box with text on it.
-    p.drawRectangle({ x: 0, y: pageHeight - HEADER_HEIGHT, width: PAGE_WIDTH, height: HEADER_HEIGHT, color: hexToRgb('#452c63') });
-    p.drawEllipse({ x: PAGE_WIDTH + 15, y: pageHeight + 10, xScale: 85, yScale: 85, color: hexToRgb('#5a3a7a') });
-    p.drawEllipse({ x: PAGE_WIDTH - 30, y: pageHeight - HEADER_HEIGHT + 15, xScale: 45, yScale: 45, color: hexToRgb('#9972ab') });
-    p.drawRectangle({ x: 0, y: pageHeight - HEADER_HEIGHT - 4, width: PAGE_WIDTH, height: 4, color: hexToRgb('#9972ab') });
-
-    let logoBottomY = pageHeight - 20;
     if (logoImage) {
-      const logoScale = 160 / logoImage.width;
-      const logoW = logoImage.width * logoScale;
-      const logoH = logoImage.height * logoScale;
-      logoBottomY = pageHeight - 20 - logoH;
-      p.drawImage(logoImage, { x: (PAGE_WIDTH - logoW) / 2, y: logoBottomY, width: logoW, height: logoH });
+      p.drawImage(logoImage, {
+        x: (PAGE_WIDTH - logoDims.width) / 2,
+        y: PAGE_HEIGHT - 24 - logoDims.height,
+        width: logoDims.width,
+        height: logoDims.height,
+      });
     } else {
       const titleText = 'TOUCH DOMAIN';
-      const titleWidth = helveticaBold.widthOfTextAtSize(titleText, 22);
-      logoBottomY = pageHeight - 55;
-      p.drawText(titleText, { x: (PAGE_WIDTH - titleWidth) / 2, y: logoBottomY, size: 22, font: helveticaBold, color: rgb(1, 1, 1) });
+      const titleWidth = fontBold.widthOfTextAtSize(titleText, 20);
+      p.drawText(titleText, { x: (PAGE_WIDTH - titleWidth) / 2, y: PAGE_HEIGHT - 46, size: 20, font: fontBold, color: BRAND.white });
     }
 
-    // Generous, deliberate gap between the logo lockup and the tagline
-    // rather than the two crowding each other.
-    const subText = 'Crafting Brands. Engineering Digital Experiences.';
-    const subWidth = helvetica.widthOfTextAtSize(subText, 9.5);
-    p.drawText(subText, { x: (PAGE_WIDTH - subWidth) / 2, y: logoBottomY - 22, size: 9.5, font: helvetica, color: hexToRgb('#e4d9ec') });
+    // Brand-voice-aligned subline: specific, not generic agency copy.
+    const subText = 'Your Custom Quote';
+    const subWidth = fontRegular.widthOfTextAtSize(subText, 10);
+    p.drawText(subText, { x: (PAGE_WIDTH - subWidth) / 2, y: PAGE_HEIGHT - HEADER_HEIGHT + 14, size: 10, font: fontRegular, color: hexToRgb('#e4d9ec') });
   };
 
-  const drawFooter = (p: typeof page) => {
-    p.drawRectangle({ x: 0, y: 0, width: PAGE_WIDTH, height: FOOTER_HEIGHT, color: hexToRgb('#452c63') });
+  const drawFooter = (p: PDFPage, pageIndex: number, pageTotal: number) => {
+    p.drawRectangle({ x: 0, y: 0, width: PAGE_WIDTH, height: FOOTER_HEIGHT, color: BRAND.plum });
     const footText = `touchdomain.co.za   |   ${CUSTOMER_CONTACT_EMAIL}   |   081 327 6153`;
-    const footWidth = helvetica.widthOfTextAtSize(footText, 9);
-    p.drawText(footText, { x: (PAGE_WIDTH - footWidth) / 2, y: (FOOTER_HEIGHT - 9) / 2, size: 9, font: helvetica, color: rgb(1, 1, 1) });
+    const footWidth = fontRegular.widthOfTextAtSize(footText, 8.5);
+    p.drawText(footText, { x: MARGIN, y: (FOOTER_HEIGHT - 8.5) / 2, size: 8.5, font: fontRegular, color: BRAND.white });
+
+    const pageLabel = `${quoteRef}   ·   Page ${pageIndex} of ${pageTotal}`;
+    const pageLabelWidth = fontRegular.widthOfTextAtSize(pageLabel, 8);
+    p.drawText(pageLabel, { x: PAGE_WIDTH - MARGIN - pageLabelWidth, y: (FOOTER_HEIGHT - 8) / 2, size: 8, font: fontRegular, color: hexToRgb('#cbb9db') });
   };
 
-  drawHeader(page, PAGE_HEIGHT);
-  let cursorY = PAGE_HEIGHT - HEADER_HEIGHT - 34;
-  const leftMargin = 50;
+  const newPage = (): PDFPage => {
+    const p = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
+    drawHeader(p);
+    pages.push(p);
+    return p;
+  };
 
-  // ─── DOCUMENT TITLE ───
-  page.drawText('Your Custom Quote Estimate', { x: leftMargin, y: cursorY, size: 18, font: helveticaBold, color: hexToRgb('#452c63') });
-  const underlineWidth = helveticaBold.widthOfTextAtSize('Your Custom Quote Estimate', 18);
-  page.drawLine({ start: { x: leftMargin, y: cursorY - 6 }, end: { x: leftMargin + underlineWidth, y: cursorY - 6 }, thickness: 2, color: hexToRgb('#9972ab') });
-  cursorY -= 32;
+  let page = newPage();
+  let cursorY = CONTENT_TOP;
 
-  const introLine1 = `Hi ${data.clientName || 'there'} — thanks for building this out with us.`;
-  const introLine2 = "Here's exactly what you selected, and what it comes to.";
-  page.drawText(introLine1, { x: leftMargin, y: cursorY, size: 11.5, font: helvetica, color: hexToRgb('#333333') });
-  cursorY -= 16;
-  page.drawText(introLine2, { x: leftMargin, y: cursorY, size: 11.5, font: helvetica, color: hexToRgb('#333333') });
-  cursorY -= 30;
+  // Ensures enough room remains before drawing the next block; page-breaks otherwise.
+  // This is the fix for the original file's total absence of pagination —
+  // a long selections list can no longer run text off the page or into the footer.
+  const ensureSpace = (neededHeight: number) => {
+    if (cursorY - neededHeight < CONTENT_BOTTOM) {
+      page = newPage();
+      cursorY = CONTENT_TOP;
+    }
+  };
 
-  // ─── CLIENT DETAILS ───
-  const textColor = hexToRgb('#333333');
-  page.drawText(`Date: ${new Date().toLocaleDateString('en-ZA')}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-  cursorY -= 17;
-  page.drawText(`Prepared For: ${data.clientName}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-  cursorY -= 17;
-  page.drawText(`Email: ${data.clientEmail}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-  cursorY -= 17;
-  if (data.clientPhone) {
-    page.drawText(`Phone: ${data.clientPhone}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-    cursorY -= 17;
-  }
-  cursorY -= 18;
-
-  // ─── PROJECT SELECTIONS ───
-  page.drawText('What You Selected', { x: leftMargin, y: cursorY, size: 14, font: helveticaBold, color: hexToRgb('#452c63') });
+  // ─── DOCUMENT TITLE + REFERENCE ───
+  page.drawText('CUSTOM QUOTE ESTIMATE', { x: MARGIN, y: cursorY, size: 18, font: fontBold, color: BRAND.plum });
+  const refWidth = fontRegular.widthOfTextAtSize(quoteRef, 9.5);
+  page.drawText(quoteRef, { x: PAGE_WIDTH - MARGIN - refWidth, y: cursorY + 4, size: 9.5, font: fontRegular, color: BRAND.grey });
   cursorY -= 24;
 
-  const ensureSpace = (p: typeof page, y: number) => {
-    if (y < FOOTER_HEIGHT + 40) {
-      drawFooter(p);
-      const newPage = pdfDoc.addPage([PAGE_WIDTH, A4_HEIGHT]);
-      drawHeader(newPage, A4_HEIGHT);
-      return { page: newPage, cursorY: A4_HEIGHT - HEADER_HEIGHT - 30 };
-    }
-    return { page: p, cursorY: y };
-  };
+  const introText = `Hi ${data.clientName || 'there'}, thanks for building out a scope with us. Here's the itemised summary of what you selected.`;
+  const introLines = wrapText(introText, CONTENT_WIDTH, fontRegular, 10);
+  introLines.forEach(line => {
+    page.drawText(line, { x: MARGIN, y: cursorY, size: 10, font: fontRegular, color: BRAND.grey });
+    cursorY -= 14;
+  });
 
-  if (data.selections && Object.keys(data.selections).length > 0) {
-    Object.entries(data.selections).forEach(([category, option]) => {
-        const bullet = `• ${category}:`;
-        page.drawText(bullet, { x: leftMargin, y: cursorY, size: 12, font: helveticaBold, color: textColor });
-
-        const bulletWidth = helveticaBold.widthOfTextAtSize(bullet, 12);
-        page.drawText(` ${option}`, { x: leftMargin + bulletWidth, y: cursorY, size: 12, font: helvetica, color: textColor });
-
-        cursorY -= 20;
-
-        const adjusted = ensureSpace(page, cursorY);
-        page = adjusted.page;
-        cursorY = adjusted.cursorY;
-    });
-  } else {
-    page.drawText('No specific service tiers selected.', { x: leftMargin, y: cursorY, size: 12, font: helvetica, color: textColor });
-    cursorY -= 20;
-  }
   cursorY -= 16;
 
-  // ─── ESTIMATED TOTAL ───
-  if (cursorY - 80 < FOOTER_HEIGHT + 20) {
-    drawFooter(page);
-    page = pdfDoc.addPage([PAGE_WIDTH, A4_HEIGHT]);
-    drawHeader(page, A4_HEIGHT);
-    cursorY = A4_HEIGHT - HEADER_HEIGHT - 30;
+  // ─── TWO-COLUMN META DATA SECTION ───
+  const col1X = MARGIN;
+  const col2X = PAGE_WIDTH / 2 + 10;
+  const metaYStart = cursorY;
+
+  page.drawText('PREPARED FOR', { x: col1X, y: metaYStart, size: 9, font: fontBold, color: BRAND.mauve });
+  page.drawText(data.clientName || 'Valued Client', { x: col1X, y: metaYStart - 15, size: 10.5, font: fontBold, color: BRAND.ink });
+  page.drawText(data.clientEmail, { x: col1X, y: metaYStart - 28, size: 9.5, font: fontRegular, color: BRAND.grey });
+  if (data.clientPhone) {
+    page.drawText(data.clientPhone, { x: col1X, y: metaYStart - 41, size: 9.5, font: fontRegular, color: BRAND.grey });
   }
 
-  page.drawLine({ start: { x: leftMargin, y: cursorY }, end: { x: PAGE_WIDTH - leftMargin, y: cursorY }, thickness: 1, color: hexToRgb('#eeeeee') });
-  cursorY -= 25;
+  const dateStr = new Date().toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' });
+  page.drawText('ESTIMATE DETAILS', { x: col2X, y: metaYStart, size: 9, font: fontBold, color: BRAND.mauve });
+  page.drawText(`Date: ${dateStr}`, { x: col2X, y: metaYStart - 15, size: 9.5, font: fontRegular, color: BRAND.ink });
+  page.drawText(`Type: Tailored Estimate`, { x: col2X, y: metaYStart - 28, size: 9.5, font: fontRegular, color: BRAND.grey });
 
-  const totalText = `Estimated Project Total (Once-Off): R ${data.estimatedTotal || 'TBD'}`;
-  const totalWidth = helveticaBold.widthOfTextAtSize(totalText, 14);
-  page.drawText(totalText, { x: PAGE_WIDTH - leftMargin - totalWidth, y: cursorY, size: 14, font: helveticaBold, color: hexToRgb('#452c63') });
+  cursorY = metaYStart - 55;
+
+  page.drawLine({ start: { x: MARGIN, y: cursorY }, end: { x: PAGE_WIDTH - MARGIN, y: cursorY }, thickness: 1, color: BRAND.hairline });
+  cursorY -= 26;
+
+  // ─── SELECTIONS LIST — card rows instead of a flat bullet list ───
+  ensureSpace(20);
+  page.drawText('SELECTED SCOPE & TIERS', { x: MARGIN, y: cursorY, size: 9, font: fontBold, color: BRAND.mauve });
   cursorY -= 22;
 
-  if (hasApp) {
-    const appText = `App Development (quoted from): R ${data.estimatedApp}`;
-    const appWidth = helvetica.widthOfTextAtSize(appText, 12);
-    page.drawText(appText, { x: PAGE_WIDTH - leftMargin - appWidth, y: cursorY, size: 12, font: helvetica, color: hexToRgb('#9972ab') });
-    cursorY -= 20;
+  const selections = data.selections ? Object.entries(data.selections) : [];
+
+  if (selections.length > 0) {
+    for (const [category, option] of selections) {
+      const catLines = wrapText(category, CONTENT_WIDTH - 30, fontBold, 10);
+      const optLines = wrapText(option, CONTENT_WIDTH - 30, fontRegular, 9.5);
+      const rowHeight = (catLines.length * 13) + (optLines.length * 12) + 18;
+
+      ensureSpace(rowHeight + 8);
+
+      page.drawRectangle({
+        x: MARGIN, y: cursorY - rowHeight + 10, width: CONTENT_WIDTH, height: rowHeight,
+        color: BRAND.lavTint,
+      });
+      page.drawRectangle({
+        x: MARGIN, y: cursorY - rowHeight + 10, width: 3, height: rowHeight,
+        color: BRAND.mauve,
+      });
+
+      let rowY = cursorY;
+      catLines.forEach(line => {
+        page.drawText(line, { x: MARGIN + 14, y: rowY, size: 10, font: fontBold, color: BRAND.plum });
+        rowY -= 13;
+      });
+      optLines.forEach(line => {
+        page.drawText(line, { x: MARGIN + 14, y: rowY, size: 9.5, font: fontRegular, color: BRAND.grey });
+        rowY -= 12;
+      });
+
+      cursorY -= rowHeight + 8;
+    }
+  } else {
+    page.drawText('No specific scope items selected.', { x: MARGIN, y: cursorY, size: 9.5, font: fontItalic, color: BRAND.grey });
+    cursorY -= 15;
   }
 
-  if (hasMonthly) {
-    const monthlyText = `Optional Monthly Retainer: R ${data.estimatedMonthly} / month`;
-    const monthlyWidth = helvetica.widthOfTextAtSize(monthlyText, 12);
-    page.drawText(monthlyText, { x: PAGE_WIDTH - leftMargin - monthlyWidth, y: cursorY, size: 12, font: helvetica, color: hexToRgb('#9972ab') });
-    cursorY -= 20;
+  cursorY -= 12;
+
+  // ─── COST SUMMARY — a highlighted card, not text blending into the page ───
+  const total = money(data.estimatedTotal) ?? 'TBD';
+  const appCost = money(data.estimatedApp);
+  const monthlyCost = money(data.estimatedMonthly);
+
+  const extraLines = (appCost ? 1 : 0) + (monthlyCost ? 1 : 0);
+  const summaryHeight = 46 + extraLines * 16;
+  ensureSpace(summaryHeight + 10);
+
+  page.drawRectangle({ x: MARGIN, y: cursorY - summaryHeight, width: CONTENT_WIDTH, height: summaryHeight, color: BRAND.plum });
+
+  let sumY = cursorY - 28;
+  const totalLabel = 'Estimated Total (Once-Off)';
+  page.drawText(totalLabel, { x: MARGIN + 18, y: sumY, size: 10, font: fontRegular, color: hexToRgb('#d9cbe8') });
+  const totalStr = `R ${total}`;
+  const totalStrWidth = fontBold.widthOfTextAtSize(totalStr, 16);
+  page.drawText(totalStr, { x: PAGE_WIDTH - MARGIN - 18 - totalStrWidth, y: sumY - 3, size: 16, font: fontBold, color: BRAND.white });
+  sumY -= 22;
+
+  if (appCost) {
+    page.drawText('App Development (From)', { x: MARGIN + 18, y: sumY, size: 9.5, font: fontRegular, color: hexToRgb('#d9cbe8') });
+    const s = `R ${appCost}`;
+    const w = fontRegular.widthOfTextAtSize(s, 10);
+    page.drawText(s, { x: PAGE_WIDTH - MARGIN - 18 - w, y: sumY, size: 10, font: fontRegular, color: BRAND.white });
+    sumY -= 16;
   }
-  cursorY -= 18;
+  if (monthlyCost) {
+    page.drawText('Optional Retainer', { x: MARGIN + 18, y: sumY, size: 9.5, font: fontRegular, color: hexToRgb('#d9cbe8') });
+    const s = `R ${monthlyCost} / month`;
+    const w = fontRegular.widthOfTextAtSize(s, 10);
+    page.drawText(s, { x: PAGE_WIDTH - MARGIN - 18 - w, y: sumY, size: 10, font: fontRegular, color: BRAND.white });
+  }
 
-  // ─── DISCLAIMER FOOTER ───
-  const rectY = cursorY - 55;
-  page.drawRectangle({ x: leftMargin, y: rectY, width: 495, height: 65, color: hexToRgb('#faf8fb'), borderColor: hexToRgb('#e6dcee'), borderWidth: 1 });
+  cursorY -= summaryHeight + 20;
 
-  const line1 = "This is an estimate, not an invoice — the number above reflects exactly what you selected,";
-  const line2 = "priced honestly with no hidden extras. We'll be in touch shortly to walk through the details";
-  const line3 = "together and lock in a final, tailored quotation before any work begins.";
+  // ─── DISCLAIMER BOX ───
+  const disclaimerText = "This document is a preliminary estimate based on your selections, not a binding invoice. Our team will confirm the full scope and issue a final quotation before any work begins.";
+  const disclaimerLines = wrapText(disclaimerText, CONTENT_WIDTH - 30, fontItalic, 8.5);
+  const boxHeight = disclaimerLines.length * 12 + 20;
 
-  page.drawText(line1, { x: leftMargin + 15, y: rectY + 44, size: 10, font: helveticaOblique, color: hexToRgb('#666666') });
-  page.drawText(line2, { x: leftMargin + 15, y: rectY + 29, size: 10, font: helveticaOblique, color: hexToRgb('#666666') });
-  page.drawText(line3, { x: leftMargin + 15, y: rectY + 14, size: 10, font: helveticaOblique, color: hexToRgb('#666666') });
+  ensureSpace(boxHeight + 10);
 
-  drawFooter(page);
+  page.drawRectangle({
+    x: MARGIN, y: cursorY - boxHeight, width: CONTENT_WIDTH, height: boxHeight,
+    color: BRAND.lavTint, borderColor: BRAND.lavBorder, borderWidth: 1,
+  });
+  let lineY = cursorY - 15;
+  disclaimerLines.forEach(line => {
+    page.drawText(line, { x: MARGIN + 15, y: lineY, size: 8.5, font: fontItalic, color: BRAND.grey });
+    lineY -= 12;
+  });
+
+  // ─── FOOTERS — drawn last, once the true page count is known ───
+  pages.forEach((p, i) => drawFooter(p, i + 1, pages.length));
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);

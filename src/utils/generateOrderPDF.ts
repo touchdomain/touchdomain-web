@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage, PDFImage } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
@@ -6,10 +6,11 @@ import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
 interface OrderData {
   clientName: string;
   clientEmail: string;
-  clientPhone: string;
+  clientPhone?: string;
   serviceName: string;
   servicePrice?: string;
   features: string[];
+  orderRef?: string; // optional — falls back to a generated reference if omitted
 }
 
 const hexToRgb = (hex: string) => {
@@ -19,149 +20,238 @@ const hexToRgb = (hex: string) => {
   return rgb(r, g, b);
 };
 
+// ── A4 layout constants (kept identical to generateQuotePDF.ts, so the two
+// documents feel like one family — same margins, same header/footer rhythm) ──
 const PAGE_WIDTH = 595.28;
-const A4_HEIGHT = 841.89; // ceiling — a package with many feature lines still gets a full page
-const MIN_PAGE_HEIGHT = 460;
-const HEADER_HEIGHT = 150;
+const PAGE_HEIGHT = 841.89;
+const HEADER_HEIGHT = 100;
 const FOOTER_HEIGHT = 40;
+const MARGIN = 45;
+const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
+const CONTENT_TOP = PAGE_HEIGHT - HEADER_HEIGHT - 35;
+const CONTENT_BOTTOM = FOOTER_HEIGHT + 30; // anything below this triggers a page break
+
+// ── Brand tokens (same values as generateQuotePDF.ts — matches touchdomain-brand-guidelines.html) ──
+const BRAND = {
+  plum: hexToRgb('#452c63'),
+  mauve: hexToRgb('#9972ab'),
+  lavTint: hexToRgb('#f5f0fa'), // corrected — was off-palette #faf8fb
+  lavBorder: hexToRgb('#e6dcee'),
+  ink: hexToRgb('#2a1b3d'), // corrected — was a generic #222222
+  grey: hexToRgb('#6b5c7d'), // corrected — was a generic #666666
+  hairline: hexToRgb('#e4dced'),
+  green: hexToRgb('#2e7d32'),
+  white: rgb(1, 1, 1),
+};
+
+const wrapText = (text: string, maxWidth: number, font: PDFFont, size: number): string[] => {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (font.widthOfTextAtSize(testLine, size) <= maxWidth) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+};
 
 export const generateOrderPDFBuffer = async (data: OrderData): Promise<Buffer> => {
   const pdfDoc = await PDFDocument.create();
 
-  const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  let logoImage = null;
+  // Logo embedding — this part was already correct in the original file
+  // (properly awaited, properly drawn). Kept as-is, just hoisted so it only
+  // needs to happen once even if the order spans multiple pages.
+  let logoImage: PDFImage | null = null;
+  let logoDims = { width: 0, height: 0 };
   try {
-    // White logo for the solid purple header band.
     const logoPath = path.join(process.cwd(), 'public', 'branding', 'touch-domain-logo-white.png');
     const logoBytes = fs.readFileSync(logoPath);
     logoImage = await pdfDoc.embedPng(logoBytes);
-  } catch (err) {
-    console.error('Order PDF: white logo asset not found, falling back to text wordmark.', err);
+    const targetHeight = 26;
+    const scale = targetHeight / logoImage.height;
+    logoDims = { width: logoImage.width * scale, height: targetHeight };
+  } catch {
+    logoImage = null; // falls back to text wordmark in drawHeader
   }
 
-  // Same principle as the quote PDF: size the page to the actual content
-  // (a 3-feature Launchpad order and a 10-feature custom order shouldn't
-  // render on an identical full-A4 canvas), capped at A4 for genuinely
-  // long feature lists.
-  const featureCount = data.features ? data.features.length : 0;
-  const estimatedContentHeight =
-    HEADER_HEIGHT +
-    36 +                          // title + underline
-    34 +                          // intro line 1 + 2
-    (data.clientPhone ? 72 : 54) + // date/name/email/phone
-    20 +                          // spacing before package section
-    25 +                          // "Your Package" heading
-    20 +                          // package name
-    (data.servicePrice ? 22 : 0) + // price line
-    18 +                          // "What's Included" heading
-    (featureCount * 15) +
-    25 +                          // spacing before disclaimer
-    100 +                         // disclaimer box
-    FOOTER_HEIGHT +
-    30;
+  const orderRef = data.orderRef || `TD-ORD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-  const PAGE_HEIGHT = Math.max(MIN_PAGE_HEIGHT, Math.min(estimatedContentHeight, A4_HEIGHT));
+  const pages: PDFPage[] = [];
 
-  const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
+  const drawHeader = (p: PDFPage) => {
+    p.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT, width: PAGE_WIDTH, height: HEADER_HEIGHT, color: BRAND.plum });
+    p.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT - 3, width: PAGE_WIDTH, height: 3, color: BRAND.mauve });
 
-  // ─── BRANDING HEADER — solid band with decorative accent circles that
-  // echo the half-circle motif already used throughout the site, so this
-  // reads as a genuine piece of brand collateral rather than a plain
-  // purple box with text on it. ───
-  page.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT, width: PAGE_WIDTH, height: HEADER_HEIGHT, color: hexToRgb('#452c63') });
-  page.drawEllipse({ x: PAGE_WIDTH + 15, y: PAGE_HEIGHT + 10, xScale: 85, yScale: 85, color: hexToRgb('#5a3a7a') });
-  page.drawEllipse({ x: PAGE_WIDTH - 30, y: PAGE_HEIGHT - HEADER_HEIGHT + 15, xScale: 45, yScale: 45, color: hexToRgb('#9972ab') });
-  page.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT - 4, width: PAGE_WIDTH, height: 4, color: hexToRgb('#9972ab') });
+    if (logoImage) {
+      p.drawImage(logoImage, {
+        x: (PAGE_WIDTH - logoDims.width) / 2,
+        y: PAGE_HEIGHT - 24 - logoDims.height,
+        width: logoDims.width,
+        height: logoDims.height,
+      });
+    } else {
+      const titleText = 'TOUCH DOMAIN';
+      const titleWidth = fontBold.widthOfTextAtSize(titleText, 20);
+      p.drawText(titleText, { x: (PAGE_WIDTH - titleWidth) / 2, y: PAGE_HEIGHT - 46, size: 20, font: fontBold, color: BRAND.white });
+    }
 
-  let logoBottomY = PAGE_HEIGHT - 20;
-  if (logoImage) {
-    const logoScale = 160 / logoImage.width;
-    const logoW = logoImage.width * logoScale;
-    const logoH = logoImage.height * logoScale;
-    logoBottomY = PAGE_HEIGHT - 20 - logoH;
-    page.drawImage(logoImage, { x: (PAGE_WIDTH - logoW) / 2, y: logoBottomY, width: logoW, height: logoH });
-  } else {
-    const titleText = 'TOUCH DOMAIN';
-    const titleWidth = helveticaBold.widthOfTextAtSize(titleText, 22);
-    logoBottomY = PAGE_HEIGHT - 55;
-    page.drawText(titleText, { x: (PAGE_WIDTH - titleWidth) / 2, y: logoBottomY, size: 22, font: helveticaBold, color: rgb(1, 1, 1) });
-  }
+    // Brand-voice-aligned subline: specific, not generic agency copy.
+    const subText = 'Your Order Confirmation';
+    const subWidth = fontRegular.widthOfTextAtSize(subText, 10);
+    p.drawText(subText, { x: (PAGE_WIDTH - subWidth) / 2, y: PAGE_HEIGHT - HEADER_HEIGHT + 14, size: 10, font: fontRegular, color: hexToRgb('#e4d9ec') });
+  };
 
-  // Generous, deliberate gap between the logo lockup and the tagline
-  // rather than the two crowding each other.
-  const subText = 'Crafting Brands. Engineering Digital Experiences.';
-  const subWidth = helvetica.widthOfTextAtSize(subText, 9.5);
-  page.drawText(subText, { x: (PAGE_WIDTH - subWidth) / 2, y: logoBottomY - 22, size: 9.5, font: helvetica, color: hexToRgb('#e4d9ec') });
+  const drawFooter = (p: PDFPage, pageIndex: number, pageTotal: number) => {
+    p.drawRectangle({ x: 0, y: 0, width: PAGE_WIDTH, height: FOOTER_HEIGHT, color: BRAND.plum });
+    const footText = `touchdomain.co.za   |   ${CUSTOMER_CONTACT_EMAIL}   |   081 327 6153`;
+    p.drawText(footText, { x: MARGIN, y: (FOOTER_HEIGHT - 8.5) / 2, size: 8.5, font: fontRegular, color: BRAND.white });
 
-  let cursorY = PAGE_HEIGHT - HEADER_HEIGHT - 34;
-  const leftMargin = 50;
+    const pageLabel = `${orderRef}   ·   Page ${pageIndex} of ${pageTotal}`;
+    const pageLabelWidth = fontRegular.widthOfTextAtSize(pageLabel, 8);
+    p.drawText(pageLabel, { x: PAGE_WIDTH - MARGIN - pageLabelWidth, y: (FOOTER_HEIGHT - 8) / 2, size: 8, font: fontRegular, color: hexToRgb('#cbb9db') });
+  };
 
-  // ─── DOCUMENT TITLE ───
-  page.drawText('Order Confirmation', { x: leftMargin, y: cursorY, size: 18, font: helveticaBold, color: hexToRgb('#333333') });
-  const underlineWidth = helveticaBold.widthOfTextAtSize('Order Confirmation', 18);
-  page.drawLine({ start: { x: leftMargin, y: cursorY - 6 }, end: { x: leftMargin + underlineWidth, y: cursorY - 6 }, thickness: 2, color: hexToRgb('#9972ab') });
-  cursorY -= 32;
+  const newPage = (): PDFPage => {
+    const p = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
+    drawHeader(p);
+    pages.push(p);
+    return p;
+  };
 
-  const introLine1 = `Hi ${data.clientName} — welcome to Touch Domain.`;
-  const introLine2 = "We've locked in your order details below. Here's everything, in writing.";
-  page.drawText(introLine1, { x: leftMargin, y: cursorY, size: 11.5, font: helvetica, color: hexToRgb('#333333') });
+  let page = newPage();
+  let cursorY = CONTENT_TOP;
+
+  // Ensures enough room remains before drawing the next block; page-breaks
+  // otherwise. This is the fix for the original file's missing pagination —
+  // a package with a long feature list can no longer run text into the footer.
+  const ensureSpace = (neededHeight: number) => {
+    if (cursorY - neededHeight < CONTENT_BOTTOM) {
+      page = newPage();
+      cursorY = CONTENT_TOP;
+    }
+  };
+
+  // ─── DOCUMENT TITLE + REFERENCE ───
+  page.drawText('ORDER CONFIRMATION', { x: MARGIN, y: cursorY, size: 18, font: fontBold, color: BRAND.plum });
+  const refWidth = fontRegular.widthOfTextAtSize(orderRef, 9.5);
+  page.drawText(orderRef, { x: PAGE_WIDTH - MARGIN - refWidth, y: cursorY + 4, size: 9.5, font: fontRegular, color: BRAND.grey });
+  cursorY -= 24;
+
+  const introText = `Hi ${data.clientName}, thank you for choosing Touch Domain. Here are your confirmed order details.`;
+  const introLines = wrapText(introText, CONTENT_WIDTH, fontRegular, 10);
+  introLines.forEach(line => {
+    page.drawText(line, { x: MARGIN, y: cursorY, size: 10, font: fontRegular, color: BRAND.grey });
+    cursorY -= 14;
+  });
+
   cursorY -= 16;
-  page.drawText(introLine2, { x: leftMargin, y: cursorY, size: 11.5, font: helvetica, color: hexToRgb('#333333') });
-  cursorY -= 30;
 
-  // ─── CLIENT DETAILS ───
-  const textColor = hexToRgb('#333333');
-  page.drawText(`Date: ${new Date().toLocaleDateString('en-ZA')}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-  cursorY -= 17;
-  page.drawText(`Client Name: ${data.clientName}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-  cursorY -= 17;
-  page.drawText(`Email: ${data.clientEmail}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-  cursorY -= 17;
-  page.drawText(`Phone: ${data.clientPhone}`, { x: leftMargin, y: cursorY, size: 11, font: helvetica, color: textColor });
-  cursorY -= 34;
+  // ─── TWO-COLUMN META DATA SECTION ───
+  const col1X = MARGIN;
+  const col2X = PAGE_WIDTH / 2 + 10;
+  const metaYStart = cursorY;
 
-  // ─── ORDER DETAILS ───
-  page.drawText('Your Package', { x: leftMargin, y: cursorY, size: 14, font: helveticaBold, color: hexToRgb('#452c63') });
-  cursorY -= 22;
-
-  page.drawText(`${data.serviceName}`, { x: leftMargin, y: cursorY, size: 13, font: helveticaBold, color: textColor });
-  cursorY -= 19;
-
-  if (data.servicePrice) {
-    page.drawText(`Estimated Investment: R ${data.servicePrice}`, { x: leftMargin, y: cursorY, size: 12, font: helveticaBold, color: hexToRgb('#9972ab') });
-    cursorY -= 20;
+  page.drawText('CLIENT DETAILS', { x: col1X, y: metaYStart, size: 9, font: fontBold, color: BRAND.mauve });
+  page.drawText(data.clientName, { x: col1X, y: metaYStart - 15, size: 10.5, font: fontBold, color: BRAND.ink });
+  page.drawText(data.clientEmail, { x: col1X, y: metaYStart - 28, size: 9.5, font: fontRegular, color: BRAND.grey });
+  if (data.clientPhone) {
+    page.drawText(data.clientPhone, { x: col1X, y: metaYStart - 41, size: 9.5, font: fontRegular, color: BRAND.grey });
   }
 
-  if (data.features && data.features.length > 0) {
-    page.drawText("What's Included:", { x: leftMargin, y: cursorY, size: 11, font: helveticaBold, color: hexToRgb('#452c63') });
-    cursorY -= 17;
-    data.features.forEach(feature => {
-      page.drawText(`- ${feature}`, { x: leftMargin + 10, y: cursorY, size: 10, font: helvetica, color: hexToRgb('#555555') });
-      cursorY -= 15;
-    });
-  }
+  const dateStr = new Date().toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' });
+  page.drawText('ORDER INFORMATION', { x: col2X, y: metaYStart, size: 9, font: fontBold, color: BRAND.mauve });
+  page.drawText(`Date: ${dateStr}`, { x: col2X, y: metaYStart - 15, size: 9.5, font: fontRegular, color: BRAND.ink });
+  page.drawText('Status: Confirmed', { x: col2X, y: metaYStart - 28, size: 9.5, font: fontBold, color: BRAND.green });
+
+  cursorY = metaYStart - 58;
+
+  page.drawLine({ start: { x: MARGIN, y: cursorY }, end: { x: PAGE_WIDTH - MARGIN, y: cursorY }, thickness: 1, color: BRAND.hairline });
+  cursorY -= 26;
+
+  // ─── PACKAGE SUMMARY — a highlighted card. This is the headline fact of an
+  // order confirmation, so it gets the same visual weight the total gets on
+  // the quote document, not plain text sitting level with everything else. ───
+  ensureSpace(20);
+  page.drawText('PACKAGE SUMMARY', { x: MARGIN, y: cursorY, size: 9, font: fontBold, color: BRAND.mauve });
   cursorY -= 18;
 
-  // ─── DISCLAIMER FOOTER ───
-  const rectY = cursorY - 55;
-  page.drawRectangle({ x: leftMargin, y: rectY, width: 495, height: 65, color: hexToRgb('#faf8fb'), borderColor: hexToRgb('#e6dcee'), borderWidth: 1 });
+  const serviceNameLines = wrapText(data.serviceName, CONTENT_WIDTH - 140, fontBold, 15);
+  const summaryHeight = Math.max(serviceNameLines.length * 19, 19) + 24;
+  ensureSpace(summaryHeight + 10);
 
-  const line1 = "This confirms we've received your order, and locks in the price shown above.";
-  const line2 = "A member of the team will be in touch shortly to walk through scope together";
-  const line3 = "and get things moving — no surprises, just the next honest conversation.";
+  page.drawRectangle({ x: MARGIN, y: cursorY - summaryHeight, width: CONTENT_WIDTH, height: summaryHeight, color: BRAND.plum });
 
-  page.drawText(line1, { x: leftMargin + 15, y: rectY + 44, size: 10, font: helveticaOblique, color: hexToRgb('#666666') });
-  page.drawText(line2, { x: leftMargin + 15, y: rectY + 29, size: 10, font: helveticaOblique, color: hexToRgb('#666666') });
-  page.drawText(line3, { x: leftMargin + 15, y: rectY + 14, size: 10, font: helveticaOblique, color: hexToRgb('#666666') });
+  let nameY = cursorY - 26;
+  serviceNameLines.forEach(line => {
+    page.drawText(line, { x: MARGIN + 18, y: nameY, size: 15, font: fontBold, color: BRAND.white });
+    nameY -= 19;
+  });
 
-  // ─── FOOTER BAND ───
-  page.drawRectangle({ x: 0, y: 0, width: PAGE_WIDTH, height: FOOTER_HEIGHT, color: hexToRgb('#452c63') });
-  const footText = `touchdomain.co.za   |   ${CUSTOMER_CONTACT_EMAIL}   |   081 327 6153`;
-  const footWidth = helvetica.widthOfTextAtSize(footText, 9);
-  page.drawText(footText, { x: (PAGE_WIDTH - footWidth) / 2, y: (FOOTER_HEIGHT - 9) / 2, size: 9, font: helvetica, color: rgb(1, 1, 1) });
+  if (data.servicePrice) {
+    const priceText = `R ${data.servicePrice}`;
+    const priceWidth = fontBold.widthOfTextAtSize(priceText, 16);
+    page.drawText(priceText, { x: PAGE_WIDTH - MARGIN - 18 - priceWidth, y: cursorY - 26, size: 16, font: fontBold, color: BRAND.white });
+  }
+
+  cursorY -= summaryHeight + 22;
+
+  // ─── FEATURES LIST — card rows, matching the visual language used for the
+  // selections list on the quote document, instead of a flat bullet list. ───
+  if (data.features && data.features.length > 0) {
+    ensureSpace(20);
+    page.drawText("WHAT'S INCLUDED", { x: MARGIN, y: cursorY, size: 9, font: fontBold, color: BRAND.mauve });
+    cursorY -= 20;
+
+    for (const feature of data.features) {
+      const lines = wrapText(feature, CONTENT_WIDTH - 30, fontRegular, 9.5);
+      const rowHeight = lines.length * 13 + 12;
+
+      ensureSpace(rowHeight + 6);
+
+      page.drawRectangle({ x: MARGIN, y: cursorY - rowHeight + 8, width: CONTENT_WIDTH, height: rowHeight, color: BRAND.lavTint });
+      page.drawRectangle({ x: MARGIN, y: cursorY - rowHeight + 8, width: 3, height: rowHeight, color: BRAND.mauve });
+
+      let rowY = cursorY - 3;
+      lines.forEach(line => {
+        page.drawText(line, { x: MARGIN + 14, y: rowY, size: 9.5, font: fontRegular, color: BRAND.ink });
+        rowY -= 13;
+      });
+
+      cursorY -= rowHeight + 6;
+    }
+  }
+
+  cursorY -= 14;
+
+  // ─── DISCLAIMER / NEXT STEPS BOX ───
+  const disclaimerText = "This confirms we've received your order and locks in the agreed scope above. A team member will reach out shortly with onboarding details.";
+  const disclaimerLines = wrapText(disclaimerText, CONTENT_WIDTH - 30, fontItalic, 8.5);
+  const boxHeight = disclaimerLines.length * 12 + 20;
+
+  ensureSpace(boxHeight + 10);
+
+  page.drawRectangle({
+    x: MARGIN, y: cursorY - boxHeight, width: CONTENT_WIDTH, height: boxHeight,
+    color: BRAND.lavTint, borderColor: BRAND.lavBorder, borderWidth: 1,
+  });
+  let lineY = cursorY - 15;
+  disclaimerLines.forEach(line => {
+    page.drawText(line, { x: MARGIN + 15, y: lineY, size: 8.5, font: fontItalic, color: BRAND.grey });
+    lineY -= 12;
+  });
+
+  // ─── FOOTERS — drawn last, once the true page count is known ───
+  pages.forEach((p, i) => drawFooter(p, i + 1, pages.length));
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
