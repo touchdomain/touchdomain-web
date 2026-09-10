@@ -196,7 +196,7 @@ export async function deleteUserAccount(userId: string): Promise<ActionResult> {
       try {
         const drive = getGoogleDriveClient();
         await Promise.allSettled(
-          files.map((f) => drive.files.delete({ fileId: f.drive_file_id }))
+          files.map((f) => drive.files.delete({ fileId: f.drive_file_id, supportsAllDrives: true }))
         );
       } catch {
         // ignore — DB erasure is the compliance-critical part

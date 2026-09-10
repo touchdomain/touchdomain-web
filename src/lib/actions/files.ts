@@ -18,7 +18,7 @@ export async function deleteClientFile(fileId: string): Promise<ActionResult> {
     if (error) throw error;
 
     try {
-      await getGoogleDriveClient().files.delete({ fileId: file.drive_file_id });
+      await getGoogleDriveClient().files.delete({ fileId: file.drive_file_id, supportsAllDrives: true });
     } catch (driveErr) {
       console.warn('Drive delete failed (continuing to remove the row):', driveErr);
     }
