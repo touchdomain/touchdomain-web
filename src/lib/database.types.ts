@@ -28,6 +28,7 @@ export interface Database {
           email: string;
           phone: string | null;
           company_name: string | null;
+          drive_folder_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -38,6 +39,7 @@ export interface Database {
           email: string;
           phone?: string | null;
           company_name?: string | null;
+          drive_folder_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };

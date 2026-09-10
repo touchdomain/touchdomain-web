@@ -42,7 +42,7 @@ export default async function InvoicesPage() {
               <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-td-dark">{money(Number(inv.amount_zar))}</span>
                 <Badge tone={TONE[inv.status]}>{inv.status}</Badge>
-                {inv.pdf_storage_path ? (
+                {inv.pdf_drive_file_id && (
                   <a
                     href={`/api/invoices/${inv.id}`}
                     target="_blank"
@@ -51,16 +51,7 @@ export default async function InvoicesPage() {
                   >
                     View / download PDF <ExternalLink className="h-3.5 w-3.5" />
                   </a>
-                ) : inv.pdf_drive_file_id ? (
-                  <a
-                    href={`https://drive.google.com/file/d/${inv.pdf_drive_file_id}/view`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-td-purple hover:text-td-accent"
-                  >
-                    PDF <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                ) : null}
+                )}
               </div>
             </Card>
           ))}

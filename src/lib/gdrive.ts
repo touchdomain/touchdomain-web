@@ -60,6 +60,16 @@ export async function createDriveFolder(
   return data.id ?? null;
 }
 
+/** Fetch a Drive file's bytes (service account must have access). */
+export async function downloadFromDrive(fileId: string): Promise<Buffer> {
+  const drive = getGoogleDriveClient();
+  const res = await drive.files.get(
+    { fileId, alt: 'media', supportsAllDrives: true },
+    { responseType: 'arraybuffer' }
+  );
+  return Buffer.from(res.data as ArrayBuffer);
+}
+
 /** Upload a buffer to Drive, optionally into a specific folder. */
 export async function uploadToDrive(
   buffer: Buffer,

@@ -31,6 +31,7 @@ CREATE TABLE public.profiles (
   email TEXT NOT NULL UNIQUE,
   phone TEXT,
   company_name TEXT,
+  drive_folder_id TEXT,                                  -- migration 004: client's company folder in the Shared Drive
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

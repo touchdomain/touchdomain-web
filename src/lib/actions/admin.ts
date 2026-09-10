@@ -232,6 +232,28 @@ export async function setUserRole(userId: string, role: UserRole): Promise<Actio
   }
 }
 
+/**
+ * Ensure the client has a company-level folder in the Shared Drive and return
+ * its id. Cached on profiles.drive_folder_id. Returns null if Drive isn't
+ * configured (no GOOGLE_DRIVE_PARENT_FOLDER_ID).
+ */
+async function ensureClientFolder(admin: Admin, clientId: string): Promise<string | null> {
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('company_name, full_name, drive_folder_id')
+    .eq('id', clientId)
+    .maybeSingle();
+  if (!profile) return null;
+  if (profile.drive_folder_id) return profile.drive_folder_id;
+
+  const folderName = (profile.company_name || profile.full_name || 'Client').trim();
+  const folderId = await createDriveFolder(folderName);
+  if (folderId) {
+    await admin.from('profiles').update({ drive_folder_id: folderId }).eq('id', clientId);
+  }
+  return folderId;
+}
+
 export interface CreateProjectInput {
   clientId: string;
   title: string;
@@ -247,14 +269,16 @@ export async function createProject(
     await requireAdmin();
     const admin = getServiceClient();
 
-    // If no folder id was supplied, try to auto-create one under the configured
-    // parent folder. Falls back to null (files then land in the parent root).
+    // Files are organised <Shared Drive>/<Company>/<Project>. If no folder id
+    // was supplied, create the project folder inside the client's company
+    // folder (creating that too if needed). Non-fatal on failure.
     let folderId = input.googleDriveFolderId?.trim() || null;
     if (!folderId) {
       try {
-        folderId = await createDriveFolder(input.title);
+        const companyFolder = await ensureClientFolder(admin, input.clientId);
+        folderId = await createDriveFolder(input.title, companyFolder);
       } catch {
-        folderId = null; // non-fatal — admin can set a folder id later
+        folderId = null; // admin can set a folder id later
       }
     }
 

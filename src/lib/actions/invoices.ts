@@ -37,6 +37,9 @@ export async function createInvoice(
       return { success: false, error: 'Client, invoice number, amount and due date are required' };
     }
 
+    // File the PDF into the client's Drive folder (Shared Drive:
+    // <company>/<project>/). Drive is the canonical store; the client
+    // downloads it through /api/invoices/[id], which proxies from Drive.
     let folderId: string | null = null;
     if (projectId) {
       const { data: project } = await admin
@@ -46,8 +49,15 @@ export async function createInvoice(
         .maybeSingle();
       folderId = project?.google_drive_folder_id ?? null;
     }
+    if (!folderId) {
+      const { data: profile } = await admin
+        .from('profiles')
+        .select('drive_folder_id')
+        .eq('id', clientId)
+        .maybeSingle();
+      folderId = profile?.drive_folder_id ?? null;
+    }
 
-    // Best-effort: also file a copy to the project's Drive folder.
     const buffer = Buffer.from(await file.arrayBuffer());
     let driveFileId: string | null = null;
     let pdfError: string | null = null;
@@ -59,8 +69,8 @@ export async function createInvoice(
         folderId
       );
       driveFileId = uploaded.id;
-    } catch {
-      // Drive is optional — Supabase Storage below is the canonical copy.
+    } catch (e) {
+      pdfError = e instanceof Error ? e.message : 'Drive upload failed';
     }
 
     const { data, error } = await admin
@@ -81,20 +91,6 @@ export async function createInvoice(
       .single();
     if (error) throw error;
 
-    // Canonical copy in Supabase Storage — this is what the client downloads.
-    let storagePath: string | null = null;
-    try {
-      const path = `${clientId}/${data.id}.pdf`;
-      const { error: upErr } = await admin.storage
-        .from('invoices')
-        .upload(path, buffer, { contentType: 'application/pdf', upsert: true });
-      if (upErr) throw upErr;
-      storagePath = path;
-      await admin.from('invoices').update({ pdf_storage_path: path }).eq('id', data.id);
-    } catch (e) {
-      pdfError = e instanceof Error ? e.message : 'storage error';
-    }
-
     if (milestoneId) {
       await admin
         .from('payment_milestones')
@@ -107,13 +103,12 @@ export async function createInvoice(
     revalidatePath('/dashboard/invoices');
     revalidatePath('/dashboard');
     if (projectId) revalidatePath(`/admin/projects/${projectId}`);
-    const filed = storagePath != null || driveFileId != null;
     return {
       success: true,
-      data: { id: data.id, filed },
-      error: filed
+      data: { id: data.id, filed: driveFileId != null },
+      error: driveFileId
         ? undefined
-        : `Invoice recorded, but the PDF could not be stored (${pdfError ?? 'unknown error'}). Regenerate and attach it manually.`,
+        : `Invoice recorded, but the PDF could not be filed to Drive (${pdfError ?? 'unknown error'}). Check GOOGLE_DRIVE_PARENT_FOLDER_ID, then re-issue.`,
     };
   } catch (error) {
     return fail(error, 'Failed to create invoice');

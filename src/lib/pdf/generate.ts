@@ -262,6 +262,10 @@ export interface InvoiceData {
   reference?: string;
   /** What this invoice bills, e.g. "Deposit (50%) — to commence work". */
   covers?: string;
+  /** Recurring services: the period this invoice covers, e.g. "1–31 March 2026". */
+  billingPeriod?: string;
+  /** Recurring services: e.g. "Recurring monthly. Next invoice: 1 April 2026." */
+  recurringNote?: string;
   /** VAT handling. Off = "INVOICE" + non-vendor disclaimer, no VAT line. */
   isTaxInvoice?: boolean;
   vatNumber?: string;
@@ -406,7 +410,10 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
   );
 
   if (data.covers) {
-    c.paragraph(`This invoice covers: ${data.covers}`, { size: 9, gap: 10 });
+    c.paragraph(`This invoice covers: ${data.covers}`, { size: 9, gap: data.billingPeriod ? 4 : 10 });
+  }
+  if (data.billingPeriod) {
+    c.paragraph(`Billing period: ${data.billingPeriod}`, { size: 9, gap: 10 });
   }
 
   const rows = data.lineItems.map((li) => [
@@ -483,6 +490,9 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
       .join('\n'),
     { size: 9, gap: 10 }
   );
+  if (data.recurringNote) {
+    c.paragraph(data.recurringNote, { size: 8.5, gap: 6 });
+  }
   if (data.notes) {
     c.heading('Notes');
     c.paragraph(data.notes, { size: 9 });

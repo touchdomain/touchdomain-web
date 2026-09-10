@@ -51,6 +51,20 @@ const RECURRING = { ...HOSTING_PLANS, ...EMAIL_PLANS, ...CAREPLAN_PLANS, ...RETA
 const money = (n: number) => 'R ' + n.toLocaleString('en-ZA', { minimumFractionDigits: 0 });
 const toLines = (s: string) => s.split('\n').map((l) => l.trim()).filter(Boolean);
 
+// "2026-03" -> { period: "1–31 March 2026", monthYear: "March 2026", next: "1 April 2026" }
+function periodParts(yyyymm: string) {
+  const [y, m] = yyyymm.split('-').map(Number);
+  const start = new Date(y, m - 1, 1);
+  const end = new Date(y, m, 0);
+  const next = new Date(y, m, 1);
+  const my = start.toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' });
+  return {
+    period: `1–${end.getDate()} ${my}`,
+    monthYear: my,
+    next: next.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' }),
+  };
+}
+
 export default function ContractForm({ clients }: { clients: ClientOption[] }) {
   const [docType, setDocType] = useState<DocType>('sa');
   const [busy, setBusy] = useState(false);
@@ -76,7 +90,9 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
     setScheduleRows(buildSchedule(scheduleTemplate(t, s), Number(fee) || 0, date));
 
   // Invoice
+  const thisMonth = new Date().toISOString().slice(0, 7);
   const [inv, setInv] = useState({
+    kind: 'once' as 'once' | 'recurring',
     invoiceNumber: `INV-${new Date().getFullYear()}-`,
     issueDate: new Date().toISOString().split('T')[0],
     termsDays: 7,
@@ -84,6 +100,7 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
     notes: '',
     isTaxInvoice: false,
     vatNumber: '',
+    periodMonth: thisMonth, // yyyy-mm, recurring only
   });
   const setI = <K extends keyof typeof inv>(k: K, v: (typeof inv)[K]) => setInv((p) => ({ ...p, [k]: v }));
   const [bank, setBank] = useState({ ...TD_BANKING });
@@ -114,6 +131,15 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
     const plan = RECURRING[key];
     if (plan) setF((p) => ({ ...p, planKey: key, planLabel: plan.label, monthlyFee: plan.fee, planIncludes: plan.includes.join('\n') }));
   };
+  const addPlanLine = (key: string) => {
+    const plan = RECURRING[key];
+    if (!plan) return;
+    const rec = periodParts(inv.periodMonth);
+    setItems((p) => [
+      ...p.filter((it) => it.description.trim()),
+      { description: `${plan.label} — ${rec.monthYear}`, quantity: 1, unitPrice: plan.fee },
+    ]);
+  };
 
   const generate = () => {
     if (!f.clientCompany.trim() || !f.clientAddress.trim()) {
@@ -126,6 +152,7 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
           setBusy(false);
           return toast.error('Add an invoice number and at least one line item.');
         }
+        const rec = inv.kind === 'recurring' ? periodParts(inv.periodMonth) : null;
         const doc = generateInvoiceDoc({
           invoiceNumber: inv.invoiceNumber.trim(),
           issueDate: inv.issueDate,
@@ -139,6 +166,10 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
           isTaxInvoice: inv.isTaxInvoice,
           vatNumber: inv.isTaxInvoice ? inv.vatNumber.trim() || undefined : undefined,
           banking: bank,
+          billingPeriod: rec?.period,
+          recurringNote: rec
+            ? `This is a recurring monthly charge for ongoing services. Next invoice: ${rec.next}. To pause or cancel, give 30 days' written notice.`
+            : undefined,
         });
         downloadDoc(doc, `${inv.invoiceNumber.trim()}.pdf`);
         toast.success('Invoice PDF generated.');
@@ -355,18 +386,47 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
         <>
           <Card>
             <SectionTitle>Invoice details</SectionTitle>
+            <div className="mb-3 flex gap-2">
+              {(['once', 'recurring'] as const).map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setI('kind', k)}
+                  className={`rounded-full border px-4 py-1.5 text-sm font-medium ${
+                    inv.kind === k ? 'border-td-purple bg-td-purple text-white' : 'border-td-purple/20 text-td-dark hover:border-td-accent'
+                  }`}
+                >
+                  {k === 'once' ? 'Once-off / project' : 'Recurring (monthly)'}
+                </button>
+              ))}
+            </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <Field label="Invoice number *" value={inv.invoiceNumber} onChange={(v) => setI('invoiceNumber', v)} />
               <NumField label="Payment terms (days)" value={inv.termsDays} onChange={(v) => setI('termsDays', v)} />
-              <Field label="Reference (SOW / plan)" value={inv.reference} onChange={(v) => setI('reference', v)} />
+              <Field label={inv.kind === 'recurring' ? 'Relates to (plan)' : 'Reference (SOW / plan)'} value={inv.reference} onChange={(v) => setI('reference', v)} />
+              {inv.kind === 'recurring' && (
+                <label className="block">
+                  <span className="mb-1 block text-sm font-medium text-td-dark">Billing month</span>
+                  <input type="month" value={inv.periodMonth} onChange={(e) => setI('periodMonth', e.target.value)} className={inputClass} />
+                </label>
+              )}
             </div>
-            <label className="mt-3 block">
-              <span className="mb-1 block text-xs font-semibold text-gray-400">Quick-add a package as a line item</span>
-              <select value="" onChange={(e) => pickPackage(e.target.value)} className={inputClass}>
-                <option value="">— select —</option>
-                {Object.values(PACKAGES).map((p) => <option key={p.key} value={p.key}>{p.label} (R{p.fee.toLocaleString('en-ZA')})</option>)}
-              </select>
-            </label>
+            {inv.kind === 'recurring' ? (
+              <label className="mt-3 block">
+                <span className="mb-1 block text-xs font-semibold text-gray-400">Quick-add a recurring plan as a line item</span>
+                <select value="" onChange={(e) => addPlanLine(e.target.value)} className={inputClass}>
+                  <option value="">— select —</option>
+                  {Object.values(RECURRING).map((p) => <option key={p.key} value={p.key}>{p.label} (R{p.fee}/mo)</option>)}
+                </select>
+              </label>
+            ) : (
+              <label className="mt-3 block">
+                <span className="mb-1 block text-xs font-semibold text-gray-400">Quick-add a package as a line item</span>
+                <select value="" onChange={(e) => pickPackage(e.target.value)} className={inputClass}>
+                  <option value="">— select —</option>
+                  {Object.values(PACKAGES).map((p) => <option key={p.key} value={p.key}>{p.label} (R{p.fee.toLocaleString('en-ZA')})</option>)}
+                </select>
+              </label>
+            )}
           </Card>
 
           <Card>
