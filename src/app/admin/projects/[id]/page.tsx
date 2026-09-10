@@ -8,6 +8,8 @@ import StatusControl from './status-control';
 import PaymentPanel from './payment-panel';
 import DriveFolderButton from './drive-folder-button';
 import OnboardingReopen from './onboarding-reopen';
+import PlaybooksControl from './playbooks-control';
+import { PLAYBOOKS } from '@/lib/playbooks';
 
 const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
   {
@@ -92,6 +94,10 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
+            <PlaybooksControl projectId={project.id} selected={project.playbooks ?? []} />
+          </Card>
+
+          <Card>
             <div className="mb-3 flex items-center justify-between">
               <SectionTitle className="mb-0">Onboarding answers</SectionTitle>
               {(onboarding?.status === 'submitted' || onboarding?.status === 'reviewed') && (
@@ -102,6 +108,25 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
               <p className="text-sm italic text-gray-400">No onboarding record.</p>
             ) : (
               <div className="space-y-5">
+                {(project.playbooks ?? []).map((pbKey) => {
+                  const pb = PLAYBOOKS[pbKey];
+                  const answers = ((onboarding.discovery ?? {}) as Record<string, Record<string, string>>)[pbKey] ?? {};
+                  const answered = pb?.questions.filter((q) => answers[q.key]) ?? [];
+                  if (answered.length === 0) return null;
+                  return (
+                    <div key={pbKey}>
+                      <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-td-accent">{pb.label} discovery</p>
+                      <dl className="space-y-2">
+                        {answered.map((q) => (
+                          <div key={q.key} className="rounded-lg bg-td-accent/[0.06] p-3">
+                            <dt className="text-xs font-semibold text-td-purple">{q.label}</dt>
+                            <dd className="mt-0.5 whitespace-pre-wrap text-sm text-td-dark">{answers[q.key]}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  );
+                })}
                 {ONBOARDING_GROUPS.map((g) => {
                   const answered = g.fields.filter(([k]) => (onboarding as Record<string, unknown>)[k]);
                   if (answered.length === 0) return null;

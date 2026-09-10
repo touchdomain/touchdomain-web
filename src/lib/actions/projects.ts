@@ -2,7 +2,29 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
+import { notify } from '@/lib/notify';
 import type { ProjectStatus } from '@/lib/database.types';
+
+/** Admin: set which product playbooks apply to a project (drives onboarding). */
+export async function updateProjectPlaybooks(
+  projectId: string,
+  playbooks: string[]
+): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+    const { error } = await admin
+      .from('projects')
+      .update({ playbooks: playbooks.filter(Boolean) })
+      .eq('id', projectId);
+    if (error) throw error;
+    revalidatePath(`/admin/projects/${projectId}`);
+    revalidatePath('/dashboard/onboarding');
+    return { success: true };
+  } catch (error) {
+    return fail(error, 'Failed to update playbooks');
+  }
+}
 
 /** Admin: unlock a submitted questionnaire so the client can edit again. */
 export async function reopenOnboarding(clientId: string): Promise<ActionResult> {
@@ -37,11 +59,17 @@ export async function setMilestoneComplete(
         completed_at: complete ? new Date().toISOString() : null,
       })
       .eq('id', milestoneId)
-      .select('project_id')
+      .select('project_id, title')
       .single();
     if (e1) throw e1;
 
     await recalcProgress(admin, m.project_id);
+
+    if (complete) {
+      const { data: proj } = await admin.from('projects').select('client_id').eq('id', m.project_id).maybeSingle();
+      if (proj?.client_id) await notify.milestoneComplete(proj.client_id, m.title);
+    }
+
     revalidatePath(`/admin/projects/${m.project_id}`);
     revalidatePath('/dashboard');
     return { success: true };

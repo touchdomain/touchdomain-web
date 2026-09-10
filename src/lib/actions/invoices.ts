@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
 import { uploadToDrive } from '@/lib/gdrive';
+import { notify } from '@/lib/notify';
 import type { InvoiceStatus } from '@/lib/database.types';
 
 /**
@@ -99,6 +100,13 @@ export async function createInvoice(
         .eq('status', 'pending');
     }
 
+    await notify.invoiceIssued(clientId, {
+      number: invoiceNumber,
+      amountZar: amountZar,
+      dueDate,
+      covers: description,
+    });
+
     revalidatePath('/admin/invoices');
     revalidatePath('/dashboard/invoices');
     revalidatePath('/dashboard');
@@ -122,8 +130,18 @@ export async function setInvoiceStatus(
   try {
     await requireAdmin();
     const admin = getServiceClient();
+    const { data: before } = await admin
+      .from('invoices')
+      .select('status, client_id, invoice_number')
+      .eq('id', invoiceId)
+      .maybeSingle();
+
     const { error } = await admin.from('invoices').update({ status }).eq('id', invoiceId);
     if (error) throw error;
+
+    if (status === 'paid' && before && before.status !== 'paid') {
+      await notify.paymentConfirmed(before.client_id, before.invoice_number);
+    }
 
     // If this invoice bills an installment, reflect paid/unpaid onto it.
     const { data: ms } = await admin

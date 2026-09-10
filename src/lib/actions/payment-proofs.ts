@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
 import { uploadToDrive } from '@/lib/gdrive';
+import { notifyTeam } from '@/lib/notify';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED = /^(image\/(png|jpe?g|webp|heic)|application\/pdf)$/i;
@@ -39,7 +40,7 @@ export async function submitPaymentProof(formData: FormData): Promise<ActionResu
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('drive_folder_id, full_name')
+      .select('drive_folder_id, full_name, company_name')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -59,6 +60,8 @@ export async function submitPaymentProof(formData: FormData): Promise<ActionResu
       amount_zar: amountZar != null && Number.isFinite(amountZar) ? amountZar : null,
     });
     if (error) throw error;
+
+    await notifyTeam.paymentProofSubmitted(profile?.company_name || profile?.full_name || 'A client', invoice.invoice_number);
 
     revalidatePath('/dashboard/invoices');
     revalidatePath('/admin/invoices');

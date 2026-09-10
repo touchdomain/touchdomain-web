@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
 import { uploadToDrive, downloadFromDrive } from '@/lib/gdrive';
 import { generateSignatureCertificate, mergeExecutedContract } from '@/lib/pdf/certificate';
+import { notify } from '@/lib/notify';
 
 function clientIp(): string {
   const h = headers();
@@ -90,6 +91,7 @@ export async function sendContractForSignature(
     if (error) throw error;
 
     await recordClientFile(admin, clientId, projectId, fileName, uploaded.id, uploaded.viewLink, uploaded.downloadLink, uploaded.sizeBytes);
+    await notify.contractToSign(clientId, title);
 
     revalidatePath('/admin/contracts');
     revalidatePath('/dashboard');
@@ -200,6 +202,7 @@ export async function countersignContract(
     if (error) throw error;
 
     await recordClientFile(admin, c.client_id, c.project_id, fileName, uploaded.id, uploaded.viewLink, uploaded.downloadLink, uploaded.sizeBytes);
+    await notify.contractExecuted(c.client_id, c.title);
 
     revalidatePath('/admin/contracts');
     revalidatePath('/dashboard/contracts');

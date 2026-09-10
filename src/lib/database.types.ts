@@ -60,6 +60,7 @@ export interface Database {
           google_drive_folder_id: string | null;
           target_launch_date: string | null;
           total_fee_zar: number | null;
+          playbooks: string[];
           created_at: string;
           updated_at: string;
         };
@@ -73,6 +74,7 @@ export interface Database {
           google_drive_folder_id?: string | null;
           target_launch_date?: string | null;
           total_fee_zar?: number | null;
+          playbooks?: string[];
           created_at?: string;
           updated_at?: string;
         };
@@ -109,6 +111,7 @@ export interface Database {
           design_likes: string | null;
           design_dislikes: string | null;
           must_have_features: string | null;
+          discovery: Json;
           submitted_at: string | null;
           created_at: string;
           updated_at: string;
@@ -118,6 +121,7 @@ export interface Database {
           project_id?: string | null;
           client_id: string;
           status?: OnboardingStatus;
+          discovery?: Json;
           business_name?: string | null;
           business_goals?: string | null;
           brand_identity?: string | null;

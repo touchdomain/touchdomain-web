@@ -2,7 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import type { ProjectOnboarding } from '@/lib/database.types';
+import { notifyTeam } from '@/lib/notify';
+import { PLAYBOOKS, type DiscoveryAnswers } from '@/lib/playbooks';
+import type { ProjectOnboarding, Json } from '@/lib/database.types';
 
 // Columns a client is allowed to write from the questionnaire. Anything else
 // (client_id, status, submitted_at, timestamps) is managed server-side.
@@ -15,7 +17,27 @@ const EDITABLE_FIELDS = [
   'design_dislikes', 'must_have_features',
 ] as const satisfies readonly (keyof ProjectOnboarding)[];
 
-export type OnboardingInput = Partial<Record<(typeof EDITABLE_FIELDS)[number], string>>;
+export type OnboardingInput = Partial<Record<(typeof EDITABLE_FIELDS)[number], string>> & {
+  /** Playbook-specific answers: { playbookKey: { questionKey: answer } }. */
+  discovery?: DiscoveryAnswers;
+};
+
+/** Keep only known playbook/question keys and non-empty string answers. */
+function sanitiseDiscovery(input: DiscoveryAnswers | undefined): DiscoveryAnswers {
+  const out: DiscoveryAnswers = {};
+  if (!input) return out;
+  for (const [pbKey, answers] of Object.entries(input)) {
+    const pb = PLAYBOOKS[pbKey];
+    if (!pb || typeof answers !== 'object' || !answers) continue;
+    const valid: Record<string, string> = {};
+    for (const q of pb.questions) {
+      const v = answers[q.key];
+      if (typeof v === 'string' && v.trim()) valid[q.key] = v.trim();
+    }
+    if (Object.keys(valid).length) out[pbKey] = valid;
+  }
+  return out;
+}
 
 // Flat shape (not a discriminated union) — this project builds with
 // `strict: false`, which disables union narrowing on the `success` flag.
@@ -90,6 +112,8 @@ export async function saveOnboardingProgress(input: OnboardingInput): Promise<Ac
       .maybeSingle();
     const keepStatus = existing?.status === 'submitted' || existing?.status === 'reviewed';
 
+    const discovery = sanitiseDiscovery(input.discovery);
+
     const { error } = await supabase
       .from('project_onboarding')
       .upsert(
@@ -97,6 +121,7 @@ export async function saveOnboardingProgress(input: OnboardingInput): Promise<Ac
           client_id: user.id,
           ...(keepStatus ? {} : { status: 'in_progress' as const }),
           ...payload,
+          ...(input.discovery ? { discovery: discovery as unknown as Json } : {}),
         },
         { onConflict: 'client_id' }
       );
@@ -126,8 +151,16 @@ export async function submitOnboarding(): Promise<ActionResult> {
 
     if (error) throw error;
 
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name, company_name')
+      .eq('id', user.id)
+      .maybeSingle();
+    await notifyTeam.onboardingSubmitted(profile?.full_name ?? 'A client', profile?.company_name ?? null);
+
     revalidatePath('/dashboard/onboarding');
     revalidatePath('/dashboard');
+    revalidatePath('/admin/projects');
     return { success: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to submit onboarding';

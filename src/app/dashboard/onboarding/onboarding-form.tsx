@@ -6,10 +6,11 @@ import { toast } from 'sonner';
 import { Check, Loader2, ShieldAlert } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { saveOnboardingProgress, submitOnboarding, type OnboardingInput } from '@/lib/actions/onboarding';
+import { PLAYBOOKS, type DiscoveryAnswers } from '@/lib/playbooks';
 import { Card, SectionTitle, inputClass, btnPrimary } from '@/components/portal/ui';
 import type { ProjectOnboarding } from '@/lib/database.types';
 
-type FieldKey = keyof OnboardingInput;
+type FieldKey = Exclude<keyof OnboardingInput, 'discovery'>;
 
 interface FieldDef {
   key: FieldKey;
@@ -70,7 +71,15 @@ const EMPTY: Record<FieldKey, string> = SECTIONS.flatMap((s) => s.fields).reduce
   {} as Record<FieldKey, string>
 );
 
-export default function OnboardingForm({ initial }: { initial: ProjectOnboarding | null }) {
+export default function OnboardingForm({
+  initial,
+  playbooks,
+}: {
+  initial: ProjectOnboarding | null;
+  playbooks: string[];
+}) {
+  const activePlaybooks = playbooks.map((k) => PLAYBOOKS[k]).filter(Boolean);
+
   const [form, setForm] = useState<Record<FieldKey, string>>(() => {
     const seeded = { ...EMPTY };
     if (initial) {
@@ -81,6 +90,13 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
     }
     return seeded;
   });
+  const [discovery, setDiscovery] = useState<DiscoveryAnswers>(() => {
+    const d = (initial?.discovery ?? {}) as DiscoveryAnswers;
+    return typeof d === 'object' && d ? d : {};
+  });
+  const setDisc = (pb: string, q: string, v: string) =>
+    setDiscovery((prev) => ({ ...prev, [pb]: { ...(prev[pb] ?? {}), [q]: v } }));
+
   const [secret, setSecret] = useState(initial?.secure_credential_links ?? '');
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [submitting, setSubmitting] = useState(false);
@@ -90,8 +106,8 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
   // Serialise to a stable string so useDebounce isn't fed a fresh object
   // reference on every render (which would loop forever).
   const snapshot = useMemo(
-    () => JSON.stringify({ ...form, secure_credential_links: secret }),
-    [form, secret]
+    () => JSON.stringify({ ...form, secure_credential_links: secret, discovery }),
+    [form, secret, discovery]
   );
   const debouncedSnapshot = useDebounce(snapshot, 900);
   const lastSaved = useRef(snapshot); // don't re-save the value we loaded with
@@ -122,7 +138,7 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
   const handleSubmit = async () => {
     setSubmitting(true);
     // Flush any pending edits first.
-    const saved = await saveOnboardingProgress({ ...form, secure_credential_links: secret } as OnboardingInput);
+    const saved = await saveOnboardingProgress({ ...form, secure_credential_links: secret, discovery } as OnboardingInput);
     if (!saved.success) {
       toast.error(saved.error);
       setSubmitting(false);
@@ -197,6 +213,40 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
                 />
               </div>
             )}
+          </div>
+        </Card>
+      ))}
+
+      {activePlaybooks.map((pb) => (
+        <Card key={pb.key}>
+          <SectionTitle>{pb.label} — project details</SectionTitle>
+          {pb.intro && <p className="mb-4 text-xs text-gray-500">{pb.intro}</p>}
+          <div className="space-y-4">
+            {pb.questions.map((q) => (
+              <div key={q.key}>
+                <label className="mb-1 block text-sm font-medium text-td-dark">{q.label}</label>
+                {q.help && <p className="mb-1 text-xs text-gray-400">{q.help}</p>}
+                {q.type === 'select' && q.options ? (
+                  <select
+                    value={discovery[pb.key]?.[q.key] ?? ''}
+                    onChange={(e) => setDisc(pb.key, q.key, e.target.value)}
+                    disabled={alreadySubmitted}
+                    className={`${inputClass} disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
+                  >
+                    <option value="">— select —</option>
+                    {q.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                ) : (
+                  <textarea
+                    rows={q.rows ?? 3}
+                    value={discovery[pb.key]?.[q.key] ?? ''}
+                    onChange={(e) => setDisc(pb.key, q.key, e.target.value)}
+                    disabled={alreadySubmitted}
+                    className={`${inputClass} resize-y disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </Card>
       ))}

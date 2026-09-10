@@ -19,6 +19,7 @@ export const LEAD_NOTIFY_EMAIL = 'helper@touchdomain.co.za';
 import 'server-only';
 import nodemailer from 'nodemailer';
 import { generateBrandedEmail } from '@/utils/emailTemplate';
+import { SITE_URL } from '@/lib/site';
 
 export function getMailTransport() {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
@@ -75,4 +76,56 @@ export async function sendPortalInvite(opts: {
     html,
     text: `${intro}\n\nSet your password: ${link}\n\n(This link expires in 24 hours.)`,
   });
+}
+
+/**
+ * Branded transactional notification for a portal event (contract to sign,
+ * invoice issued, milestone done, …). Best-effort — callers should wrap it
+ * so a mail failure never breaks the underlying action.
+ */
+export async function sendPortalNotification(opts: {
+  to: string;
+  name: string;
+  subject: string;
+  heading: string;
+  /** One or more short paragraphs (plain strings — no HTML needed). */
+  lines: string[];
+  ctaLabel?: string;
+  /** Path on the portal, e.g. "/dashboard/contracts". */
+  ctaPath?: string;
+}) {
+  const { to, name, subject, heading, lines, ctaLabel, ctaPath } = opts;
+  const url = ctaPath ? `${SITE_URL}${ctaPath}` : null;
+
+  const body = `
+    <p>Hi ${name || 'there'},</p>
+    ${lines.map((l) => `<p>${l}</p>`).join('\n')}
+    ${
+      url && ctaLabel
+        ? `<p style="margin:28px 0;">
+             <a href="${url}" style="background:#452c63;color:#fff;text-decoration:none;padding:13px 26px;border-radius:8px;font-weight:600;display:inline-block;">${ctaLabel}</a>
+           </p>
+           <p style="font-size:13px;color:#666;">Or sign in at <a href="${SITE_URL}/login" style="color:#9972ab;">${SITE_URL.replace(/^https?:\/\//, '')}/login</a></p>`
+        : ''
+    }
+    <p>— Your Helper at Touch Domain</p>
+  `;
+
+  await getMailTransport().sendMail({
+    from: `"Touch Domain" <${process.env.SMTP_USER}>`,
+    replyTo: CUSTOMER_CONTACT_EMAIL,
+    to,
+    subject,
+    html: generateBrandedEmail(heading, body),
+    text: `${lines.join('\n\n')}${url ? `\n\n${ctaLabel ?? 'Open the portal'}: ${url}` : ''}`,
+  });
+}
+
+/** Fire-and-forget wrapper — logs on failure, never throws. */
+export async function notifySafe(fn: () => Promise<unknown>) {
+  try {
+    await fn();
+  } catch (e) {
+    console.error('Portal notification failed:', e instanceof Error ? e.message : e);
+  }
 }

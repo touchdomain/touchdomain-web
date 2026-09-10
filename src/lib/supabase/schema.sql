@@ -49,6 +49,7 @@ CREATE TABLE public.projects (
   google_drive_folder_id TEXT,
   target_launch_date DATE,
   total_fee_zar DECIMAL(10, 2),                          -- added in migration 002
+  playbooks TEXT[] NOT NULL DEFAULT '{}',                -- migration 007: which product playbooks apply
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -85,6 +86,7 @@ CREATE TABLE public.project_onboarding (
   design_likes TEXT,
   design_dislikes TEXT,
   must_have_features TEXT,
+  discovery JSONB NOT NULL DEFAULT '{}'::jsonb,          -- migration 007: playbook-specific answers
 
   submitted_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
