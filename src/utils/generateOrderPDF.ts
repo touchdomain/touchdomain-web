@@ -24,7 +24,7 @@ const hexToRgb = (hex: string) => {
 // documents feel like one family — same margins, same header/footer rhythm) ──
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
-const HEADER_HEIGHT = 100;
+const HEADER_HEIGHT = 120; // restored to match the original file's working header
 const FOOTER_HEIGHT = 40;
 const MARGIN = 45;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
@@ -77,9 +77,9 @@ export const generateOrderPDFBuffer = async (data: OrderData): Promise<Buffer> =
     const logoPath = path.join(process.cwd(), 'public', 'branding', 'touch-domain-logo-white.png');
     const logoBytes = fs.readFileSync(logoPath);
     logoImage = await pdfDoc.embedPng(logoBytes);
-    const targetHeight = 26;
-    const scale = targetHeight / logoImage.height;
-    logoDims = { width: logoImage.width * scale, height: targetHeight };
+    const targetWidth = 140; // matches the original file's working logo size exactly
+    const scale = targetWidth / logoImage.width;
+    logoDims = { width: targetWidth, height: logoImage.height * scale };
   } catch {
     logoImage = null; // falls back to text wordmark in drawHeader
   }
@@ -95,7 +95,7 @@ export const generateOrderPDFBuffer = async (data: OrderData): Promise<Buffer> =
     if (logoImage) {
       p.drawImage(logoImage, {
         x: (PAGE_WIDTH - logoDims.width) / 2,
-        y: PAGE_HEIGHT - 24 - logoDims.height,
+        y: PAGE_HEIGHT - 20 - logoDims.height,
         width: logoDims.width,
         height: logoDims.height,
       });

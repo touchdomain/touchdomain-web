@@ -1,66 +1,28 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Roboto } from "next/font/google";
-import PageLoader from '../components/PageLoader';
+import { Toaster } from "sonner";
 // @ts-ignore: side-effect import for global styles
 import "./globals.css";
-import Navigation from "../components/Navigation";
-import Footer from "../components/Footer";
 
 // Self-hosted by next/font — the single source of Roboto for the site.
 // Applied via roboto.className on <body>, which cascades to everything.
-// Do NOT also @import Roboto from Google Fonts in globals.css: that loads
-// the family a second time over the network and blocks first render.
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ['100', '300', '400', '500', '700', '900'],
 });
 
 const SITE_URL = "https://www.touchdomain.co.za";
-const SITE_TITLE = "Touch Domain | Crafting Brands. Engineering Digital Experiences.";
-const SITE_DESCRIPTION = "Touch Domain specializes in crafting brands and engineering digital experiences that drive impactful online success.";
 
+// Root metadata is intentionally minimal + noindex. The marketing route
+// group ((marketing)/layout.tsx) re-opens indexing and supplies the real
+// SEO copy; the portal (admin/dashboard/login) stays out of search.
 export const metadata: Metadata = {
-  // metadataBase lets every relative URL below (og:image, canonical, etc.)
-  // resolve correctly without hardcoding the domain in each one.
   metadataBase: new URL(SITE_URL),
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  // Every page currently shares this same title/description — the pages
-  // themselves are Client Components ('use client'), which Next.js does not
-  // allow to export their own metadata. Giving each page a genuinely unique
-  // title/description needs those pages restructured into a thin Server
-  // Component wrapper around the existing client content — a real, separate
-  // piece of work, not something folded into this file.
-  alternates: {
-    canonical: '/',
+  title: {
+    default: "Touch Domain",
+    template: "%s | Touch Domain",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  openGraph: {
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    url: SITE_URL,
-    siteName: "Touch Domain",
-    images: [
-      {
-        url: "/branding/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Touch Domain — South African Digital Studio for SMEs",
-      },
-    ],
-    locale: "en_ZA",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: ["/branding/og-image.png"],
-  },
+  robots: { index: false, follow: false },
   icons: {
     icon: [
       { url: '/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
@@ -74,35 +36,6 @@ export const metadata: Metadata = {
   manifest: '/favicon/site.webmanifest',
 };
 
-// LocalBusiness / ProfessionalService structured data — helps Google
-// understand what Touch Domain actually is (a South African digital
-// studio), independent of whatever page someone lands on first. The
-// registered address matches the legal documents (src/data/legal.mjs).
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "Touch Domain",
-  "legalName": "TOUCHDOMAIN (Pty) Ltd",
-  "description": SITE_DESCRIPTION,
-  "url": SITE_URL,
-  "telephone": "+27813276153",
-  "email": "info@touchdomain.co.za",
-  "areaServed": "South Africa",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "96 Makgathe Street, Ipelegeng",
-    "addressLocality": "Schweizer-Reneke",
-    "postalCode": "2780",
-    "addressRegion": "North West",
-    "addressCountry": "ZA",
-  },
-  "sameAs": [
-    "https://web.facebook.com/profile.php?id=61592261381746",
-    "https://www.instagram.com/touchdomain/",
-    "https://www.linkedin.com/company/touchdomain/",
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -110,29 +43,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-      </head>
       <body className={roboto.className}>
-        {/* FontAwesome kit — loaded via next/script with the default
-            afterInteractive strategy so its client-side <i>→<svg> DOM
-            rewrite runs only after React has hydrated, rather than racing
-            hydration and triggering "Extra attributes from the server"
-            mismatch warnings. */}
-        <Script src="https://kit.fontawesome.com/76e3c9c22e.js" crossOrigin="anonymous" />
-        <PageLoader />
-        <Navigation />
-        
-        {/* 'children' represents whatever page is currently active (e.g., page.tsx or quote/page.tsx) */}
-        <div className="min-h-screen">
-          {children}
-        </div>
-        
-        <Footer />
-        
+        {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: { fontFamily: 'inherit' },
+            classNames: {
+              toast: 'rounded-[14px] border border-td-purple/15',
+            },
+          }}
+        />
       </body>
     </html>
   );

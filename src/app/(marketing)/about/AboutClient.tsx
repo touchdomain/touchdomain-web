@@ -1,0 +1,326 @@
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import ContactSnippet from '@/components/ContactSnippet';
+import ConsultationModal from '@/components/ConsultationModal';
+import HalfCircleTopRight from '@/components/HalfcircleTopRight';
+import HalfCircleBottomLeft from '@/components/HalfcircleBottomLeft';
+
+
+export default function AboutClient() {
+  const [activeTab, setActiveTab] = useState('mission');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
+      {/* ── Static Hero Section ── */}
+      <section className="relative block h-screen overflow-x-hidden bg-white w-full pt-[100px] pb-0 md:pt-0 md:pb-0">
+        {/* Right 45% Background Image Overlay — desktop/tablet only */}
+        <div className="hidden md:block absolute top-0 right-0 w-[45%] h-full bg-[url('/branding/hero-background.png')] bg-cover bg-center z-0"></div>
+
+        <div className="relative md:absolute md:top-1/2 md:-translate-y-1/2 w-full h-full md:h-auto z-10 flex flex-col md:flex-row justify-start md:justify-center">
+          <div className="w-full h-full md:h-auto md:max-w-[93%] md:mx-auto px-0 flex flex-col md:block">
+            <div className="flex flex-col md:grid md:grid-cols-2 items-center md:pr-[3%] lg:pr-[8%] gap-0 md:gap-10 lg:gap-12 flex-1 md:flex-none h-full md:h-auto">
+              
+              <div className="flex flex-col items-center text-center md:items-start md:text-left animate-fadeIn w-full px-6 md:px-0 pb-6 md:pb-0 flex-shrink-0">
+                <h1 className="text-td-purple uppercase font-[800] text-[clamp(1.9rem,7vw+0.3rem,3rem)] leading-[1.1] md:leading-[1] w-full mb-[1px] ml-0 md:ml-[5px] pr-0 md:pr-8">
+                  We Are About You
+                </h1>
+                <span className="text-td-accent font-bold uppercase text-[clamp(1.05rem,3vw+0.4rem,2rem)] block mb-[0.5rem] ml-0 md:ml-[5px] w-full pr-0 md:pr-8">
+                  Here Is Our Story
+                </span>
+                <p className="text-gray-700 text-[clamp(0.9rem,1vw+0.7rem,1.25rem)] mt-[4px] mb-[1.1rem] ml-0 md:ml-[5px] max-w-lg pr-0 md:pr-4">
+                  Touch Domain builds custom websites, brand identities, and apps for South African SMEs, providing end-to-end hosting and 
+                  maintenance. Instead of juggling fragmented freelancers, businesses get a single dedicated team delivering engineered 
+                  solutions, from the deliverable through to ongoing support.
+                </p>
+                
+                <div className="mt-4 ml-0 md:ml-[5px]">
+                  <button onClick={() => setIsModalOpen(true)} className="inline-block text-[14px] px-[15px] py-[10px] bg-td-purple text-white rounded-[20px] border-[1.7px] border-transparent transition-all duration-300 hover:bg-transparent hover:border-td-accent hover:text-td-accent font-semibold">
+                    Let's Talk
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative w-full bg-td-purple md:bg-transparent flex-1 md:flex-none flex flex-col items-center justify-center md:block overflow-hidden">
+                <div className="relative flex justify-center md:justify-end animate-fadeIn">
+                <div className="w-[190px] xs:w-[220px] sm:w-[260px] md:w-[280px] lg:w-[340px] xl:w-[400px] 2xl:w-[460px]">
+                  <Image 
+                    src="/branding/about-landing.png" 
+                    alt="About page landing page" 
+                    width={500} 
+                    height={400} 
+                    className="w-full h-auto object-contain drop-shadow-2xl" 
+                    priority 
+                  />
+                </div>
+              </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main className="relative py-[2rem] my-[1.5rem]">
+        
+        {/* ── About Section ── */}
+        <section id="about-page" className="section-wrapper overflow-hidden">
+          <h2>Our Blueprint for Digital Excellence</h2>
+          <h3 className="heading-text mb-[10px]">Our Foundation & Your Advantage</h3>
+          <p className="intro">
+            Most agencies do one thing — a logo, or a website, or your social content. We do all five under one roof — brand, build, content, hosting, and the custom apps that go beyond a website — as one coherent identity, with a real plan for what comes after launch, not just a handshake and an invoice.
+          </p>
+          <HalfCircleTopRight />
+          <div className="flex flex-col md:flex-row justify-around items-center md:items-start mt-20 sm:mt-28 md:mt-[13rem] mx-4 sm:mx-8 mb-16 md:mb-[7rem] relative z-10 max-w-7xl md:mx-auto">
+            <div className="w-full md:w-[60%] border border-td-purple/15 rounded-[24px] p-6 md:p-8 bg-white shadow-sm">
+
+              <div className="flex items-center gap-[10px] mb-5">
+                <i className="!bg-transparent fas fa-compass text-[20px] text-td-purple text-[20px] !p-0"></i>
+                <span className="text-td-purple font-[700] text-[17px]">What Guides Us</span>
+              </div>
+
+              {/*Pill tab bar*/}
+              <nav role="tablist" aria-label="Mission, Vision, and Values" className="inline-flex !bg-td-purple/8 rounded-full p-1 mb-4" style={{ backgroundColor: '#372A6624' }}>
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'mission'}
+                  onClick={() => setActiveTab('mission')}
+                  className={`px-5 py-2 rounded-full text-[14px] font-[500] transition-colors bg-transparent outline-none ${activeTab === 'mission' ? '!bg-td-purple !text-white' : 'text-td-accent hover:text-td-purple'}`}
+                >Mission</button>
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'vision'}
+                  onClick={() => setActiveTab('vision')}
+                  className={`px-5 py-2 rounded-full text-[14px] font-[500] transition-colors bg-transparent outline-none ${activeTab === 'vision' ? '!bg-td-purple !text-white' : 'text-td-accent hover:text-td-purple'}`}
+                >Vision</button>
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'values'}
+                  onClick={() => setActiveTab('values')}
+                  className={`px-5 py-2 rounded-full text-[14px] font-[500] transition-colors bg-transparent outline-none ${activeTab === 'values' ? '!bg-td-purple !text-white' : 'text-td-accent hover:text-td-purple'}`}
+                >Values</button>
+              </nav>
+
+              {/* Tinted card wrapper so this side has the same visual weight as "Our Designs Are" */}
+              <div role="tabpanel" className="mt-2">
+                {activeTab === 'mission' && (
+                  <>
+                    <p className="mb-[14px] text-[17px]">We strive to be recognized for delivering exceptionally user-friendly, secure, and highly effective digital ecosystems. Through meticulous technical engineering and innovative design, we build impactful experiences that forge lasting brand connections and drive measurable success for our clients.</p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
+                        <i className="fas fa-lightbulb text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Innovation
+                      </span>
+                      <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
+                        <i className="fas fa-gear text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Technical excellence
+                      </span>
+                      <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
+                        <i className="fas fa-shield text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Integrity
+                      </span>
+                      <span className="inline-flex items-center gap-[6px] bg-td-purple/10 text-td-purple text-[12px] font-[600] px-3 py-[6px] rounded-full">
+                        <i className="fas fa-street-view text-[17px] bg-td-accent text-white py-[7px] px-[8px] rounded-full inline-flex items-center justify-center"></i>Client-centric
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {activeTab === 'vision' && (
+                  <p className="mb-[12px] text-[17px]">To empower businesses with comprehensive digital engineering and creative solutions that unlock their full potential, elevate their brand presence, and drive sustained, unprecedented growth, enabling them to lead in their industries and thrive in the dynamic digital landscape.</p>
+                )}
+
+                {activeTab === 'values' && (
+                  <div className="text-[15px]">
+                    <div className="flex justify-center flex-col md:flex-row md:gap-x-10">
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">1</span></div> Client-Centric Collaboration</h5>
+                        <p className="ml-[30px] mb-[12px]">We believe in building strong, collaborative partnerships with our clients.</p>
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">2</span></div> Innovation</h5>
+                        <p className="ml-[30px] mb-[12px]">We embrace a culture of continuous innovation, constantly seeking new and creative ways to solve problems and improve our services.</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-center flex-col md:flex-row md:gap-x-10">
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">3</span></div> Integrity</h5>
+                        <p className="ml-[30px] mb-[12px]">We conduct our business with the highest ethical standards, demonstrating honesty, transparency, and fairness in all our interactions.</p>
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">4</span></div> Continuous Learning</h5>
+                        <p className="ml-[30px] mb-[12px]">We are dedicated to ongoing learning and development, recognizing that the digital landscape is constantly evolving.</p>
+                      </div>
+                    </div>
+                    <h5 className="flex items-center text-[17px] font-[600] mt-[15px] mb-0 text-td-accent"><div className="circle-indicator"><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">5</span></div> Accountability</h5>
+                    <p className="ml-[30px] mb-[12px]">We take ownership of our work and are accountable for our actions.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="w-full max-w-[350px] min-h-[290px] bg-td-purple rounded-[19px] text-white p-[13px] mx-auto md:ml-[2rem] md:mr-0 mt-8 md:mt-0">
+              <h3 className="text-[18px] text-white font-bold text-left mb-4 uppercase">Our Designs Are</h3>
+              <div className="flex flex-row mb-3">
+                <div className="ml-[5px] mr-[4px]">
+                  <i className="fas fa-street-view text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
+                </div>
+                <div>
+                  <span className="text-[14px] font-[700] block">Brand Conscious</span>
+                  <p className="text-[12px] mb-[10px] leading-tight">Our website designs are based on your brand strategy to ensure that your target audience can easily identify with you.</p>
+                </div>
+              </div>
+              <div className="flex flex-row mb-3">
+                <div className="ml-[5px] mr-[4px]">
+                  <i className="fas fa-lightbulb text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
+                </div>
+                <div>
+                  <span className="text-[14px] font-[700] block">Intuitive</span>
+                  <p className="text-[12px] mb-[10px] leading-tight">We customise the user experience on your website based on findings from our target audience research. Giving you more conversions.</p>
+                </div>
+              </div>
+              <div className="flex flex-row mb-3">
+                <div className="ml-[5px] mr-[4px]">
+                  <i className="fas fa-tablet text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
+                </div>
+                <div>
+                  <span className="text-[14px] font-[700] block">Responsive</span>
+                  <p className="text-[12px] mb-[10px] leading-tight">Your site works properly on the phone it's actually viewed on first, not just the desktop it was designed on.</p>
+                </div>
+              </div>
+              <div className="flex flex-row">
+                <div className="ml-[5px] mr-[4px]">
+                  <i className="fas fa-gear text-[18px] !w-[36px] !h-[36px] !bg-td-accent rounded-full !p-[10px] text-center inline-flex items-center justify-center"></i>
+                </div>
+                <div>
+                  <span className="text-[14px] font-[700] block">Engineered, Not Templated</span>
+                  <p className="text-[12px] mb-[10px] leading-tight">We build on modern web technology instead of recycling another WordPress template — faster to load, easier to maintain, harder to break.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <HalfCircleBottomLeft />
+        </section>
+
+        {/* ── Services Section ── */}
+        <section id="services-intro" className="section-wrapper overflow-hidden">
+          <h2>From an Idea to Online Creation</h2>
+          <h3 className="heading-text mb-[10px]">Choose a Package or Fully Customize Your Solution</h3>
+          <p className="intro">
+            Our expert team turns your innovative concepts into impactful online realities. Choose a package for efficiency, or let us build a custom solution for exceptional results.
+          </p>
+          <HalfCircleTopRight />
+
+          <div className="flex flex-row overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 snap-x snap-mandatory md:snap-none [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden [scrollbar-width:none] gap-5 md:gap-6 items-stretch md:items-center relative z-10 max-w-7xl mx-auto px-4 pb-2 md:pb-0">
+
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                {/* fa-fingerprint has no clean FontAwesome v4 equivalent and is a
+                    meaningfully better fit for "Branding" than the site's other
+                    v4-style icons — kept as a deliberate exception rather than
+                    forced into a worse icon just for prefix consistency. */}
+                <i className="!bg-transparent fas fa-fingerprint text-[22px] !p-0"></i>
+                <span className="text-[19px] font-[600]">Branding</span>
+              </div>
+              <div className="flex-1 flex items-center">
+                <p className="text-[14px] leading-relaxed">
+                  In branding, we focus on building a solid, positive perception of your company and its products in your customer's mind — sharing your story and differentiating you from competitors.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Link href="/services" className="flex-1 text-center text-[13px] px-3 py-2 bg-white text-td-purple rounded-[20px] font-[600] transition-all hover:bg-td-accent hover:text-white">Packages</Link>
+                <Link href="/quote" className="flex-1 text-center text-[13px] px-3 py-2 border border-white/40 text-white rounded-[20px] font-[600] transition-all hover:bg-white/10">Customise</Link>
+              </div>
+            </div>
+
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <i className="!bg-transparent fas fa-desktop text-[22px] !p-0"></i>
+                <span className="text-[19px] font-[600]">Web design</span>
+              </div>
+              <div className="flex-1 flex items-center">
+                <p className="text-[14px] leading-relaxed">
+                  In web design, we focus on organising content in a way that holds your customer's attention, controlling how your brand is perceived from the first click.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Link href="/services" className="flex-1 text-center text-[13px] px-3 py-2 bg-white text-td-purple rounded-[20px] font-[600] transition-all hover:bg-td-accent hover:text-white">Packages</Link>
+                <Link href="/quote" className="flex-1 text-center text-[13px] px-3 py-2 border border-white/40 text-white rounded-[20px] font-[600] transition-all hover:bg-white/10">Customise</Link>
+              </div>
+            </div>
+
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <i className="!bg-transparent fas fa-pencil text-[22px] !p-0"></i>
+                <span className="text-[19px] font-[600]">Graphic design</span>
+              </div>
+              <div className="flex-1 flex items-center">
+                <p className="text-[14px] leading-relaxed">
+                  In graphic design, we focus on communicating and promoting your products in a visually appealing way that stays true to your brand identity.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Link href="/services" className="flex-1 text-center text-[13px] px-3 py-2 bg-white text-td-purple rounded-[20px] font-[600] transition-all hover:bg-td-accent hover:text-white">Packages</Link>
+                <Link href="/quote" className="flex-1 text-center text-[13px] px-3 py-2 border border-white/40 text-white rounded-[20px] font-[600] transition-all hover:bg-white/10">Customise</Link>
+              </div>
+            </div>
+
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <i className="!bg-transparent fas fa-server text-[22px] !p-0"></i>
+                <span className="text-[19px] font-[600]">Hosting</span>
+              </div>
+              <div className="flex-1 flex items-center">
+                <p className="text-[14px] leading-relaxed">
+                  Built and hosted by the same team, so there's one person to call, not three — secure weekly backups, real email under your own domain, billed monthly, cancel any time.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Link href="/services" className="flex-1 text-center text-[13px] px-3 py-2 bg-white text-td-purple rounded-[20px] font-[600] transition-all hover:bg-td-accent hover:text-white">Packages</Link>
+                <Link href="/quote" className="flex-1 text-center text-[13px] px-3 py-2 border border-white/40 text-white rounded-[20px] font-[600] transition-all hover:bg-white/10">Customise</Link>
+              </div>
+            </div>
+
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col text-white min-h-[300px] bg-td-purple p-5 rounded-[16px]">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <i className="!bg-transparent fas fa-mobile-screen text-[22px] !p-0"></i>
+                <span className="text-[19px] font-[600]">App development</span>
+              </div>
+              <div className="flex-1 flex items-center">
+                <p className="text-[14px] leading-relaxed">
+                  From an installable, offline-ready web app to a fully custom platform with accounts, dashboards, and the workflows your business actually needs.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Link href="/services" className="flex-1 text-center text-[13px] px-3 py-2 bg-white text-td-purple rounded-[20px] font-[600] transition-all hover:bg-td-accent hover:text-white">Packages</Link>
+                <Link href="/quote" className="flex-1 text-center text-[13px] px-3 py-2 border border-white/40 text-white rounded-[20px] font-[600] transition-all hover:bg-white/10">Customise</Link>
+              </div>
+            </div>
+
+            <div className="shrink-0 snap-center w-[82vw] xs:w-[345px] md:w-auto flex flex-col items-center justify-center text-center min-h-[300px] !bg-td-purple/10 p-5 rounded-[16px]">
+              <i className="!bg-transparent fas fa-comment text-[26px] text-td-purple !p-0 mb-2"></i>
+              <p className="text-[15px] font-[600] text-td-purple mb-1">Not sure which you need?</p>
+              <p className="text-[13px] text-td-purple/80 mb-4">Get a free consultation and we'll point you the right way.</p>
+              <button onClick={() => setIsModalOpen(true)} className="text-[13px] px-5 py-2 bg-td-purple text-white rounded-[20px] font-[600] transition-all hover:bg-td-accent">Talk to us</button>
+            </div>
+
+          </div>
+
+    <p className="md:hidden text-center text-gray-400 text-[12px] mt-3">
+      <span className="inline-block mr-1 animate-swipeLeft" aria-hidden="true">&larr;</span>
+      Swipe to see more
+      <span className="inline-block ml-1 animate-swipeRight" aria-hidden="true">&rarr;</span>
+    </p>
+
+          <HalfCircleBottomLeft />
+        </section>
+
+      </main>
+      
+      {/* ── Contact Snippet ── */}
+      <ContactSnippet />
+
+      {/* ── Consultation Modal ── */}
+      <ConsultationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </>
+  );
+}

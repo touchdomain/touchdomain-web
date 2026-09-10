@@ -24,7 +24,7 @@ const hexToRgb = (hex: string) => {
 // ── A4 layout constants ──
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
-const HEADER_HEIGHT = 100;
+const HEADER_HEIGHT = 120; // matches the working size/position from the original order-PDF file
 const FOOTER_HEIGHT = 40;
 const MARGIN = 45;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
@@ -60,9 +60,15 @@ const wrapText = (text: string, maxWidth: number, font: PDFFont, size: number): 
   return lines;
 };
 
-const money = (v: number | string | undefined) => {
+// Strips currency symbols, spaces, and thousands separators before parsing —
+// the original file never parsed this value at all, it just printed
+// data.estimatedTotal directly. A strict parser here is what caused a
+// pre-formatted value like "R18,500" to silently fall back to "TBD".
+const money = (v: number | string | undefined): string | null => {
   if (v === undefined || v === null || v === '') return null;
-  const n = Number(String(v).replace(/,/g, ''));
+  const cleaned = String(v).replace(/[^0-9.]/g, '');
+  if (!cleaned) return null;
+  const n = Number(cleaned);
   if (!isFinite(n) || n <= 0) return null;
   return n.toLocaleString('en-ZA');
 };
@@ -83,9 +89,9 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
     const logoPath = path.join(process.cwd(), 'public', 'branding', 'touch-domain-logo-white.png');
     const logoBytes = fs.readFileSync(logoPath);
     logoImage = await pdfDoc.embedPng(logoBytes);
-    const targetHeight = 26;
-    const scale = targetHeight / logoImage.height;
-    logoDims = { width: logoImage.width * scale, height: targetHeight };
+    const targetWidth = 140; // matches generateOrderPDF.ts's original working logo size
+    const scale = targetWidth / logoImage.width;
+    logoDims = { width: targetWidth, height: logoImage.height * scale };
   } catch {
     logoImage = null; // falls back to text wordmark in drawHeader
   }
@@ -102,7 +108,7 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
     if (logoImage) {
       p.drawImage(logoImage, {
         x: (PAGE_WIDTH - logoDims.width) / 2,
-        y: PAGE_HEIGHT - 24 - logoDims.height,
+        y: PAGE_HEIGHT - 20 - logoDims.height,
         width: logoDims.width,
         height: logoDims.height,
       });
@@ -230,7 +236,10 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
   cursorY -= 12;
 
   // ─── COST SUMMARY — a highlighted card, not text blending into the page ───
-  const total = money(data.estimatedTotal) ?? 'TBD';
+  // If a total was provided but couldn't be cleanly parsed/formatted, show
+  // the raw value rather than discarding it — "TBD" is reserved for when
+  // no total was provided at all.
+  const total = money(data.estimatedTotal) ?? (data.estimatedTotal ? String(data.estimatedTotal) : 'TBD');
   const appCost = money(data.estimatedApp);
   const monthlyCost = money(data.estimatedMonthly);
 
