@@ -266,6 +266,8 @@ export interface InvoiceData {
   billingPeriod?: string;
   /** Recurring services: e.g. "Recurring monthly. Next invoice: 1 April 2026." */
   recurringNote?: string;
+  /** Payment terms printed under the total, e.g. deposit / net-7 wording. */
+  paymentTerms?: string;
   /** VAT handling. Off = "INVOICE" + non-vendor disclaimer, no VAT line. */
   isTaxInvoice?: boolean;
   vatNumber?: string;
@@ -452,6 +454,11 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
     );
   } else if (data.vatNumber) {
     c.paragraph(`VAT registration number: ${data.vatNumber}`, { size: 8, gap: 12 });
+  }
+
+  if (data.paymentTerms) {
+    c.heading('Payment Terms');
+    c.paragraph(data.paymentTerms, { size: 9, gap: 12 });
   }
 
   if (data.schedule?.length) {

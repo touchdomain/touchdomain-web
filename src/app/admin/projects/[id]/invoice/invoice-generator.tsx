@@ -31,6 +31,8 @@ interface ScheduleRow {
 interface Props {
   projectId: string;
   clientId: string;
+  defaultInvoiceNumber: string;
+  defaultTerms: string;
   client: { name: string; company: string | null; email: string; address?: string };
   milestone: MilestoneCtx | null;
   schedule: ScheduleRow[];
@@ -48,6 +50,8 @@ const plusDays = (n: number) => {
 export default function InvoiceGenerator({
   projectId,
   clientId,
+  defaultInvoiceNumber,
+  defaultTerms,
   client,
   milestone,
   schedule,
@@ -55,10 +59,11 @@ export default function InvoiceGenerator({
   paidToDate,
 }: Props) {
   const router = useRouter();
-  const [invoiceNumber, setInvoiceNumber] = useState(`INV-${new Date().getFullYear()}-`);
+  const [invoiceNumber, setInvoiceNumber] = useState(defaultInvoiceNumber);
   const [issueDate, setIssueDate] = useState(today());
   const [dueDate, setDueDate] = useState(milestone?.dueDate || plusDays(7));
   const [reference, setReference] = useState('');
+  const [terms, setTerms] = useState(defaultTerms);
   const [notes, setNotes] = useState('');
   const [isTaxInvoice, setIsTaxInvoice] = useState(false);
   const [vatNumber, setVatNumber] = useState('');
@@ -95,6 +100,7 @@ export default function InvoiceGenerator({
     lineItems: items.filter((it) => it.description.trim()),
     notes: notes.trim() || undefined,
     reference: reference.trim() || undefined,
+    paymentTerms: terms.trim() || undefined,
     covers: covers || undefined,
     isTaxInvoice,
     vatNumber: isTaxInvoice ? vatNumber.trim() || undefined : undefined,
@@ -221,6 +227,11 @@ export default function InvoiceGenerator({
           )}
           <div className="text-gray-500">Total due <span className="ml-3 text-lg font-bold text-td-purple">R {total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span></div>
         </div>
+
+        <label className="mt-4 block">
+          <span className="mb-1 block text-sm font-medium text-td-dark">Payment terms</span>
+          <textarea rows={2} value={terms} onChange={(e) => setTerms(e.target.value)} className={`${inputClass} resize-y`} />
+        </label>
 
         <label className="mt-4 block">
           <span className="mb-1 block text-sm font-medium text-td-dark">Notes (optional)</span>

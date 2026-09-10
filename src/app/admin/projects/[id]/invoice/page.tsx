@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { getProjectDetail } from '@/lib/admin-data';
+import { getProjectDetail, getNextInvoiceNumber } from '@/lib/admin-data';
 import { PageHeader } from '@/components/portal/ui';
 import { summariseSchedule } from '@/lib/payment-schedule';
 import InvoiceGenerator from './invoice-generator';
@@ -15,7 +15,10 @@ export default async function NewInvoicePage({
   params: { id: string };
   searchParams: { milestone?: string };
 }) {
-  const detail = await getProjectDetail(params.id);
+  const [detail, nextInvoiceNumber] = await Promise.all([
+    getProjectDetail(params.id),
+    getNextInvoiceNumber(),
+  ]);
   if (!detail) notFound();
   const { project, paymentMilestones } = detail;
 
@@ -24,6 +27,8 @@ export default async function NewInvoicePage({
     : null;
 
   const summary = summariseSchedule(paymentMilestones);
+  const isFirstInstalment =
+    milestone != null && paymentMilestones[0]?.id === milestone.id;
 
   return (
     <div className="max-w-3xl">
@@ -40,6 +45,12 @@ export default async function NewInvoicePage({
       <InvoiceGenerator
         projectId={project.id}
         clientId={project.client_id}
+        defaultInvoiceNumber={nextInvoiceNumber}
+        defaultTerms={
+          isFirstInstalment
+            ? 'Payable on signature of the agreement. Work commences once this payment reflects. Accounts more than 14 calendar days past due may pause the project.'
+            : 'Payable per the agreed project payment schedule. Accounts more than 14 calendar days past due may pause work in progress.'
+        }
         client={{
           name: project.profiles?.full_name ?? 'Client',
           company: project.profiles?.company_name ?? null,

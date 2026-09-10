@@ -108,6 +108,22 @@ export async function getAllInvoices(): Promise<InvoiceWithClient[]> {
   return (data ?? []) as InvoiceWithClient[];
 }
 
+/** Next invoice number in the running yearly series, e.g. "INV-2026-014". */
+export async function getNextInvoiceNumber(): Promise<string> {
+  const supabase = createClient();
+  const year = new Date().getFullYear();
+  const prefix = `INV-${year}-`;
+  const { data } = await supabase
+    .from('invoices')
+    .select('invoice_number')
+    .like('invoice_number', `${prefix}%`);
+  const max = (data ?? []).reduce(
+    (m, r) => Math.max(m, parseInt(r.invoice_number.slice(prefix.length), 10) || 0),
+    0
+  );
+  return `${prefix}${String(max + 1).padStart(3, '0')}`;
+}
+
 export async function getStaff(): Promise<Profile[]> {
   const supabase = createClient();
   const { data } = await supabase

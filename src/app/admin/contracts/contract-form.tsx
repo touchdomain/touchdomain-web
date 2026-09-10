@@ -3,15 +3,19 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { FileDown, Loader2, Plus, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import {
   generateContractDoc,
   generateInvoiceDoc,
+  generateInvoiceBlob,
   downloadDoc,
   TD_BANKING,
   type ContractData,
   type ContractDocType,
+  type InvoiceData,
   type InvoiceLineItem,
 } from '@/lib/pdf/generate';
+import { createInvoice } from '@/lib/actions/invoices';
 import {
   PACKAGES,
   HOSTING_PLANS,
@@ -29,7 +33,7 @@ import {
   type PaymentTier,
   type SmallStructure,
 } from '@/lib/payment-schedule';
-import { Card, SectionTitle, inputClass, btnPrimary } from '@/components/portal/ui';
+import { Card, SectionTitle, inputClass, btnPrimary, btnSecondary } from '@/components/portal/ui';
 
 interface ClientOption {
   id: string;
@@ -65,9 +69,17 @@ function periodParts(yyyymm: string) {
   };
 }
 
-export default function ContractForm({ clients }: { clients: ClientOption[] }) {
+export default function ContractForm({
+  clients,
+  nextInvoiceNumber,
+}: {
+  clients: ClientOption[];
+  nextInvoiceNumber: string;
+}) {
+  const router = useRouter();
   const [docType, setDocType] = useState<DocType>('sa');
   const [busy, setBusy] = useState(false);
+  const [invoiceClientId, setInvoiceClientId] = useState('');
 
   const [f, setF] = useState({
     agreementDate: new Date().toISOString().split('T')[0],
@@ -93,10 +105,11 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
   const thisMonth = new Date().toISOString().slice(0, 7);
   const [inv, setInv] = useState({
     kind: 'once' as 'once' | 'recurring',
-    invoiceNumber: `INV-${new Date().getFullYear()}-`,
+    invoiceNumber: nextInvoiceNumber,
     issueDate: new Date().toISOString().split('T')[0],
     termsDays: 7,
     reference: '',
+    terms: '',
     notes: '',
     isTaxInvoice: false,
     vatNumber: '',
@@ -141,42 +154,88 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
     ]);
   };
 
+  const invoiceValid = () =>
+    inv.invoiceNumber.trim().length > 3 && items.some((it) => it.description.trim() && it.unitPrice > 0);
+  const invoiceDueDate = () => addDays(inv.issueDate, Number(inv.termsDays) || 0);
+
+  const buildInvoice = (): InvoiceData => {
+    const rec = inv.kind === 'recurring' ? periodParts(inv.periodMonth) : null;
+    const defaultTerms =
+      inv.kind === 'recurring'
+        ? 'Payable monthly in advance. This service continues month to month; either party may cancel on 30 days’ written notice.'
+        : 'Payable on the due date shown. Work on the related project proceeds once payment reflects; accounts more than 14 calendar days past due may pause work.';
+    return {
+      invoiceNumber: inv.invoiceNumber.trim(),
+      issueDate: inv.issueDate,
+      dueDate: invoiceDueDate(),
+      clientName: f.clientContact || f.clientCompany,
+      clientCompany: f.clientCompany || undefined,
+      clientAddress: f.clientAddress || undefined,
+      lineItems: items.filter((it) => it.description.trim()),
+      reference: inv.reference.trim() || undefined,
+      paymentTerms: inv.terms.trim() || defaultTerms,
+      notes: inv.notes.trim() || undefined,
+      isTaxInvoice: inv.isTaxInvoice,
+      vatNumber: inv.isTaxInvoice ? inv.vatNumber.trim() || undefined : undefined,
+      banking: bank,
+      billingPeriod: rec?.period,
+      recurringNote: rec
+        ? `This is a recurring monthly charge for ongoing services. Next invoice: ${rec.next}. To pause or cancel, give 30 days' written notice.`
+        : undefined,
+    };
+  };
+
+  const fileInvoiceToPortal = async () => {
+    if (!invoiceValid()) return toast.error('Add an invoice number and at least one line item.');
+    if (!invoiceClientId) return toast.error('Pick which portal client this invoice is for.');
+    setBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', generateInvoiceBlob(buildInvoice()), `${inv.invoiceNumber.trim()}.pdf`);
+      fd.append('clientId', invoiceClientId);
+      fd.append('invoiceNumber', inv.invoiceNumber.trim());
+      fd.append('amountZar', String(invTotal));
+      fd.append('dueDate', invoiceDueDate());
+      if (inv.reference.trim()) fd.append('reference', inv.reference.trim());
+      fd.append('isTaxInvoice', String(inv.isTaxInvoice));
+      const desc =
+        inv.kind === 'recurring' ? `Recurring — ${periodParts(inv.periodMonth).monthYear}` : 'Ad-hoc invoice';
+      fd.append('description', desc);
+      const res = await createInvoice(fd);
+      if (res.success) {
+        if (res.data?.filed) toast.success('Invoice filed to the client’s portal.');
+        else toast.warning(res.error || 'Invoice recorded, but the PDF was not filed to Drive.');
+        router.push('/admin/invoices');
+      } else {
+        toast.error(res.error);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to file invoice');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const generate = () => {
+    if (docType === 'invoice') {
+      if (!invoiceValid()) return toast.error('Add an invoice number and at least one line item.');
+      setBusy(true);
+      try {
+        downloadDoc(generateInvoiceDoc(buildInvoice()), `${inv.invoiceNumber.trim()}.pdf`);
+        toast.success('Invoice PDF generated.');
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Failed to generate invoice');
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
     if (!f.clientCompany.trim() || !f.clientAddress.trim()) {
       return toast.error('Client company and address are required.');
     }
     setBusy(true);
     try {
-      if (docType === 'invoice') {
-        if (!inv.invoiceNumber.trim() || !items.some((it) => it.description.trim() && it.unitPrice > 0)) {
-          setBusy(false);
-          return toast.error('Add an invoice number and at least one line item.');
-        }
-        const rec = inv.kind === 'recurring' ? periodParts(inv.periodMonth) : null;
-        const doc = generateInvoiceDoc({
-          invoiceNumber: inv.invoiceNumber.trim(),
-          issueDate: inv.issueDate,
-          dueDate: addDays(inv.issueDate, Number(inv.termsDays) || 0),
-          clientName: f.clientContact || f.clientCompany,
-          clientCompany: f.clientCompany || undefined,
-          clientAddress: f.clientAddress || undefined,
-          lineItems: items.filter((it) => it.description.trim()),
-          reference: inv.reference.trim() || undefined,
-          notes: inv.notes.trim() || undefined,
-          isTaxInvoice: inv.isTaxInvoice,
-          vatNumber: inv.isTaxInvoice ? inv.vatNumber.trim() || undefined : undefined,
-          banking: bank,
-          billingPeriod: rec?.period,
-          recurringNote: rec
-            ? `This is a recurring monthly charge for ongoing services. Next invoice: ${rec.next}. To pause or cancel, give 30 days' written notice.`
-            : undefined,
-        });
-        downloadDoc(doc, `${inv.invoiceNumber.trim()}.pdf`);
-        toast.success('Invoice PDF generated.');
-        setBusy(false);
-        return;
-      }
-
       const data: ContractData = {
         docType,
         agreementDate: f.agreementDate,
@@ -427,6 +486,16 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
                 </select>
               </label>
             )}
+            <label className="mt-3 block">
+              <span className="mb-1 block text-xs font-semibold text-gray-400">
+                File to a portal client (optional — leave blank for download-only)
+              </span>
+              <select value={invoiceClientId} onChange={(e) => setInvoiceClientId(e.target.value)} className={inputClass}>
+                <option value="">— not filed, download only —</option>
+                {clients.map((c) => <option key={c.id} value={c.id}>{c.company_name || c.full_name} · {c.email}</option>)}
+              </select>
+            </label>
+            <TextArea label="Payment terms (shown on the PDF — leave blank for the default)" value={inv.terms} onChange={(v) => setI('terms', v)} />
           </Card>
 
           <Card>
@@ -478,10 +547,15 @@ export default function ContractForm({ clients }: { clients: ClientOption[] }) {
         </>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-3">
+        {docType === 'invoice' && invoiceClientId && (
+          <button onClick={fileInvoiceToPortal} disabled={busy} className={btnSecondary}>
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />} File to client&apos;s portal
+          </button>
+        )}
         <button onClick={generate} disabled={busy} className={btnPrimary}>
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-          {docType === 'invoice' ? 'Generate invoice PDF' : 'Generate contract PDF'}
+          {docType === 'invoice' ? 'Download invoice PDF' : 'Generate contract PDF'}
         </button>
       </div>
     </div>
