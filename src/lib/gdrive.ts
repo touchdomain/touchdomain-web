@@ -34,6 +34,31 @@ export interface DriveUploadResult {
   downloadLink: string | null;
 }
 
+/**
+ * Create a folder in Drive and return its id. `parentId` defaults to
+ * GOOGLE_DRIVE_PARENT_FOLDER_ID; that parent must be shared with the service
+ * account as Editor. Returns null if no parent is configured (nothing to
+ * create the folder in — the caller should fall back to a manual folder id).
+ */
+export async function createDriveFolder(
+  name: string,
+  parentId?: string | null
+): Promise<string | null> {
+  const parent = parentId || process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || null;
+  if (!parent) return null;
+
+  const drive = getGoogleDriveClient();
+  const { data } = await drive.files.create({
+    requestBody: {
+      name,
+      mimeType: 'application/vnd.google-apps.folder',
+      parents: [parent],
+    },
+    fields: 'id',
+  });
+  return data.id ?? null;
+}
+
 /** Upload a buffer to Drive, optionally into a specific folder. */
 export async function uploadToDrive(
   buffer: Buffer,

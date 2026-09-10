@@ -80,6 +80,10 @@ export default function NewClient() {
                 <Input label="Google Drive folder ID" value={form.driveFolderId} onChange={(v) => set('driveFolderId', v)} />
                 <Input label="Target launch date" type="date" value={form.targetLaunchDate} onChange={(v) => set('targetLaunchDate', v)} />
               </div>
+              <p className="text-xs text-gray-400">
+                Leave the folder ID blank — a project folder is created automatically under your
+                configured Drive parent folder. Set an ID only to reuse an existing folder.
+              </p>
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-2">

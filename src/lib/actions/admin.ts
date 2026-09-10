@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
+import { createDriveFolder } from '@/lib/gdrive';
 
 export interface CreateClientInput {
   email: string;
@@ -65,6 +66,17 @@ export async function createProject(
     await requireAdmin();
     const admin = getServiceClient();
 
+    // If no folder id was supplied, try to auto-create one under the configured
+    // parent folder. Falls back to null (files then land in the parent root).
+    let folderId = input.googleDriveFolderId?.trim() || null;
+    if (!folderId) {
+      try {
+        folderId = await createDriveFolder(input.title);
+      } catch {
+        folderId = null; // non-fatal — admin can set a folder id later
+      }
+    }
+
     const { data, error } = await admin
       .from('projects')
       .insert({
@@ -72,7 +84,7 @@ export async function createProject(
         title: input.title,
         description: input.description ?? null,
         target_launch_date: input.targetLaunchDate ?? null,
-        google_drive_folder_id: input.googleDriveFolderId ?? null,
+        google_drive_folder_id: folderId,
       })
       .select('id')
       .single();
