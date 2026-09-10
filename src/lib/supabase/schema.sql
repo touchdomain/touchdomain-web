@@ -16,6 +16,8 @@ CREATE TYPE public.user_role AS ENUM ('admin', 'client');
 CREATE TYPE public.invoice_status AS ENUM ('unpaid', 'paid', 'overdue', 'cancelled');
 CREATE TYPE public.project_status AS ENUM ('discovery', 'in_progress', 'review', 'completed', 'paused');
 CREATE TYPE public.onboarding_status AS ENUM ('not_started', 'in_progress', 'submitted', 'reviewed');
+-- Added in migration 002:
+CREATE TYPE public.payment_status AS ENUM ('pending', 'invoiced', 'partial', 'paid', 'waived');
 
 -- ====================================================================
 -- 2. TABLE DEFINITIONS
@@ -43,6 +45,7 @@ CREATE TABLE public.projects (
   progress_percentage INT NOT NULL DEFAULT 0 CHECK (progress_percentage BETWEEN 0 AND 100),
   google_drive_folder_id TEXT,
   target_launch_date DATE,
+  total_fee_zar DECIMAL(10, 2),                          -- added in migration 002
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -101,12 +104,33 @@ CREATE TABLE public.milestones (
 CREATE TABLE public.invoices (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   client_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,   -- migration 002
   invoice_number TEXT NOT NULL UNIQUE,
   amount_zar DECIMAL(10, 2) NOT NULL,
   status public.invoice_status NOT NULL DEFAULT 'unpaid',
   due_date DATE NOT NULL,
+  description TEXT,                                                   -- migration 002: what this invoice bills
+  reference TEXT,                                                     -- migration 002: SOW / plan ref on the PDF
+  is_tax_invoice BOOLEAN NOT NULL DEFAULT FALSE,                      -- migration 002
   pdf_drive_file_id TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- PAYMENT MILESTONES — the installment schedule for a project (migration 002)
+CREATE TABLE public.payment_milestones (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  percentage NUMERIC(5, 2),
+  amount_zar DECIMAL(10, 2) NOT NULL,
+  amount_paid_zar DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  due_date DATE,
+  status public.payment_status NOT NULL DEFAULT 'pending',
+  invoice_id UUID REFERENCES public.invoices(id) ON DELETE SET NULL,
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- CLIENT FILES METADATA (Google Drive Links)
@@ -174,6 +198,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_update_profiles BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER trigger_update_projects BEFORE UPDATE ON public.projects FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER trigger_update_onboarding BEFORE UPDATE ON public.project_onboarding FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE TRIGGER trigger_update_payment_milestones BEFORE UPDATE ON public.payment_milestones FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ====================================================================
 -- 4. ROW LEVEL SECURITY (RLS) POLICIES
@@ -197,6 +222,7 @@ ALTER TABLE public.project_onboarding ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.milestones ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.client_files ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_milestones ENABLE ROW LEVEL SECURITY;
 
 -- PROFILES
 CREATE POLICY "Admin full profiles" ON public.profiles FOR ALL TO authenticated USING (is_admin());
@@ -228,3 +254,11 @@ CREATE POLICY "Client view own invoices" ON public.invoices FOR SELECT TO authen
 CREATE POLICY "Admin full files" ON public.client_files FOR ALL TO authenticated USING (is_admin());
 CREATE POLICY "Client view own files" ON public.client_files FOR SELECT TO authenticated USING (client_id = auth.uid());
 CREATE POLICY "Client insert own files" ON public.client_files FOR INSERT TO authenticated WITH CHECK (client_id = auth.uid());
+
+-- PAYMENT MILESTONES  (clients read-only via project ownership)
+CREATE POLICY "Admin full payment_milestones" ON public.payment_milestones FOR ALL TO authenticated USING (is_admin());
+CREATE POLICY "Client view own payment_milestones" ON public.payment_milestones FOR SELECT TO authenticated
+USING (EXISTS (
+  SELECT 1 FROM public.projects
+  WHERE projects.id = payment_milestones.project_id AND projects.client_id = auth.uid()
+));

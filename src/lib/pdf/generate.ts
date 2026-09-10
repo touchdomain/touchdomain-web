@@ -16,18 +16,33 @@ const TD = {
   email: 'helper@touchdomain.co.za',
   web: 'www.touchdomain.co.za',
   signatory: 'Thabo Mtsweni',
-  banking: {
-    bank: 'First National Bank',
-    account: 'TOUCHDOMAIN (Pty) Ltd',
-    number: '—',
-    branch: '250655',
-  },
+};
+
+export interface BankingDetails {
+  bank: string;
+  holder: string;
+  account: string;
+  branch: string;
+  accountType?: string;
+  swift?: string;
+}
+
+/** Default banking block — override per-invoice via InvoiceData.banking. */
+export const TD_BANKING: BankingDetails = {
+  bank: 'Standard Bank',
+  holder: 'Touch Domain',
+  account: '10286525788',
+  branch: '051001', // universal / electronic-payments branch code
+  accountType: 'MyMoBiz Current Account',
+  swift: 'SBZAZAJJ',
 };
 
 const PAGE_W = 595.28;
 const PAGE_H = 841.89;
 const MARGIN = 54;
 const CONTENT_W = PAGE_W - MARGIN * 2;
+
+const VAT_RATE = 0.15;
 
 const money = (n: number) =>
   'R ' + n.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -157,7 +172,6 @@ class Cursor {
       headStyles: { fillColor: PURPLE, textColor: [255, 255, 255], fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [247, 244, 249] },
     });
-    // jspdf-autotable stashes the end position here.
     this.y = ((this.doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? this.y) + 18;
   }
 
@@ -182,6 +196,18 @@ class Cursor {
 // ── Types ─────────────────────────────────────────────────────────────
 export type ContractDocType = 'sa' | 'hosting' | 'careplan';
 
+export interface ContractMilestone {
+  label: string;
+  percentage: number | null;
+  amountZar: number;
+  dueDate?: string | null;
+}
+
+export interface TimelineEntry {
+  label: string;
+  date: string; // yyyy-mm-dd, already resolved from days-after-signing
+}
+
 export interface ContractData {
   docType: ContractDocType;
   agreementDate: string;
@@ -197,6 +223,12 @@ export interface ContractData {
   clientMaterials?: string[];
   totalFee?: number;
   revisions?: number;
+  /** Milestone payment breakdown (from the payment-schedule engine). */
+  paymentSchedule?: ContractMilestone[];
+  paymentTierLabel?: string;
+  /** Timeline entries as resolved calendar dates. */
+  timeline?: TimelineEntry[];
+  warrantyDays?: number;
   // Hosting / Care Plan
   planLabel?: string;
   monthlyFee?: number;
@@ -210,6 +242,13 @@ export interface InvoiceLineItem {
   unitPrice: number;
 }
 
+export interface InvoiceScheduleRow {
+  label: string;
+  amountZar: number;
+  dueDate?: string | null;
+  paid?: boolean;
+}
+
 export interface InvoiceData {
   invoiceNumber: string;
   issueDate: string;
@@ -220,6 +259,17 @@ export interface InvoiceData {
   clientAddress?: string;
   lineItems: InvoiceLineItem[];
   notes?: string;
+  reference?: string;
+  /** What this invoice bills, e.g. "Deposit (50%) — to commence work". */
+  covers?: string;
+  /** VAT handling. Off = "INVOICE" + non-vendor disclaimer, no VAT line. */
+  isTaxInvoice?: boolean;
+  vatNumber?: string;
+  banking?: BankingDetails;
+  /** The wider project payment schedule, shown for context. */
+  schedule?: InvoiceScheduleRow[];
+  projectTotal?: number;
+  paidToDate?: number;
 }
 
 // ── Contracts ─────────────────────────────────────────────────────────
@@ -245,60 +295,81 @@ export function generateContractDoc(data: ContractData): jsPDF {
     );
   }
 
+  let n = 1;
+  const heading = (t: string) => c.heading(`${n++}. ${t}`);
+
   if (data.docType === 'sa') {
-    c.heading('1. Scope of Work & Deliverables');
+    heading('Scope of Work & Deliverables');
     c.paragraph('Touch Domain will provide the following deliverables:');
-    c.bullets((data.deliverables && data.deliverables.length ? data.deliverables : ['As set out in the accompanying proposal.']));
+    c.bullets(data.deliverables && data.deliverables.length ? data.deliverables : ['As set out in the accompanying proposal.']);
     if (data.outOfScope?.length) {
       c.paragraph('The following are expressly out of scope and will be quoted separately if required:');
       c.bullets(data.outOfScope);
     }
     if (data.clientMaterials?.length) {
-      c.heading('2. Client Responsibilities');
+      heading('Client Responsibilities');
       c.paragraph('The Client will supply, in a timely manner:');
       c.bullets(data.clientMaterials);
     }
 
-    c.heading(`${data.clientMaterials?.length ? '3' : '2'}. Fees & Payment Schedule`);
-    const fee = data.totalFee ?? 0;
-    c.paragraph(`The total once-off project fee is ${money(fee)} (excluding VAT where applicable), payable as follows:`);
-    c.table(
-      ['Milestone', 'Portion', 'Amount (ZAR)'],
-      [
-        ['Deposit on signature of this Agreement', '50%', money(fee * 0.5)],
-        ['Staging / draft sign-off', '25%', money(fee * 0.25)],
-        ['Final delivery & deployment', '25%', money(fee * 0.25)],
-      ]
-    );
-    c.paragraph('Work commences once the deposit reflects. Accounts unpaid for more than 14 calendar days past due may result in work being paused until settled.');
+    if (data.timeline?.length) {
+      heading('Indicative Timeline');
+      c.paragraph('Dates below are calculated from the agreement date and assume the Client meets feedback deadlines. Delays in Client feedback or materials shift subsequent dates by the same period.');
+      c.table(['Stage', 'Target date'], data.timeline.map((t) => [t.label, dateZA(t.date)]));
+    }
 
-    c.heading(`${data.clientMaterials?.length ? '4' : '3'}. Revisions`);
+    heading('Fees & Payment Schedule');
+    const fee = data.totalFee ?? 0;
+    c.paragraph(
+      `The total project fee is ${money(fee)} (Touch Domain is not a registered VAT vendor; no VAT is charged). Payment is due per the schedule below${data.paymentTierLabel ? ` (${data.paymentTierLabel} project structure)` : ''}:`
+    );
+    const schedule = data.paymentSchedule?.length
+      ? data.paymentSchedule
+      : [
+          { label: 'Deposit on signature of this Agreement', percentage: 50, amountZar: fee * 0.5 },
+          { label: 'Staging / draft sign-off', percentage: 25, amountZar: fee * 0.25 },
+          { label: 'Final delivery & deployment', percentage: 25, amountZar: fee * 0.25 },
+        ];
+    c.table(
+      ['Milestone', '%', 'Amount', 'Due'],
+      schedule.map((m) => [
+        m.label,
+        m.percentage != null ? `${m.percentage}%` : '—',
+        money(m.amountZar),
+        m.dueDate ? dateZA(m.dueDate) : 'On milestone',
+      ])
+    );
+    c.paragraph('Work commences once the deposit reflects. Each subsequent milestone is invoiced as it is reached. Accounts unpaid for more than 14 calendar days past due may result in work being paused until settled. If the Client terminates the project after the deposit, amounts already invoiced remain payable and work product is delivered up to the last paid milestone.');
+
+    heading('Revisions');
     c.paragraph(`The fee includes ${data.revisions ?? 2} round(s) of consolidated revisions per major deliverable. Additional rounds are billed at Touch Domain's standard hourly rate, agreed in writing beforehand.`);
+
+    heading('Warranty & Sign-off');
+    c.paragraph(`On final delivery, Touch Domain will correct defects reported within ${data.warrantyDays ?? 30} calendar days at no charge, provided the defect is a failure of the delivered work to function as agreed. This warranty excludes new features, third-party service faults, and changes made by the Client or others after handover.`);
   } else {
-    c.heading('1. Services & Plan');
+    heading('Services & Plan');
     c.paragraph(`Touch Domain will provide the "${data.planLabel || 'selected'}" plan on the terms below.`);
     if (data.planIncludes?.length) c.bullets(data.planIncludes);
-    c.heading('2. Fees & Billing');
+    heading('Fees & Billing');
     c.paragraph(
-      `The recurring fee is ${money(data.monthlyFee ?? 0)} per month, billed monthly in advance${data.termMonths ? ` on a minimum ${data.termMonths}-month term` : ' on a month-to-month basis'}. Either party may cancel on 30 days' written notice. Non-payment beyond 14 days past due may result in suspension of the hosted service, with data retained per our backup policy.`
+      `The recurring fee is ${money(data.monthlyFee ?? 0)} per month, billed monthly in advance${data.termMonths ? ` on a minimum ${data.termMonths}-month term` : ' on a month-to-month basis'}. Touch Domain is not a registered VAT vendor; no VAT is charged. Either party may cancel on 30 days' written notice. Non-payment beyond 14 days past due may result in suspension of the hosted service, with data retained per our backup policy.`
     );
   }
 
-  const ipNo = data.docType === 'sa' ? '5' : '3';
-  c.heading(`${ipNo}. Intellectual Property`);
+  heading('Intellectual Property');
   c.paragraph(
     'Final project deliverables become the property of the Client on receipt of full and final payment, subject to any third-party software, font, or content licensing. Touch Domain retains the right to display completed work in its portfolio unless the Client requests otherwise in writing. Pre-existing tools, code libraries, and methodologies remain the property of Touch Domain.'
   );
 
-  c.heading(`${data.docType === 'sa' ? '6' : '4'}. Confidentiality`);
+  heading('Confidentiality');
   c.paragraph('Each party will keep confidential any non-public business information disclosed during the engagement and will not share it with third parties without prior written consent, except where required by law.');
 
-  c.heading(`${data.docType === 'sa' ? '7' : '5'}. Limitation of Liability & Force Majeure`);
+  heading('Limitation of Liability & Force Majeure');
   c.paragraph(
     "Touch Domain's total liability under this Agreement is limited to the fees paid by the Client for the affected work. Neither party is liable for delays caused by circumstances beyond reasonable control, including load-shedding, network or hosting-provider outages, or third-party service disruption."
   );
 
-  c.heading(`${data.docType === 'sa' ? '8' : '6'}. Governing Law`);
+  heading('Governing Law');
   c.paragraph('This Agreement is governed by the laws of the Republic of South Africa. The parties will attempt to resolve any dispute directly and in good faith before commencing legal proceedings, and submit to the exclusive jurisdiction of the South African courts.');
 
   c.signatures();
@@ -315,7 +386,8 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
   drawLetterhead(doc);
   const c = new Cursor(doc);
 
-  c.title('TAX INVOICE');
+  const taxInvoice = !!data.isTaxInvoice;
+  c.title(taxInvoice ? 'TAX INVOICE' : 'INVOICE');
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
@@ -323,6 +395,7 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
   doc.text(`Invoice No: ${data.invoiceNumber}`, MARGIN, c.y);
   doc.text(`Issue date: ${dateZA(data.issueDate)}`, PAGE_W - MARGIN, c.y, { align: 'right' });
   c.y += 13;
+  if (data.reference) doc.text(`Reference: ${data.reference}`, MARGIN, c.y);
   doc.text(`Due date: ${dateZA(data.dueDate)}`, PAGE_W - MARGIN, c.y, { align: 'right' });
   c.y += 20;
 
@@ -332,6 +405,10 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
     { size: 9, gap: 12 }
   );
 
+  if (data.covers) {
+    c.paragraph(`This invoice covers: ${data.covers}`, { size: 9, gap: 10 });
+  }
+
   const rows = data.lineItems.map((li) => [
     li.description,
     String(li.quantity),
@@ -339,18 +416,71 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
     money(li.quantity * li.unitPrice),
   ]);
   const subtotal = data.lineItems.reduce((s, li) => s + li.quantity * li.unitPrice, 0);
+  const vat = taxInvoice ? Math.round(subtotal * VAT_RATE * 100) / 100 : 0;
+  const total = subtotal + vat;
   c.table(['Description', 'Qty', 'Unit price', 'Amount'], rows);
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(...INK);
+  const amtRight = (label: string, value: string, bold = false) => {
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.text(label, PAGE_W - MARGIN - 150, c.y, { align: 'right' });
+    doc.text(value, PAGE_W - MARGIN, c.y, { align: 'right' });
+    c.y += 15;
+  };
+  if (taxInvoice) {
+    amtRight('Subtotal', money(subtotal));
+    amtRight(`VAT @ ${(VAT_RATE * 100).toFixed(0)}%`, money(vat));
+  }
   doc.setTextColor(...PURPLE);
-  doc.text('Total due:', PAGE_W - MARGIN - 140, c.y, { align: 'right' });
-  doc.text(money(subtotal), PAGE_W - MARGIN, c.y, { align: 'right' });
-  c.y += 24;
+  amtRight('Total due', money(total), true);
+  doc.setTextColor(...INK);
+  c.y += 8;
 
+  if (!taxInvoice) {
+    c.paragraph(
+      `${TD.legal} is not a registered VAT vendor and does not qualify for compulsory registration at this time. No VAT is charged on this invoice and no VAT may be claimed against it.`,
+      { size: 8, gap: 12 }
+    );
+  } else if (data.vatNumber) {
+    c.paragraph(`VAT registration number: ${data.vatNumber}`, { size: 8, gap: 12 });
+  }
+
+  if (data.schedule?.length) {
+    c.heading('Project Payment Schedule');
+    if (data.projectTotal != null) {
+      const paid = data.paidToDate ?? 0;
+      c.paragraph(
+        `Project total ${money(data.projectTotal)}  ·  Paid to date ${money(paid)}  ·  Outstanding ${money(data.projectTotal - paid)}`,
+        { size: 9, gap: 8 }
+      );
+    }
+    c.table(
+      ['Installment', 'Amount', 'Due', 'Status'],
+      data.schedule.map((s) => [
+        s.label,
+        money(s.amountZar),
+        s.dueDate ? dateZA(s.dueDate) : '—',
+        s.paid ? 'Paid' : 'Due',
+      ])
+    );
+  }
+
+  const bank = data.banking ?? TD_BANKING;
   c.heading('Payment Details');
   c.paragraph(
-    `Bank: ${TD.banking.bank}\nAccount name: ${TD.banking.account}\nAccount number: ${TD.banking.number}\nBranch code: ${TD.banking.branch}\nReference: ${data.invoiceNumber}`,
+    [
+      `Bank: ${bank.bank}`,
+      `Account name: ${bank.holder}`,
+      `Account number: ${bank.account || '—'}`,
+      bank.accountType ? `Account type: ${bank.accountType}` : null,
+      `Branch code: ${bank.branch}`,
+      bank.swift ? `SWIFT: ${bank.swift}` : null,
+      `Reference: ${data.invoiceNumber}`,
+    ]
+      .filter(Boolean)
+      .join('\n'),
     { size: 9, gap: 10 }
   );
   if (data.notes) {
@@ -359,7 +489,7 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
   }
   c.paragraph(`${TD.legal}  ·  Reg. ${TD.reg}  ·  ${TD.email}  ·  ${TD.phone}`, { size: 8 });
 
-  drawFooter(doc, `Invoice ${data.invoiceNumber}`);
+  drawFooter(doc, `${taxInvoice ? 'Tax Invoice' : 'Invoice'} ${data.invoiceNumber}`);
   return doc;
 }
 

@@ -5,6 +5,7 @@ import { getProjectDetail } from '@/lib/admin-data';
 import { PageHeader, Card, SectionTitle, Badge } from '@/components/portal/ui';
 import MilestonesPanel from './milestones-panel';
 import StatusControl from './status-control';
+import PaymentPanel from './payment-panel';
 
 const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
   {
@@ -44,7 +45,8 @@ const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
   const detail = await getProjectDetail(params.id);
   if (!detail) notFound();
-  const { project, onboarding, milestones, files } = detail;
+  const { project, onboarding, milestones, files, paymentMilestones } = detail;
+  const agreementDate = project.created_at.slice(0, 10);
 
   return (
     <div className="max-w-5xl">
@@ -72,6 +74,15 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             Drive folder <ExternalLink className="h-3.5 w-3.5" />
           </a>
         )}
+      </div>
+
+      <div className="mb-6">
+        <PaymentPanel
+          projectId={project.id}
+          agreementDate={agreementDate}
+          totalFeeZar={project.total_fee_zar}
+          milestones={paymentMilestones}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

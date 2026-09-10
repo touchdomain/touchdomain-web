@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
-import { getClientContext, getClientMilestones, getClientOnboarding } from '@/lib/portal-data';
+import { getClientContext, getClientMilestones, getClientOnboarding, getClientPaymentSchedule } from '@/lib/portal-data';
 import { PageHeader, Card, SectionTitle, Badge, EmptyState } from '@/components/portal/ui';
+import { summariseSchedule, PAYMENT_STATUS_TONE } from '@/lib/payment-schedule';
+
+const money = (n: number) => 'R ' + n.toLocaleString('en-ZA', { minimumFractionDigits: 2 });
+const shortDate = (d: string) =>
+  new Date(d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
 
 const STATUS_LABEL: Record<string, string> = {
   discovery: 'Discovery',
@@ -13,10 +18,12 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function DashboardOverviewPage() {
   const { profile, project } = await getClientContext();
-  const [milestones, onboarding] = await Promise.all([
+  const [milestones, onboarding, payments] = await Promise.all([
     project ? getClientMilestones(project.id) : Promise.resolve([]),
     getClientOnboarding(),
+    project ? getClientPaymentSchedule(project.id) : Promise.resolve([]),
   ]);
+  const pay = summariseSchedule(payments);
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there';
   const onboardingDone = onboarding?.status === 'submitted' || onboarding?.status === 'reviewed';
@@ -66,6 +73,49 @@ export default async function DashboardOverviewPage() {
               </p>
             )}
           </Card>
+
+          {payments.length > 0 && (
+            <Card>
+              <SectionTitle>Payments</SectionTitle>
+              <p className="mb-4 text-sm text-gray-500">
+                Total <b className="text-td-dark">{money(pay.total)}</b> · Paid{' '}
+                <b className="text-td-dark">{money(pay.paid)}</b> · Outstanding{' '}
+                <b className="text-td-dark">{money(pay.outstanding)}</b>
+                {pay.next && (
+                  <>
+                    {' '}· Next{' '}
+                    <b className="text-td-dark">
+                      {money(Number(pay.next.amount_zar) - Number(pay.next.amount_paid_zar))}
+                    </b>
+                    {pay.next.due_date ? ` due ${shortDate(pay.next.due_date)}` : ''}
+                  </>
+                )}
+              </p>
+              <ul className="space-y-2">
+                {payments.map((m) => {
+                  const remaining = Number(m.amount_zar) - Number(m.amount_paid_zar);
+                  return (
+                    <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-td-purple/10 p-3">
+                      <div>
+                        <p className="text-sm font-medium text-td-dark">{m.label}</p>
+                        <p className="text-xs text-gray-400">
+                          {money(Number(m.amount_zar))}
+                          {m.due_date && m.status !== 'paid' ? ` · due ${shortDate(m.due_date)}` : ''}
+                          {m.status === 'partial' ? ` · ${money(remaining)} still due` : ''}
+                        </p>
+                      </div>
+                      <Badge tone={PAYMENT_STATUS_TONE[m.status]}>
+                        {m.status === 'invoiced' ? 'awaiting payment' : m.status}
+                      </Badge>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="mt-3 text-xs text-gray-400">
+                Invoices and payment details are under <Link href="/dashboard/invoices" className="text-td-accent hover:underline">Invoices</Link>.
+              </p>
+            </Card>
+          )}
 
           <Card>
             <SectionTitle>Milestones</SectionTitle>

@@ -1,6 +1,6 @@
 import 'server-only';
 import { createClient } from '@/lib/supabase/server';
-import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile } from '@/lib/database.types';
+import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone } from '@/lib/database.types';
 
 // Admin server components run with the admin's session; RLS "Admin full …"
 // policies give read access to every row.
@@ -66,6 +66,7 @@ export interface ProjectDetail {
   onboarding: ProjectOnboarding | null;
   milestones: Milestone[];
   files: ClientFile[];
+  paymentMilestones: PaymentMilestone[];
 }
 
 export async function getProjectDetail(id: string): Promise<ProjectDetail | null> {
@@ -77,17 +78,20 @@ export async function getProjectDetail(id: string): Promise<ProjectDetail | null
     .maybeSingle();
   if (!project) return null;
 
-  const [{ data: onboarding }, { data: milestones }, { data: files }] = await Promise.all([
-    supabase.from('project_onboarding').select('*').eq('project_id', id).maybeSingle(),
-    supabase.from('milestones').select('*').eq('project_id', id).order('created_at', { ascending: true }),
-    supabase.from('client_files').select('*').eq('project_id', id).order('created_at', { ascending: false }),
-  ]);
+  const [{ data: onboarding }, { data: milestones }, { data: files }, { data: paymentMilestones }] =
+    await Promise.all([
+      supabase.from('project_onboarding').select('*').eq('project_id', id).maybeSingle(),
+      supabase.from('milestones').select('*').eq('project_id', id).order('created_at', { ascending: true }),
+      supabase.from('client_files').select('*').eq('project_id', id).order('created_at', { ascending: false }),
+      supabase.from('payment_milestones').select('*').eq('project_id', id).order('sort_order', { ascending: true }),
+    ]);
 
   return {
     project: project as ProjectWithClient,
     onboarding: onboarding ?? null,
     milestones: milestones ?? [],
     files: files ?? [],
+    paymentMilestones: paymentMilestones ?? [],
   };
 }
 

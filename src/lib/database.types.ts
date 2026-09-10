@@ -15,6 +15,7 @@ export type UserRole = 'admin' | 'client';
 export type InvoiceStatus = 'unpaid' | 'paid' | 'overdue' | 'cancelled';
 export type ProjectStatus = 'discovery' | 'in_progress' | 'review' | 'completed' | 'paused';
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'submitted' | 'reviewed';
+export type PaymentStatus = 'pending' | 'invoiced' | 'partial' | 'paid' | 'waived';
 
 export interface Database {
   public: {
@@ -55,6 +56,7 @@ export interface Database {
           progress_percentage: number;
           google_drive_folder_id: string | null;
           target_launch_date: string | null;
+          total_fee_zar: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -67,6 +69,7 @@ export interface Database {
           progress_percentage?: number;
           google_drive_folder_id?: string | null;
           target_launch_date?: string | null;
+          total_fee_zar?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -174,26 +177,72 @@ export interface Database {
         Row: {
           id: string;
           client_id: string;
+          project_id: string | null;
           invoice_number: string;
           amount_zar: number;
           status: InvoiceStatus;
           due_date: string;
+          description: string | null;
+          reference: string | null;
+          is_tax_invoice: boolean;
           pdf_drive_file_id: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           client_id: string;
+          project_id?: string | null;
           invoice_number: string;
           amount_zar: number;
           status?: InvoiceStatus;
           due_date: string;
+          description?: string | null;
+          reference?: string | null;
+          is_tax_invoice?: boolean;
           pdf_drive_file_id?: string | null;
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['invoices']['Insert']>;
         Relationships: [
           { foreignKeyName: 'invoices_client_id_fkey'; columns: ['client_id']; referencedRelation: 'profiles'; referencedColumns: ['id'] },
+          { foreignKeyName: 'invoices_project_id_fkey'; columns: ['project_id']; referencedRelation: 'projects'; referencedColumns: ['id'] },
+        ];
+      };
+      payment_milestones: {
+        Row: {
+          id: string;
+          project_id: string;
+          label: string;
+          sort_order: number;
+          percentage: number | null;
+          amount_zar: number;
+          amount_paid_zar: number;
+          due_date: string | null;
+          status: PaymentStatus;
+          invoice_id: string | null;
+          paid_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          label: string;
+          sort_order?: number;
+          percentage?: number | null;
+          amount_zar: number;
+          amount_paid_zar?: number;
+          due_date?: string | null;
+          status?: PaymentStatus;
+          invoice_id?: string | null;
+          paid_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['payment_milestones']['Insert']>;
+        Relationships: [
+          { foreignKeyName: 'payment_milestones_project_id_fkey'; columns: ['project_id']; referencedRelation: 'projects'; referencedColumns: ['id'] },
+          { foreignKeyName: 'payment_milestones_invoice_id_fkey'; columns: ['invoice_id']; referencedRelation: 'invoices'; referencedColumns: ['id'] },
         ];
       };
       client_files: {
@@ -237,6 +286,7 @@ export interface Database {
       invoice_status: InvoiceStatus;
       project_status: ProjectStatus;
       onboarding_status: OnboardingStatus;
+      payment_status: PaymentStatus;
     };
     CompositeTypes: { [_ in never]: never };
   };
@@ -250,3 +300,4 @@ export type ProjectOnboarding = Tables['project_onboarding']['Row'];
 export type Milestone = Tables['milestones']['Row'];
 export type Invoice = Tables['invoices']['Row'];
 export type ClientFile = Tables['client_files']['Row'];
+export type PaymentMilestone = Tables['payment_milestones']['Row'];

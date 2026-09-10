@@ -12,7 +12,7 @@ export const generateBrandedEmail = (title: string, content: string) => {
   // Email clients need an absolute, publicly reachable URL (no local/relative
   // paths), and the header band is dark purple so the logo must be white.
   // If APP_LOGO_URL is set it must also be a www / non-redirecting URL.
-  const logoUrl = process.env.APP_LOGO_URL || `${SITE}/branding/touch-domain-logo-onlight.png`;
+  const logoUrl = process.env.APP_LOGO_URL || `${SITE}/branding/touch-domain-logo-ondark.png`;
 
   return `
   <!DOCTYPE html>
