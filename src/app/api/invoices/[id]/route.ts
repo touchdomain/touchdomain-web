@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { downloadFromDrive } from '@/lib/gdrive';
+import { contentDisposition } from '@/lib/http';
 
 /**
  * Streams an invoice PDF to the signed-in user. RLS on `invoices` means a
@@ -29,7 +30,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     return new NextResponse(new Uint8Array(bytes), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${invoice.invoice_number}.pdf"`,
+        'Content-Disposition': contentDisposition(`${invoice.invoice_number}.pdf`),
         'Cache-Control': 'private, no-store',
       },
     });

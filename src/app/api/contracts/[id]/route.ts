@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { downloadFromDrive } from '@/lib/gdrive';
+import { contentDisposition } from '@/lib/http';
 
 /**
  * Streams a contract PDF to the signed-in user. RLS on `contracts` scopes a
@@ -31,7 +32,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     return new NextResponse(new Uint8Array(bytes), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${contract.title} (${suffix}).pdf"`,
+        'Content-Disposition': contentDisposition(`${contract.title} (${suffix}).pdf`),
         'Cache-Control': 'private, no-store',
       },
     });
