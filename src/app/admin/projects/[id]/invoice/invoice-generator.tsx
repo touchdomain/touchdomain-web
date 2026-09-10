@@ -133,7 +133,8 @@ export default function InvoiceGenerator({
 
       const res = await createInvoice(fd);
       if (res.success) {
-        toast.success('Invoice issued and filed to Drive.');
+        if (res.data?.filed) toast.success('Invoice issued and filed to Drive.');
+        else toast.warning(res.error || 'Invoice recorded, but the PDF was not filed to Drive.');
         router.push(`/admin/projects/${projectId}`);
       } else {
         toast.error(res.error);

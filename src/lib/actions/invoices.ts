@@ -14,7 +14,9 @@ import type { InvoiceStatus } from '@/lib/database.types';
  * FormData fields: file, clientId, projectId?, milestoneId?, invoiceNumber,
  * amountZar, dueDate, description?, reference?, isTaxInvoice?
  */
-export async function createInvoice(formData: FormData): Promise<ActionResult<{ id: string }>> {
+export async function createInvoice(
+  formData: FormData
+): Promise<ActionResult<{ id: string; filed: boolean }>> {
   try {
     await requireAdmin();
     const admin = getServiceClient();
@@ -45,13 +47,22 @@ export async function createInvoice(formData: FormData): Promise<ActionResult<{ 
       folderId = project?.google_drive_folder_id ?? null;
     }
 
+    // File the PDF to Drive — but don't lose the invoice if Drive is
+    // unavailable (no Shared Drive configured, quota, auth). Record it anyway.
     const buffer = Buffer.from(await file.arrayBuffer());
-    const uploaded = await uploadToDrive(
-      buffer,
-      file.name || `${invoiceNumber}.pdf`,
-      'application/pdf',
-      folderId
-    );
+    let driveFileId: string | null = null;
+    let driveError: string | null = null;
+    try {
+      const uploaded = await uploadToDrive(
+        buffer,
+        file.name || `${invoiceNumber}.pdf`,
+        'application/pdf',
+        folderId
+      );
+      driveFileId = uploaded.id;
+    } catch (e) {
+      driveError = e instanceof Error ? e.message : 'Drive upload failed';
+    }
 
     const { data, error } = await admin
       .from('invoices')
@@ -65,7 +76,7 @@ export async function createInvoice(formData: FormData): Promise<ActionResult<{ 
         reference,
         is_tax_invoice: isTaxInvoice,
         status: 'unpaid',
-        pdf_drive_file_id: uploaded.id,
+        pdf_drive_file_id: driveFileId,
       })
       .select('id')
       .single();
@@ -83,7 +94,13 @@ export async function createInvoice(formData: FormData): Promise<ActionResult<{ 
     revalidatePath('/dashboard/invoices');
     revalidatePath('/dashboard');
     if (projectId) revalidatePath(`/admin/projects/${projectId}`);
-    return { success: true, data: { id: data.id } };
+    return {
+      success: true,
+      data: { id: data.id, filed: driveFileId != null },
+      error: driveError
+        ? `Invoice recorded, but the PDF was not filed to Drive (${driveError}). Attach it manually or set up a Shared Drive.`
+        : undefined,
+    };
   } catch (error) {
     return fail(error, 'Failed to create invoice');
   }

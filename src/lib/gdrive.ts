@@ -55,6 +55,7 @@ export async function createDriveFolder(
       parents: [parent],
     },
     fields: 'id',
+    supportsAllDrives: true,
   });
   return data.id ?? null;
 }
@@ -81,6 +82,7 @@ export async function uploadToDrive(
     },
     media: { mimeType, body: stream },
     fields: 'id, name, mimeType, size, webViewLink, webContentLink',
+    supportsAllDrives: true,
   });
 
   if (!data.id) throw new Error('Drive upload returned no file id');

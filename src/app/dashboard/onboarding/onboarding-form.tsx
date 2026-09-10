@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Check, Loader2, ShieldAlert } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -84,19 +85,27 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [submitting, setSubmitting] = useState(false);
   const alreadySubmitted = initial?.status === 'submitted' || initial?.status === 'reviewed';
+  const router = useRouter();
 
-  const debounced = useDebounce({ ...form, secure_credential_links: secret }, 900);
-  const firstRun = useRef(true);
+  // Serialise to a stable string so useDebounce isn't fed a fresh object
+  // reference on every render (which would loop forever).
+  const snapshot = useMemo(
+    () => JSON.stringify({ ...form, secure_credential_links: secret }),
+    [form, secret]
+  );
+  const debouncedSnapshot = useDebounce(snapshot, 900);
+  const lastSaved = useRef(snapshot); // don't re-save the value we loaded with
 
   useEffect(() => {
-    if (firstRun.current) {
-      firstRun.current = false;
-      return;
-    }
+    if (debouncedSnapshot === lastSaved.current) return;
+    const payload = JSON.parse(debouncedSnapshot) as OnboardingInput;
+    let cancelled = false;
     (async () => {
       setStatus('saving');
-      const res = await saveOnboardingProgress(debounced as OnboardingInput);
+      const res = await saveOnboardingProgress(payload);
+      if (cancelled) return;
       if (res.success) {
+        lastSaved.current = debouncedSnapshot;
         setStatus('saved');
         setTimeout(() => setStatus('idle'), 2500);
       } else {
@@ -104,7 +113,8 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
         toast.error(res.error);
       }
     })();
-  }, [debounced]);
+    return () => { cancelled = true; };
+  }, [debouncedSnapshot]);
 
   const set = (key: FieldKey, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
@@ -117,10 +127,15 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
       setSubmitting(false);
       return;
     }
+    lastSaved.current = snapshot;
     const res = await submitOnboarding();
     setSubmitting(false);
-    if (res.success) toast.success('Onboarding submitted — thank you!');
-    else toast.error(res.error);
+    if (res.success) {
+      toast.success('Onboarding submitted — thank you!');
+      router.refresh();
+    } else {
+      toast.error(res.error);
+    }
   };
 
   return (

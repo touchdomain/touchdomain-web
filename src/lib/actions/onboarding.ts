@@ -81,16 +81,30 @@ export async function saveOnboardingProgress(input: OnboardingInput): Promise<Ac
       }
     }
 
+    // Don't downgrade a submitted/reviewed questionnaire back to in_progress
+    // on an autosave — only advance not_started -> in_progress.
+    const { data: existing } = await supabase
+      .from('project_onboarding')
+      .select('status')
+      .eq('client_id', user.id)
+      .maybeSingle();
+    const keepStatus = existing?.status === 'submitted' || existing?.status === 'reviewed';
+
     const { error } = await supabase
       .from('project_onboarding')
       .upsert(
-        { client_id: user.id, status: 'in_progress', ...payload },
+        {
+          client_id: user.id,
+          ...(keepStatus ? {} : { status: 'in_progress' as const }),
+          ...payload,
+        },
         { onConflict: 'client_id' }
       );
 
     if (error) throw error;
 
     revalidatePath('/dashboard/onboarding');
+    revalidatePath('/dashboard');
     return { success: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to save onboarding';
