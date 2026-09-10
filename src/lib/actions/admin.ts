@@ -234,24 +234,60 @@ export async function setUserRole(userId: string, role: UserRole): Promise<Actio
 
 /**
  * Ensure the client has a company-level folder in the Shared Drive and return
- * its id. Cached on profiles.drive_folder_id. Returns null if Drive isn't
- * configured (no GOOGLE_DRIVE_PARENT_FOLDER_ID).
+ * its id, caching it on profiles.drive_folder_id. Throws if Drive isn't
+ * configured or the Google API rejects the call.
  */
-async function ensureClientFolder(admin: Admin, clientId: string): Promise<string | null> {
+async function ensureClientFolder(admin: Admin, clientId: string): Promise<string> {
   const { data: profile } = await admin
     .from('profiles')
     .select('company_name, full_name, drive_folder_id')
     .eq('id', clientId)
     .maybeSingle();
-  if (!profile) return null;
+  if (!profile) throw new Error('Client not found');
   if (profile.drive_folder_id) return profile.drive_folder_id;
 
   const folderName = (profile.company_name || profile.full_name || 'Client').trim();
   const folderId = await createDriveFolder(folderName);
-  if (folderId) {
-    await admin.from('profiles').update({ drive_folder_id: folderId }).eq('id', clientId);
-  }
+  await admin.from('profiles').update({ drive_folder_id: folderId }).eq('id', clientId);
   return folderId;
+}
+
+/**
+ * Create (or repair) the Drive folder structure for an existing project:
+ * <Shared Drive>/<Company>/<Project>/. Surfaces the real error so Drive
+ * misconfiguration is visible rather than silently skipped.
+ */
+export async function syncProjectDriveFolder(
+  projectId: string
+): Promise<ActionResult<{ folderId: string }>> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+
+    const { data: project } = await admin
+      .from('projects')
+      .select('id, title, client_id, google_drive_folder_id')
+      .eq('id', projectId)
+      .maybeSingle();
+    if (!project) return { success: false, error: 'Project not found' };
+    if (project.google_drive_folder_id) {
+      return { success: true, data: { folderId: project.google_drive_folder_id } };
+    }
+
+    const companyFolder = await ensureClientFolder(admin, project.client_id);
+    const folderId = await createDriveFolder(project.title, companyFolder);
+
+    const { error } = await admin
+      .from('projects')
+      .update({ google_drive_folder_id: folderId })
+      .eq('id', projectId);
+    if (error) throw error;
+
+    revalidatePath(`/admin/projects/${projectId}`);
+    return { success: true, data: { folderId } };
+  } catch (error) {
+    return fail(error, 'Failed to create the Drive folder');
+  }
 }
 
 export interface CreateProjectInput {
@@ -277,8 +313,9 @@ export async function createProject(
       try {
         const companyFolder = await ensureClientFolder(admin, input.clientId);
         folderId = await createDriveFolder(input.title, companyFolder);
-      } catch {
-        folderId = null; // admin can set a folder id later
+      } catch (e) {
+        console.error('Project Drive folder not created:', e);
+        folderId = null; // repair later via syncProjectDriveFolder
       }
     }
 

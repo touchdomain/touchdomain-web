@@ -212,6 +212,39 @@ export interface Database {
           { foreignKeyName: 'invoices_project_id_fkey'; columns: ['project_id']; referencedRelation: 'projects'; referencedColumns: ['id'] },
         ];
       };
+      payment_proofs: {
+        Row: {
+          id: string;
+          invoice_id: string;
+          client_id: string;
+          drive_file_id: string;
+          file_name: string;
+          mime_type: string;
+          view_link: string | null;
+          note: string | null;
+          amount_zar: number | null;
+          reviewed: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          invoice_id: string;
+          client_id: string;
+          drive_file_id: string;
+          file_name: string;
+          mime_type: string;
+          view_link?: string | null;
+          note?: string | null;
+          amount_zar?: number | null;
+          reviewed?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['payment_proofs']['Insert']>;
+        Relationships: [
+          { foreignKeyName: 'payment_proofs_invoice_id_fkey'; columns: ['invoice_id']; referencedRelation: 'invoices'; referencedColumns: ['id'] },
+          { foreignKeyName: 'payment_proofs_client_id_fkey'; columns: ['client_id']; referencedRelation: 'profiles'; referencedColumns: ['id'] },
+        ];
+      };
       payment_milestones: {
         Row: {
           id: string;
@@ -305,3 +338,4 @@ export type Milestone = Tables['milestones']['Row'];
 export type Invoice = Tables['invoices']['Row'];
 export type ClientFile = Tables['client_files']['Row'];
 export type PaymentMilestone = Tables['payment_milestones']['Row'];
+export type PaymentProof = Tables['payment_proofs']['Row'];

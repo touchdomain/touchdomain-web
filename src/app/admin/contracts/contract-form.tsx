@@ -6,6 +6,7 @@ import { FileDown, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   generateContractDoc,
+  generateContractBlob,
   generateInvoiceDoc,
   generateInvoiceBlob,
   downloadDoc,
@@ -16,6 +17,7 @@ import {
   type InvoiceLineItem,
 } from '@/lib/pdf/generate';
 import { createInvoice } from '@/lib/actions/invoices';
+import { fileDocumentToClient } from '@/lib/actions/files';
 import {
   PACKAGES,
   HOSTING_PLANS,
@@ -80,6 +82,7 @@ export default function ContractForm({
   const [docType, setDocType] = useState<DocType>('sa');
   const [busy, setBusy] = useState(false);
   const [invoiceClientId, setInvoiceClientId] = useState('');
+  const [contractClientId, setContractClientId] = useState('');
 
   const [f, setF] = useState({
     agreementDate: new Date().toISOString().split('T')[0],
@@ -216,6 +219,87 @@ export default function ContractForm({
     }
   };
 
+  const buildContract = (): ContractData | null => {
+    if (docType === 'invoice') return null;
+    if (!f.clientCompany.trim() || !f.clientAddress.trim()) {
+      toast.error('Client company and address are required.');
+      return null;
+    }
+    return {
+      docType,
+      agreementDate: f.agreementDate,
+      clientContact: f.clientContact,
+      clientCompany: f.clientCompany,
+      clientReg: f.clientReg || undefined,
+      clientAddress: f.clientAddress,
+      projectName: f.projectName || undefined,
+      sowRef: f.sowRef || undefined,
+      ...(docType === 'sa'
+        ? {
+            deliverables: toLines(f.deliverables),
+            outOfScope: toLines(f.outOfScope),
+            clientMaterials: toLines(f.clientMaterials),
+            totalFee: Number(f.totalFee),
+            revisions: Number(f.revisions),
+            warrantyDays: Number(f.warrantyDays),
+            paymentTierLabel: tierLabel(tier),
+            paymentSchedule: scheduleRows.map((r) => ({
+              label: r.label,
+              percentage: r.percentage,
+              amountZar: Number(r.amount_zar),
+              dueDate: r.due_date,
+            })),
+            timeline: [
+              { label: 'Project start', date: addDays(f.agreementDate, Number(f.startDays)) },
+              { label: 'Draft / first review', date: addDays(f.agreementDate, Number(f.draftDays)) },
+              { label: 'Client feedback due', date: addDays(f.agreementDate, Number(f.feedbackDays)) },
+              { label: 'Final delivery', date: addDays(f.agreementDate, Number(f.finalDays)) },
+            ],
+          }
+        : {
+            planLabel: f.planLabel,
+            monthlyFee: Number(f.monthlyFee),
+            planIncludes: toLines(f.planIncludes),
+            termMonths: Number(f.termMonths) || undefined,
+          }),
+    };
+  };
+
+  const contractFileName = () => {
+    const slug = (f.clientCompany || 'client').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const kind = docType === 'sa' ? 'Service-Agreement' : docType === 'hosting' ? 'Hosting-Addendum' : 'Care-Plan';
+    return `TouchDomain-${kind}-${slug}.pdf`;
+  };
+
+  const fileContractToPortal = async () => {
+    const data = buildContract();
+    if (!data) return;
+    if (!contractClientId) return toast.error('Pick which portal client this is for.');
+    setBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', generateContractBlob(data), contractFileName());
+      fd.append('clientId', contractClientId);
+      const label =
+        docType === 'sa'
+          ? `Service Agreement — ${f.projectName || f.clientCompany}`
+          : docType === 'hosting'
+            ? `Hosting & Email Addendum — ${f.clientCompany}`
+            : `Care Plan Agreement — ${f.clientCompany}`;
+      fd.append('label', label);
+      const res = await fileDocumentToClient(fd);
+      if (res.success) {
+        toast.success('Contract filed to the client’s Files tab.');
+      } else {
+        toast.error(res.error);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to file contract');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const generate = () => {
     if (docType === 'invoice') {
       if (!invoiceValid()) return toast.error('Add an invoice number and at least one line item.');
@@ -231,51 +315,11 @@ export default function ContractForm({
       return;
     }
 
-    if (!f.clientCompany.trim() || !f.clientAddress.trim()) {
-      return toast.error('Client company and address are required.');
-    }
+    const data = buildContract();
+    if (!data) return;
     setBusy(true);
     try {
-      const data: ContractData = {
-        docType,
-        agreementDate: f.agreementDate,
-        clientContact: f.clientContact,
-        clientCompany: f.clientCompany,
-        clientReg: f.clientReg || undefined,
-        clientAddress: f.clientAddress,
-        projectName: f.projectName || undefined,
-        sowRef: f.sowRef || undefined,
-        ...(docType === 'sa'
-          ? {
-              deliverables: toLines(f.deliverables),
-              outOfScope: toLines(f.outOfScope),
-              clientMaterials: toLines(f.clientMaterials),
-              totalFee: Number(f.totalFee),
-              revisions: Number(f.revisions),
-              warrantyDays: Number(f.warrantyDays),
-              paymentTierLabel: tierLabel(tier),
-              paymentSchedule: scheduleRows.map((r) => ({
-                label: r.label,
-                percentage: r.percentage,
-                amountZar: Number(r.amount_zar),
-                dueDate: r.due_date,
-              })),
-              timeline: [
-                { label: 'Project start', date: addDays(f.agreementDate, Number(f.startDays)) },
-                { label: 'Draft / first review', date: addDays(f.agreementDate, Number(f.draftDays)) },
-                { label: 'Client feedback due', date: addDays(f.agreementDate, Number(f.feedbackDays)) },
-                { label: 'Final delivery', date: addDays(f.agreementDate, Number(f.finalDays)) },
-              ],
-            }
-          : {
-              planLabel: f.planLabel,
-              monthlyFee: Number(f.monthlyFee),
-              planIncludes: toLines(f.planIncludes),
-              termMonths: Number(f.termMonths) || undefined,
-            }),
-      };
-      const slug = (f.clientCompany || 'client').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      downloadDoc(generateContractDoc(data), `TouchDomain-${docType}-${slug}.pdf`);
+      downloadDoc(generateContractDoc(data), contractFileName());
       toast.success('Contract PDF generated.');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to generate document');
@@ -486,15 +530,6 @@ export default function ContractForm({
                 </select>
               </label>
             )}
-            <label className="mt-3 block">
-              <span className="mb-1 block text-xs font-semibold text-gray-400">
-                File to a portal client (optional — leave blank for download-only)
-              </span>
-              <select value={invoiceClientId} onChange={(e) => setInvoiceClientId(e.target.value)} className={inputClass}>
-                <option value="">— not filed, download only —</option>
-                {clients.map((c) => <option key={c.id} value={c.id}>{c.company_name || c.full_name} · {c.email}</option>)}
-              </select>
-            </label>
             <TextArea label="Payment terms (shown on the PDF — leave blank for the default)" value={inv.terms} onChange={(v) => setI('terms', v)} />
           </Card>
 
@@ -547,15 +582,39 @@ export default function ContractForm({
         </>
       )}
 
+      <Card>
+        <SectionTitle>File to a client&apos;s portal</SectionTitle>
+        <p className="mb-3 text-xs text-gray-400">
+          {docType === 'invoice'
+            ? 'Records the invoice against the client and files the PDF to their Drive folder — it appears under their Invoices.'
+            : 'Files a copy of this contract to the client&apos;s Files tab and Drive folder. Optional — you can just download and send it yourself.'}
+        </p>
+        <select
+          value={docType === 'invoice' ? invoiceClientId : contractClientId}
+          onChange={(e) => (docType === 'invoice' ? setInvoiceClientId(e.target.value) : setContractClientId(e.target.value))}
+          className={inputClass}
+        >
+          <option value="">— not filed, download only —</option>
+          {clients.map((c) => (
+            <option key={c.id} value={c.id}>{c.company_name || c.full_name} · {c.email}</option>
+          ))}
+        </select>
+      </Card>
+
       <div className="flex flex-wrap justify-end gap-3">
         {docType === 'invoice' && invoiceClientId && (
           <button onClick={fileInvoiceToPortal} disabled={busy} className={btnSecondary}>
             {busy && <Loader2 className="h-4 w-4 animate-spin" />} File to client&apos;s portal
           </button>
         )}
+        {docType !== 'invoice' && contractClientId && (
+          <button onClick={fileContractToPortal} disabled={busy} className={btnSecondary}>
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />} File to client&apos;s portal
+          </button>
+        )}
         <button onClick={generate} disabled={busy} className={btnPrimary}>
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-          {docType === 'invoice' ? 'Download invoice PDF' : 'Generate contract PDF'}
+          {docType === 'invoice' ? 'Download invoice PDF' : 'Download contract PDF'}
         </button>
       </div>
     </div>

@@ -97,6 +97,7 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
   const lastSaved = useRef(snapshot); // don't re-save the value we loaded with
 
   useEffect(() => {
+    if (alreadySubmitted) return; // locked — no autosave after submission
     if (debouncedSnapshot === lastSaved.current) return;
     const payload = JSON.parse(debouncedSnapshot) as OnboardingInput;
     let cancelled = false;
@@ -114,7 +115,7 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
       }
     })();
     return () => { cancelled = true; };
-  }, [debouncedSnapshot]);
+  }, [debouncedSnapshot, alreadySubmitted]);
 
   const set = (key: FieldKey, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
@@ -140,12 +141,23 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex items-center gap-2 text-sm">
-        {status === 'saving' && <><Loader2 className="h-3.5 w-3.5 animate-spin text-td-accent" /> <span className="text-gray-400">Saving…</span></>}
-        {status === 'saved' && <><Check className="h-3.5 w-3.5 text-emerald-500" /> <span className="text-gray-400">Saved</span></>}
-        {status === 'error' && <span className="text-red-500">Couldn’t save — check your connection</span>}
-        {status === 'idle' && <span className="text-gray-400">Your answers save automatically as you type.</span>}
-      </div>
+      {alreadySubmitted ? (
+        <div className="flex items-start gap-2 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">
+          <Check className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            Submitted{initial?.submitted_at ? ` on ${new Date(initial.submitted_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}.
+            These answers are now locked. Need to change something? Email{' '}
+            <a href="mailto:helper@touchdomain.co.za" className="font-semibold underline">helper@touchdomain.co.za</a> and we&apos;ll reopen it.
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 text-sm">
+          {status === 'saving' && <><Loader2 className="h-3.5 w-3.5 animate-spin text-td-accent" /> <span className="text-gray-400">Saving…</span></>}
+          {status === 'saved' && <><Check className="h-3.5 w-3.5 text-emerald-500" /> <span className="text-gray-400">Saved</span></>}
+          {status === 'error' && <span className="text-red-500">Couldn’t save — check your connection</span>}
+          {status === 'idle' && <span className="text-gray-400">Your answers save automatically as you type.</span>}
+        </div>
+      )}
 
       {SECTIONS.map((section) => (
         <Card key={section.title}>
@@ -165,7 +177,8 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
                   value={form[f.key]}
                   onChange={(e) => set(f.key, e.target.value)}
                   placeholder={f.placeholder}
-                  className={`${inputClass} resize-y`}
+                  disabled={alreadySubmitted}
+                  className={`${inputClass} resize-y disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
                 />
               </div>
             ))}
@@ -179,7 +192,8 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
                   placeholder="https://onetimesecret.com/secret/…  — one link per line"
-                  className={`${inputClass} resize-y`}
+                  disabled={alreadySubmitted}
+                  className={`${inputClass} resize-y disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
                 />
               </div>
             )}
@@ -187,17 +201,15 @@ export default function OnboardingForm({ initial }: { initial: ProjectOnboarding
         </Card>
       ))}
 
-      <div className="flex items-center justify-between rounded-2xl border border-td-purple/10 bg-white p-5">
-        <p className="text-sm text-gray-500">
-          {alreadySubmitted
-            ? 'Submitted — you can still edit and it will re-save.'
-            : 'Done? Submit to let the team know it’s ready to review.'}
-        </p>
-        <button onClick={handleSubmit} disabled={submitting} className={btnPrimary}>
-          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          {alreadySubmitted ? 'Re-submit' : 'Submit onboarding'}
-        </button>
-      </div>
+      {!alreadySubmitted && (
+        <div className="flex items-center justify-between rounded-2xl border border-td-purple/10 bg-white p-5">
+          <p className="text-sm text-gray-500">Done? Submit to let the team know it’s ready to review.</p>
+          <button onClick={handleSubmit} disabled={submitting} className={btnPrimary}>
+            {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            Submit onboarding
+          </button>
+        </div>
+      )}
     </div>
   );
 }

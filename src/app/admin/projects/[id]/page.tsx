@@ -6,6 +6,8 @@ import { PageHeader, Card, SectionTitle, Badge } from '@/components/portal/ui';
 import MilestonesPanel from './milestones-panel';
 import StatusControl from './status-control';
 import PaymentPanel from './payment-panel';
+import DriveFolderButton from './drive-folder-button';
+import OnboardingReopen from './onboarding-reopen';
 
 const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
   {
@@ -69,10 +71,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
           <span className="text-gray-500">Launch <b className="text-td-dark">{new Date(project.target_launch_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })}</b></span>
         )}
         <span className="text-gray-500">Onboarding <Badge tone={onboarding?.status === 'submitted' || onboarding?.status === 'reviewed' ? 'green' : 'amber'}>{(onboarding?.status ?? 'not started').replace('_', ' ')}</Badge></span>
-        {project.google_drive_folder_id && (
+        {project.google_drive_folder_id ? (
           <a href={`https://drive.google.com/drive/folders/${project.google_drive_folder_id}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-td-purple hover:text-td-accent">
             Drive folder <ExternalLink className="h-3.5 w-3.5" />
           </a>
+        ) : (
+          <DriveFolderButton projectId={project.id} />
         )}
       </div>
 
@@ -88,7 +92,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
-            <SectionTitle>Onboarding answers</SectionTitle>
+            <div className="mb-3 flex items-center justify-between">
+              <SectionTitle className="mb-0">Onboarding answers</SectionTitle>
+              {(onboarding?.status === 'submitted' || onboarding?.status === 'reviewed') && (
+                <OnboardingReopen clientId={project.client_id} />
+              )}
+            </div>
             {!onboarding ? (
               <p className="text-sm italic text-gray-400">No onboarding record.</p>
             ) : (

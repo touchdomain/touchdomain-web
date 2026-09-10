@@ -34,18 +34,25 @@ export interface DriveUploadResult {
   downloadLink: string | null;
 }
 
+export class DriveNotConfiguredError extends Error {
+  constructor() {
+    super('GOOGLE_DRIVE_PARENT_FOLDER_ID is not set — no Shared Drive to create folders in.');
+    this.name = 'DriveNotConfiguredError';
+  }
+}
+
 /**
  * Create a folder in Drive and return its id. `parentId` defaults to
- * GOOGLE_DRIVE_PARENT_FOLDER_ID; that parent must be shared with the service
- * account as Editor. Returns null if no parent is configured (nothing to
- * create the folder in — the caller should fall back to a manual folder id).
+ * GOOGLE_DRIVE_PARENT_FOLDER_ID (must be a Shared Drive or a folder the
+ * service account can write to). Throws DriveNotConfiguredError when no
+ * parent is configured, and rethrows Google API errors.
  */
 export async function createDriveFolder(
   name: string,
   parentId?: string | null
-): Promise<string | null> {
-  const parent = parentId || process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || null;
-  if (!parent) return null;
+): Promise<string> {
+  const parent = (parentId || process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || '').trim();
+  if (!parent) throw new DriveNotConfiguredError();
 
   const drive = getGoogleDriveClient();
   const { data } = await drive.files.create({
@@ -57,7 +64,8 @@ export async function createDriveFolder(
     fields: 'id',
     supportsAllDrives: true,
   });
-  return data.id ?? null;
+  if (!data.id) throw new Error('Drive folder creation returned no id');
+  return data.id;
 }
 
 /** Fetch a Drive file's bytes (service account must have access). */

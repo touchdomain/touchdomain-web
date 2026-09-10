@@ -118,6 +118,21 @@ CREATE TABLE public.invoices (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- PAYMENT PROOFS — client-uploaded EFT/ATM deposit slips (migration 005)
+CREATE TABLE public.payment_proofs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  invoice_id UUID NOT NULL REFERENCES public.invoices(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  drive_file_id TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  mime_type TEXT NOT NULL,
+  view_link TEXT,
+  note TEXT,
+  amount_zar DECIMAL(10, 2),
+  reviewed BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- PAYMENT MILESTONES — the installment schedule for a project (migration 002)
 CREATE TABLE public.payment_milestones (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -225,6 +240,7 @@ ALTER TABLE public.milestones ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.client_files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payment_milestones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_proofs ENABLE ROW LEVEL SECURITY;
 
 -- PROFILES
 CREATE POLICY "Admin full profiles" ON public.profiles FOR ALL TO authenticated USING (is_admin());
@@ -264,3 +280,8 @@ USING (EXISTS (
   SELECT 1 FROM public.projects
   WHERE projects.id = payment_milestones.project_id AND projects.client_id = auth.uid()
 ));
+
+-- PAYMENT PROOFS  (migration 005 — clients add + read own, admin reviews)
+CREATE POLICY "Admin full payment_proofs" ON public.payment_proofs FOR ALL TO authenticated USING (is_admin());
+CREATE POLICY "Client view own payment_proofs" ON public.payment_proofs FOR SELECT TO authenticated USING (client_id = auth.uid());
+CREATE POLICY "Client add own payment_proofs" ON public.payment_proofs FOR INSERT TO authenticated WITH CHECK (client_id = auth.uid());

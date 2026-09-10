@@ -1,6 +1,6 @@
 import 'server-only';
 import { createClient } from '@/lib/supabase/server';
-import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone } from '@/lib/database.types';
+import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone, PaymentProof } from '@/lib/database.types';
 
 /** The signed-in client's profile + most-recent project (RLS-scoped). */
 export async function getClientContext(): Promise<{
@@ -64,6 +64,15 @@ export async function getClientPaymentSchedule(projectId: string): Promise<Payme
     .select('*')
     .eq('project_id', projectId)
     .order('sort_order', { ascending: true });
+  return data ?? [];
+}
+
+export async function getClientPaymentProofs(): Promise<PaymentProof[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from('payment_proofs')
+    .select('*')
+    .order('created_at', { ascending: false });
   return data ?? [];
 }
 

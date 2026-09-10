@@ -1,6 +1,6 @@
 import 'server-only';
 import { createClient } from '@/lib/supabase/server';
-import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone } from '@/lib/database.types';
+import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone, PaymentProof } from '@/lib/database.types';
 
 // Admin server components run with the admin's session; RLS "Admin full …"
 // policies give read access to every row.
@@ -106,6 +106,15 @@ export async function getAllInvoices(): Promise<InvoiceWithClient[]> {
     .select('*, profiles(full_name, company_name)')
     .order('created_at', { ascending: false });
   return (data ?? []) as InvoiceWithClient[];
+}
+
+export async function getPaymentProofs(): Promise<PaymentProof[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from('payment_proofs')
+    .select('*')
+    .order('created_at', { ascending: false });
+  return (data ?? []) as PaymentProof[];
 }
 
 /** Next invoice number in the running yearly series, e.g. "INV-2026-014". */

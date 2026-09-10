@@ -4,6 +4,24 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
 import type { ProjectStatus } from '@/lib/database.types';
 
+/** Admin: unlock a submitted questionnaire so the client can edit again. */
+export async function reopenOnboarding(clientId: string): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+    const { error } = await admin
+      .from('project_onboarding')
+      .update({ status: 'in_progress', submitted_at: null })
+      .eq('client_id', clientId);
+    if (error) throw error;
+    revalidatePath('/dashboard/onboarding');
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    return fail(error, 'Failed to reopen onboarding');
+  }
+}
+
 export async function setMilestoneComplete(
   milestoneId: string,
   complete: boolean
