@@ -17,9 +17,13 @@ const EDITABLE_FIELDS = [
 
 export type OnboardingInput = Partial<Record<(typeof EDITABLE_FIELDS)[number], string>>;
 
-type ActionResult<T = undefined> =
-  | { success: true; data?: T }
-  | { success: false; error: string };
+// Flat shape (not a discriminated union) — this project builds with
+// `strict: false`, which disables union narrowing on the `success` flag.
+type ActionResult<T = undefined> = {
+  success: boolean;
+  data?: T;
+  error?: string;
+};
 
 // POPIA: don't let raw credentials get persisted in free-text answers.
 const SECRET_PATTERNS: RegExp[] = [

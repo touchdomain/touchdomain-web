@@ -2,111 +2,83 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { inputClass, btnPrimary } from '@/components/portal/ui';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      setError(error.message);
+      toast.error(error.message);
       setLoading(false);
       return;
     }
 
-    // Fetch user profile role to route them correctly
     const { data: { user } } = await supabase.auth.getUser();
+    let dest = '/dashboard';
     if (user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      if (profile?.role === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
-      router.refresh();
-    } else {
-      router.push('/dashboard');
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+      if (profile?.role === 'admin') dest = '/admin';
     }
+    router.push(dest);
+    router.refresh();
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-slate-900 p-8 border border-slate-800 shadow-2xl">
+    <div className="w-full max-w-sm rounded-2xl border border-td-purple/10 bg-white p-8 shadow-[0_4px_24px_rgba(69,44,99,0.08)]">
+      <h1 className="text-center text-xl font-bold text-td-dark">Portal sign in</h1>
+      <p className="mt-1 text-center text-sm text-gray-500">
+        Client zone and staff management.
+      </p>
+
+      <form className="mt-7 space-y-4" onSubmit={handleLogin}>
         <div>
-          <h2 className="text-center text-3xl font-extrabold tracking-tight text-white">
-            TOUCHDOMAIN Portal
-          </h2>
-          <p className="mt-2 text-center text-sm text-slate-400">
-            Sign in to access your client zone or admin management
-          </p>
+          <label className="mb-1 block text-sm font-medium text-td-dark">Email address</label>
+          <input
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={inputClass}
+            placeholder="name@company.co.za"
+          />
         </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-td-dark">Password</label>
+          <input
+            type="password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={inputClass}
+            placeholder="••••••••"
+          />
+        </div>
+        <button type="submit" disabled={loading} className={`${btnPrimary} w-full`}>
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {loading ? 'Signing in…' : 'Sign in'}
+        </button>
+      </form>
 
-        {error && (
-          <div className="rounded-lg bg-red-950/50 border border-red-500/50 p-4 text-sm text-red-200">
-            {error}
-          </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="space-y-4 rounded-md">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Email address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                placeholder="name@touchdomain.co.za"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="relative block w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 transition-all cursor-pointer"
-            >
-              {loading ? 'Authenticating...' : 'Sign in'}
-            </button>
-          </div>
-        </form>
-      </div>
+      <p className="mt-5 text-center text-xs text-gray-400">
+        Trouble signing in? Email{' '}
+        <a href="mailto:helper@touchdomain.co.za" className="text-td-accent hover:underline">
+          helper@touchdomain.co.za
+        </a>
+      </p>
     </div>
   );
 }

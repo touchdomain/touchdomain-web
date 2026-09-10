@@ -1,101 +1,69 @@
-'use client';
+import { FileText, ExternalLink } from 'lucide-react';
+import { getClientContext, getClientFiles } from '@/lib/portal-data';
+import { PageHeader, Card, EmptyState } from '@/components/portal/ui';
+import UploadWidget from './upload-widget';
 
-import { useState, useCallback } from 'react';
+export const metadata = { title: 'Files' };
 
-export default function FilesPage() {
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+function formatSize(bytes: number | null) {
+  if (!bytes) return '';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let n = bytes;
+  let i = 0;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return `${n.toFixed(n < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
+}
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
-
-  const uploadFile = async (file: File) => {
-    setUploading(true);
-    setMessage(null);
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      const data = await res.json();
-      if (data.success) {
-        setMessage({ text: 'File uploaded successfully!', type: 'success' });
-      } else {
-        setMessage({ text: `Error: ${data.error}`, type: 'error' });
-      }
-    } catch (error) {
-      setMessage({ text: 'An error occurred during upload.', type: 'error' });
-    } finally {
-      setUploading(false);
-      setIsDragging(false);
-    }
-  };
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files?.[0]) uploadFile(e.dataTransfer.files[0]);
-  }, []);
+export default async function FilesPage() {
+  const [{ project }, files] = await Promise.all([getClientContext(), getClientFiles()]);
 
   return (
-    <div className="max-w-4xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Project Files</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Securely upload and manage documents for your Touch Domain project.
-        </p>
-      </div>
+    <div className="max-w-3xl">
+      <PageHeader
+        title="Project files"
+        subtitle="Share assets, briefs and reference material with your project team."
+      />
 
-      <div 
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-12 text-center transition-colors ${
-          isDragging 
-            ? 'border-indigo-500 bg-indigo-500/10' 
-            : 'border-slate-700 bg-slate-900 hover:border-slate-600'
-        }`}
-      >
-        <div className="rounded-full bg-slate-800 p-4 mb-4">
-          <svg className="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
-        </div>
-        <h3 className="text-lg font-medium text-white mb-1">
-          {uploading ? 'Uploading...' : 'Click or drag file to this area to upload'}
-        </h3>
-        
-        <label className="mt-4 cursor-pointer rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors">
-          Select File
-          <input 
-            type="file" 
-            className="hidden" 
-            onChange={(e) => e.target.files?.[0] && uploadFile(e.target.files[0])} 
-            disabled={uploading} 
-          />
-        </label>
-      </div>
-
-      {message && (
-        <div className={`p-4 rounded-lg border ${
-          message.type === 'error' ? 'bg-red-950/50 border-red-500/50 text-red-200' : 'bg-emerald-950/50 border-emerald-500/50 text-emerald-200'
-        }`}>
-          {message.text}
-        </div>
+      {project ? (
+        <UploadWidget />
+      ) : (
+        <EmptyState title="Uploads open once your project is set up." />
       )}
+
+      <div className="mt-8">
+        {files.length === 0 ? (
+          <p className="text-sm italic text-gray-400">Nothing uploaded yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {files.map((f) => (
+              <li key={f.id}>
+                <Card className="flex items-center justify-between p-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <FileText className="h-5 w-5 shrink-0 text-td-accent" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-td-dark">{f.file_name}</p>
+                      <p className="text-xs text-gray-400">
+                        {new Date(f.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {f.file_size_bytes ? ` · ${formatSize(f.file_size_bytes)}` : ''}
+                      </p>
+                    </div>
+                  </div>
+                  {f.view_link && (
+                    <a
+                      href={f.view_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-td-purple hover:text-td-accent"
+                    >
+                      Open <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

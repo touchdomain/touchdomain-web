@@ -1,72 +1,102 @@
-export default function DashboardOverviewPage() {
-  // Mock data - eventually fetch this from Supabase based on the user's active project
-  const projectPhase = "Web App Development";
-  const projectProgress = 65; 
+import Link from 'next/link';
+import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
+import { getClientContext, getClientMilestones, getClientOnboarding } from '@/lib/portal-data';
+import { PageHeader, Card, SectionTitle, Badge, EmptyState } from '@/components/portal/ui';
 
-  const milestones = [
-    { id: 1, title: 'Project Kickoff & Onboarding', status: 'completed', date: 'Aug 10' },
-    { id: 2, title: 'Brand Identity & Design Concept', status: 'completed', date: 'Aug 24' },
-    { id: 3, title: 'Web App Development', status: 'in-progress', date: 'In Progress' },
-    { id: 4, title: 'Infrastructure & Cloud Setup', status: 'pending', date: 'Upcoming' },
-    { id: 5, title: 'Testing & Final Deployment', status: 'pending', date: 'Upcoming' },
-  ];
+const STATUS_LABEL: Record<string, string> = {
+  discovery: 'Discovery',
+  in_progress: 'In progress',
+  review: 'In review',
+  completed: 'Completed',
+  paused: 'Paused',
+};
+
+export default async function DashboardOverviewPage() {
+  const { profile, project } = await getClientContext();
+  const [milestones, onboarding] = await Promise.all([
+    project ? getClientMilestones(project.id) : Promise.resolve([]),
+    getClientOnboarding(),
+  ]);
+
+  const firstName = profile?.full_name?.split(' ')[0] ?? 'there';
+  const onboardingDone = onboarding?.status === 'submitted' || onboarding?.status === 'reviewed';
 
   return (
-    <div className="max-w-4xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Welcome back!</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Here is the current status of your project with Touch Domain.
-        </p>
-      </div>
+    <div className="max-w-4xl">
+      <PageHeader title={`Welcome back, ${firstName}`} subtitle="Where your project stands right now." />
 
-      {/* Progress Card */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-white">Current Phase: <span className="text-indigo-400">{projectPhase}</span></h2>
-          <span className="text-sm font-medium text-slate-400">{projectProgress}% Complete</span>
-        </div>
-        <div className="h-3 w-full rounded-full bg-slate-800">
-          <div 
-            className="h-3 rounded-full bg-indigo-500 transition-all duration-500" 
-            style={{ width: `${projectProgress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Interactive Timeline */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-sm">
-        <h2 className="text-lg font-medium text-white mb-6">Project Milestones</h2>
-        
-        <div className="relative border-l border-slate-800 ml-3 space-y-8">
-          {milestones.map((milestone, index) => (
-            <div key={milestone.id} className="relative pl-8">
-              {/* Timeline Dot */}
-              <div className={`absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-slate-900 ${
-                milestone.status === 'completed' ? 'bg-indigo-500' :
-                milestone.status === 'in-progress' ? 'bg-amber-500' : 'bg-slate-700'
-              }`} />
-              
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      {!project ? (
+        <EmptyState
+          title="Your project space is being set up."
+          hint="Once your project kicks off, milestones and progress will appear here. In the meantime you can start the onboarding questionnaire."
+        />
+      ) : (
+        <div className="space-y-6">
+          {!onboardingDone && (
+            <Card className="border-td-accent/30 bg-td-purple/[0.03]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className={`font-medium ${
-                    milestone.status === 'completed' ? 'text-slate-300' :
-                    milestone.status === 'in-progress' ? 'text-white' : 'text-slate-500'
-                  }`}>
-                    {milestone.title}
-                  </h3>
-                  <p className="text-sm text-slate-500 mt-1 capitalize">
-                    {milestone.status.replace('-', ' ')}
-                  </p>
+                  <p className="text-sm font-semibold text-td-purple">Finish your onboarding questionnaire</p>
+                  <p className="mt-0.5 text-xs text-gray-500">It tells us everything we need to get moving.</p>
                 </div>
-                <div className="mt-2 sm:mt-0 text-sm text-slate-400 bg-slate-950 px-3 py-1 rounded-md border border-slate-800 w-fit">
-                  {milestone.date}
-                </div>
+                <Link href="/dashboard/onboarding" className="inline-flex items-center gap-1.5 text-sm font-semibold text-td-purple hover:text-td-accent">
+                  Continue <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
+            </Card>
+          )}
+
+          <Card>
+            <div className="mb-4 flex items-center justify-between">
+              <SectionTitle className="mb-0">{project.title}</SectionTitle>
+              <Badge tone={project.status === 'completed' ? 'green' : project.status === 'paused' ? 'amber' : 'purple'}>
+                {STATUS_LABEL[project.status] ?? project.status}
+              </Badge>
             </div>
-          ))}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">Overall progress</span>
+              <span className="font-semibold text-td-dark">{project.progress_percentage}%</span>
+            </div>
+            <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-td-purple/10">
+              <div className="h-full rounded-full bg-td-accent transition-all" style={{ width: `${project.progress_percentage}%` }} />
+            </div>
+            {project.target_launch_date && (
+              <p className="mt-3 text-xs text-gray-400">
+                Target launch: {new Date(project.target_launch_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
+            )}
+          </Card>
+
+          <Card>
+            <SectionTitle>Milestones</SectionTitle>
+            {milestones.length === 0 ? (
+              <p className="text-sm italic text-gray-400">Milestones will be added as your project is scoped.</p>
+            ) : (
+              <ol className="relative ml-2 space-y-5 border-l border-td-purple/15">
+                {milestones.map((m) => (
+                  <li key={m.id} className="relative pl-6">
+                    <span className="absolute -left-[9px] top-0.5">
+                      {m.is_completed
+                        ? <CheckCircle2 className="h-4 w-4 text-td-accent" fill="white" />
+                        : <Circle className="h-4 w-4 text-td-purple/25" />}
+                    </span>
+                    <p className={`text-sm font-medium ${m.is_completed ? 'text-gray-400 line-through' : 'text-td-dark'}`}>
+                      {m.title}
+                    </p>
+                    {m.due_date && (
+                      <p className="text-xs text-gray-400">
+                        {m.is_completed && m.completed_at
+                          ? `Completed ${new Date(m.completed_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}`
+                          : `Due ${new Date(m.due_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}`}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </Card>
         </div>
-      </div>
+      )}
     </div>
   );
 }

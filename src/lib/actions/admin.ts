@@ -1,36 +1,7 @@
 'use server';
 
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
-import { createClient as createServerClient } from '@/lib/supabase/server';
-import type { Database } from '@/lib/database.types';
-
-type ActionResult<T = undefined> =
-  | { success: true; data?: T }
-  | { success: false; error: string };
-
-/** Throws unless the current session belongs to an admin. */
-async function requireAdmin(): Promise<void> {
-  const supabase = createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Unauthorized');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (profile?.role !== 'admin') throw new Error('Forbidden — admin access required');
-}
-
-/** Service-role client — bypasses RLS. Only ever used after requireAdmin(). */
-function getServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceKey) throw new Error('Missing Supabase service-role environment variables');
-  return createServiceClient<Database>(url, serviceKey, { auth: { persistSession: false } });
-}
+import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
 
 export interface CreateClientInput {
   email: string;
@@ -39,7 +10,9 @@ export interface CreateClientInput {
   phone?: string;
 }
 
-export async function createClientAccount(input: CreateClientInput): Promise<ActionResult<{ userId: string }>> {
+export async function createClientAccount(
+  input: CreateClientInput
+): Promise<ActionResult<{ userId: string }>> {
   try {
     await requireAdmin();
     const admin = getServiceClient();
@@ -57,20 +30,23 @@ export async function createClientAccount(input: CreateClientInput): Promise<Act
 
     const userId = authData.user.id;
 
-    // The handle_new_user trigger already inserted the profile row; this fills
-    // in the phone (which the trigger doesn't carry) and is idempotent.
+    // handle_new_user() already inserted the profile row; fill in the phone
+    // (which the trigger doesn't carry). Idempotent.
     const { error: profileError } = await admin
       .from('profiles')
-      .update({ phone: input.phone ?? null, company_name: input.companyName, full_name: input.fullName })
+      .update({
+        phone: input.phone ?? null,
+        company_name: input.companyName,
+        full_name: input.fullName,
+      })
       .eq('id', userId);
     if (profileError) throw profileError;
 
     revalidatePath('/admin/clients');
+    revalidatePath('/admin');
     return { success: true, data: { userId } };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to create client';
-    console.error('Create Client Error:', error);
-    return { success: false, error: message };
+    return fail(error, 'Failed to create client');
   }
 }
 
@@ -82,7 +58,9 @@ export interface CreateProjectInput {
   googleDriveFolderId?: string;
 }
 
-export async function createProject(input: CreateProjectInput): Promise<ActionResult<{ projectId: string }>> {
+export async function createProject(
+  input: CreateProjectInput
+): Promise<ActionResult<{ projectId: string }>> {
   try {
     await requireAdmin();
     const admin = getServiceClient();
@@ -103,10 +81,9 @@ export async function createProject(input: CreateProjectInput): Promise<ActionRe
     // on_project_created trigger seeds the blank project_onboarding row.
     revalidatePath('/admin');
     revalidatePath('/admin/clients');
+    revalidatePath('/admin/projects');
     return { success: true, data: { projectId: data.id } };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to create project';
-    console.error('Create Project Error:', error);
-    return { success: false, error: message };
+    return fail(error, 'Failed to create project');
   }
 }

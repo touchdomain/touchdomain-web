@@ -1,47 +1,45 @@
 import { ExternalLink } from 'lucide-react';
-import { getClientInvoices } from '@/lib/portal-data';
-import { PageHeader, Card, Badge, EmptyState } from '@/components/portal/ui';
-import type { InvoiceStatus } from '@/lib/database.types';
+import { getAllInvoices } from '@/lib/admin-data';
+import { PageHeader, Card, EmptyState } from '@/components/portal/ui';
+import InvoiceStatusControl from './invoice-status';
 
 export const metadata = { title: 'Invoices' };
 
-const TONE: Record<InvoiceStatus, 'green' | 'amber' | 'red' | 'neutral'> = {
-  paid: 'green',
-  unpaid: 'amber',
-  overdue: 'red',
-  cancelled: 'neutral',
-};
-
 const money = (n: number) => 'R ' + n.toLocaleString('en-ZA', { minimumFractionDigits: 2 });
 
-export default async function InvoicesPage() {
-  const invoices = await getClientInvoices();
+export default async function AdminInvoicesPage() {
+  const invoices = await getAllInvoices();
   const outstanding = invoices
     .filter((i) => i.status === 'unpaid' || i.status === 'overdue')
     .reduce((s, i) => s + Number(i.amount_zar), 0);
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-4xl">
       <PageHeader
         title="Invoices"
-        subtitle={outstanding > 0 ? `${money(outstanding)} currently outstanding.` : 'Your billing history.'}
+        subtitle={
+          outstanding > 0
+            ? `${money(outstanding)} outstanding across ${invoices.length} invoice(s).`
+            : `${invoices.length} invoice(s) on record.`
+        }
       />
 
       {invoices.length === 0 ? (
-        <EmptyState title="No invoices yet." />
+        <EmptyState title="No invoices issued yet." hint="Generate one from a project page." />
       ) : (
         <div className="space-y-2">
           {invoices.map((inv) => (
             <Card key={inv.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-semibold text-td-dark">{inv.invoice_number}</p>
                 <p className="text-xs text-gray-400">
-                  Due {new Date(inv.due_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {inv.profiles?.company_name || inv.profiles?.full_name || 'Client'} · due{' '}
+                  {new Date(inv.due_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </p>
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-td-dark">{money(Number(inv.amount_zar))}</span>
-                <Badge tone={TONE[inv.status]}>{inv.status}</Badge>
+                <InvoiceStatusControl invoiceId={inv.id} status={inv.status} />
                 {inv.pdf_drive_file_id && (
                   <a
                     href={`https://drive.google.com/file/d/${inv.pdf_drive_file_id}/view`}
@@ -57,11 +55,6 @@ export default async function InvoicesPage() {
           ))}
         </div>
       )}
-
-      <p className="mt-6 text-xs text-gray-400">
-        Payment details are on each invoice PDF. Questions? Email{' '}
-        <a href="mailto:helper@touchdomain.co.za" className="text-td-accent hover:underline">helper@touchdomain.co.za</a>.
-      </p>
     </div>
   );
 }
