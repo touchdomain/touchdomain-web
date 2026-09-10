@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
@@ -72,6 +73,12 @@ export default function LoginPage() {
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
+
+      <p className="mt-4 text-center text-sm">
+        <Link href="/set-password" className="font-semibold text-td-purple hover:text-td-accent">
+          First time here, or forgot your password?
+        </Link>
+      </p>
 
       <p className="mt-5 text-center text-xs text-gray-400">
         Trouble signing in? Email{' '}

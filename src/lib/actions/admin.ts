@@ -1,8 +1,79 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
-import { createDriveFolder } from '@/lib/gdrive';
+import { createDriveFolder, getGoogleDriveClient } from '@/lib/gdrive';
+import { sendPortalInvite } from '@/lib/mailer';
+import { SITE_URL } from '@/lib/site';
+import type { Database, UserRole } from '@/lib/database.types';
+
+type Admin = SupabaseClient<Database>;
+
+/**
+ * Provision a portal user (or reuse an existing one), then email them a link
+ * to set their password. Returns whether the invite email actually went out.
+ */
+async function provisionUser(
+  admin: Admin,
+  opts: { email: string; fullName: string; role: UserRole; companyName?: string; phone?: string }
+): Promise<{ userId: string; invited: boolean; note?: string }> {
+  const email = opts.email.trim().toLowerCase();
+
+  // Create the auth user. If they already exist, look up their id instead.
+  let userId: string;
+  const { data: created, error: createErr } = await admin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    user_metadata: {
+      full_name: opts.fullName,
+      role: opts.role,
+      ...(opts.companyName ? { company_name: opts.companyName } : {}),
+    },
+  });
+  if (createErr || !created?.user) {
+    // Already registered — find them.
+    const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
+    const users = (list?.users ?? []) as Array<{ id: string; email?: string | null }>;
+    const existing = users.find((u) => u.email?.toLowerCase() === email);
+    if (!existing) throw createErr ?? new Error('Could not provision user');
+    userId = existing.id;
+  } else {
+    userId = created.user.id;
+  }
+
+  // handle_new_user() seeds the profile row; make sure it reflects the inputs.
+  await admin
+    .from('profiles')
+    .update({
+      full_name: opts.fullName,
+      role: opts.role,
+      phone: opts.phone ?? null,
+      company_name: opts.companyName ?? null,
+    })
+    .eq('id', userId);
+
+  // Generate a password-set link and email it ourselves (we don't rely on
+  // Supabase's built-in mailer, which only reaches project members on free).
+  let invited = false;
+  let note: string | undefined;
+  try {
+    const { data: link, error: linkErr } = await admin.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+      options: { redirectTo: `${SITE_URL}/set-password` },
+    });
+    if (linkErr) throw linkErr;
+    const actionLink = link.properties?.action_link;
+    if (!actionLink) throw new Error('No action link returned');
+    await sendPortalInvite({ to: email, name: opts.fullName, link: actionLink, role: opts.role });
+    invited = true;
+  } catch (e) {
+    note = `Account is ready, but the invite email failed (${e instanceof Error ? e.message : 'unknown'}). Use "Resend invite".`;
+  }
+
+  return { userId, invited, note };
+}
 
 export interface CreateClientInput {
   email: string;
@@ -13,41 +84,138 @@ export interface CreateClientInput {
 
 export async function createClientAccount(
   input: CreateClientInput
-): Promise<ActionResult<{ userId: string }>> {
+): Promise<ActionResult<{ userId: string; invited: boolean; note?: string }>> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+    const result = await provisionUser(admin, {
+      email: input.email,
+      fullName: input.fullName,
+      companyName: input.companyName,
+      phone: input.phone,
+      role: 'client',
+    });
+    revalidatePath('/admin/clients');
+    revalidatePath('/admin');
+    return { success: true, data: result, error: result.note };
+  } catch (error) {
+    return fail(error, 'Failed to create client');
+  }
+}
+
+export async function createAdminAccount(input: {
+  email: string;
+  fullName: string;
+}): Promise<ActionResult<{ userId: string; invited: boolean; note?: string }>> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+    const result = await provisionUser(admin, {
+      email: input.email,
+      fullName: input.fullName,
+      role: 'admin',
+    });
+    revalidatePath('/admin/clients');
+    return { success: true, data: result, error: result.note };
+  } catch (error) {
+    return fail(error, 'Failed to create admin');
+  }
+}
+
+/** Re-send the set-password email to an existing portal user. */
+export async function resendInvite(userId: string): Promise<ActionResult> {
   try {
     await requireAdmin();
     const admin = getServiceClient();
 
-    const { data: authData, error: authError } = await admin.auth.admin.createUser({
-      email: input.email,
-      email_confirm: true,
-      user_metadata: {
-        full_name: input.fullName,
-        company_name: input.companyName,
-        role: 'client',
-      },
-    });
-    if (authError) throw authError;
-
-    const userId = authData.user.id;
-
-    // handle_new_user() already inserted the profile row; fill in the phone
-    // (which the trigger doesn't carry). Idempotent.
-    const { error: profileError } = await admin
+    const { data: profile } = await admin
       .from('profiles')
-      .update({
-        phone: input.phone ?? null,
-        company_name: input.companyName,
-        full_name: input.fullName,
-      })
-      .eq('id', userId);
-    if (profileError) throw profileError;
+      .select('email, full_name, role')
+      .eq('id', userId)
+      .maybeSingle();
+    if (!profile) return { success: false, error: 'User not found.' };
+
+    const { data: link, error: linkErr } = await admin.auth.admin.generateLink({
+      type: 'recovery',
+      email: profile.email,
+      options: { redirectTo: `${SITE_URL}/set-password` },
+    });
+    if (linkErr) throw linkErr;
+    const actionLink = link.properties?.action_link;
+    if (!actionLink) throw new Error('No action link returned');
+
+    await sendPortalInvite({
+      to: profile.email,
+      name: profile.full_name,
+      link: actionLink,
+      role: profile.role,
+    });
+    return { success: true };
+  } catch (error) {
+    return fail(error, 'Failed to resend invite');
+  }
+}
+
+/**
+ * Permanently delete a user and all their portal data (POPIA erasure).
+ * profiles → projects → onboarding / milestones / invoices / files /
+ * payment_milestones all cascade via ON DELETE CASCADE. Drive files are
+ * best-effort removed first.
+ *
+ * NOTE: this also removes invoice records. SARS requires tax records to be
+ * kept for 5 years — export the invoice PDFs from Drive before deleting a
+ * client you have billed.
+ */
+export async function deleteUserAccount(userId: string): Promise<ActionResult> {
+  try {
+    const me = await requireAdmin();
+    if (userId === me.id) {
+      return { success: false, error: 'You cannot delete your own account.' };
+    }
+    const admin = getServiceClient();
+
+    // Best-effort: remove the client's Drive files.
+    const { data: files } = await admin
+      .from('client_files')
+      .select('drive_file_id')
+      .eq('client_id', userId);
+    if (files?.length) {
+      try {
+        const drive = getGoogleDriveClient();
+        await Promise.allSettled(
+          files.map((f) => drive.files.delete({ fileId: f.drive_file_id }))
+        );
+      } catch {
+        // ignore — DB erasure is the compliance-critical part
+      }
+    }
+
+    const { error } = await admin.auth.admin.deleteUser(userId);
+    if (error) throw error;
 
     revalidatePath('/admin/clients');
     revalidatePath('/admin');
-    return { success: true, data: { userId } };
+    revalidatePath('/admin/projects');
+    return { success: true };
   } catch (error) {
-    return fail(error, 'Failed to create client');
+    return fail(error, 'Failed to delete account');
+  }
+}
+
+/** Promote or demote a user. */
+export async function setUserRole(userId: string, role: UserRole): Promise<ActionResult> {
+  try {
+    const me = await requireAdmin();
+    if (userId === me.id && role !== 'admin') {
+      return { success: false, error: 'You cannot remove your own admin access.' };
+    }
+    const admin = getServiceClient();
+    const { error } = await admin.from('profiles').update({ role }).eq('id', userId);
+    if (error) throw error;
+    revalidatePath('/admin/clients');
+    return { success: true };
+  } catch (error) {
+    return fail(error, 'Failed to change role');
   }
 }
 

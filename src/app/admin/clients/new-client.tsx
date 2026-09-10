@@ -43,7 +43,11 @@ export default function NewClient() {
       if (!proj.success) toast.error(`Client created, but project failed: ${proj.error}`);
     }
 
-    toast.success(`${form.fullName} provisioned. They can sign in via password reset.`);
+    if (acc.data?.invited) {
+      toast.success(`${form.fullName} provisioned — a set-password email is on its way.`);
+    } else {
+      toast.warning(acc.data?.note || `${form.fullName} provisioned, but the invite email did not send. Use "Resend invite".`);
+    }
     setBusy(false);
     setOpen(false);
     setForm({ email: '', fullName: '', companyName: '', phone: '', projectTitle: '', driveFolderId: '', targetLaunchDate: '' });

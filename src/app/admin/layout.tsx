@@ -25,12 +25,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (profile?.role !== 'admin') redirect('/dashboard');
 
+  // handle_new_user() defaults full_name to 'Client' when no metadata was
+  // supplied — show 'Admin' for staff who were created that way.
+  const name =
+    !profile.full_name || profile.full_name.trim().toLowerCase() === 'client'
+      ? 'Admin'
+      : profile.full_name;
+
   return (
-    <PortalShell
-      variant="admin"
-      navItems={NAV}
-      user={{ name: profile.full_name, email: profile.email }}
-    >
+    <PortalShell variant="admin" navItems={NAV} user={{ name, email: profile.email }}>
       {children}
     </PortalShell>
   );

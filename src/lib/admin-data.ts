@@ -108,6 +108,16 @@ export async function getAllInvoices(): Promise<InvoiceWithClient[]> {
   return (data ?? []) as InvoiceWithClient[];
 }
 
+export async function getStaff(): Promise<Profile[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'admin')
+    .order('created_at', { ascending: true });
+  return (data ?? []) as Profile[];
+}
+
 export async function getClientOptions(): Promise<Pick<Profile, 'id' | 'full_name' | 'company_name' | 'email'>[]> {
   const supabase = createClient();
   const { data } = await supabase
