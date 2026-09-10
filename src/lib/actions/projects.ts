@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
 import { notify } from '@/lib/notify';
+import { progressFor } from '@/lib/project-status';
 import type { ProjectStatus } from '@/lib/database.types';
 
 /** Admin: set which product playbooks apply to a project (drives onboarding). */
@@ -128,6 +129,7 @@ export async function updateProjectStatus(
     const admin = getServiceClient();
     const { error } = await admin.from('projects').update({ status }).eq('id', projectId);
     if (error) throw error;
+    await recalcProgress(admin, projectId);
     revalidatePath(`/admin/projects/${projectId}`);
     revalidatePath('/dashboard');
     return { success: true };
@@ -136,17 +138,22 @@ export async function updateProjectStatus(
   }
 }
 
-// Progress = share of milestones completed.
+/**
+ * Progress = the higher of the status baseline and the share of delivery
+ * milestones completed — so the bar moves as the project advances even
+ * before any milestones are added.
+ */
 async function recalcProgress(
   admin: ReturnType<typeof getServiceClient>,
   projectId: string
 ) {
-  const { data } = await admin
-    .from('milestones')
-    .select('is_completed')
-    .eq('project_id', projectId);
-  const total = data?.length ?? 0;
-  const done = data?.filter((m) => m.is_completed).length ?? 0;
-  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  const [{ data: project }, { data: milestones }] = await Promise.all([
+    admin.from('projects').select('status, progress_percentage').eq('id', projectId).maybeSingle(),
+    admin.from('milestones').select('is_completed').eq('project_id', projectId),
+  ]);
+  if (!project) return;
+  const total = milestones?.length ?? 0;
+  const done = milestones?.filter((m) => m.is_completed).length ?? 0;
+  const pct = progressFor(project.status, total, done, project.progress_percentage);
   await admin.from('projects').update({ progress_percentage: pct }).eq('id', projectId);
 }

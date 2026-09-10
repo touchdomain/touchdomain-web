@@ -10,6 +10,7 @@ import DriveFolderButton from './drive-folder-button';
 import OnboardingReopen from './onboarding-reopen';
 import PlaybooksControl from './playbooks-control';
 import { PLAYBOOKS } from '@/lib/playbooks';
+import { progressFor } from '@/lib/project-status';
 
 const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
   {
@@ -51,6 +52,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
   if (!detail) notFound();
   const { project, onboarding, milestones, files, paymentMilestones } = detail;
   const agreementDate = project.created_at.slice(0, 10);
+  const displayProgress = progressFor(
+    project.status,
+    milestones.length,
+    milestones.filter((m) => m.is_completed).length,
+    project.progress_percentage
+  );
 
   return (
     <div className="max-w-5xl">
@@ -68,7 +75,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
       />
 
       <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-        <span className="text-gray-500">Progress <b className="text-td-dark">{project.progress_percentage}%</b></span>
+        <span className="text-gray-500">Progress <b className="text-td-dark">{displayProgress}%</b></span>
         {project.target_launch_date && (
           <span className="text-gray-500">Launch <b className="text-td-dark">{new Date(project.target_launch_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })}</b></span>
         )}

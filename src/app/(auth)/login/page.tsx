@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { inputClass, btnPrimary } from '@/components/portal/ui';
+import PasswordInput from '@/components/portal/password-input';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -58,15 +59,7 @@ export default function LoginPage() {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-td-dark">Password</label>
-          <input
-            type="password"
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
-            placeholder="••••••••"
-          />
+          <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" required />
         </div>
         <button type="submit" disabled={loading} className={`${btnPrimary} w-full`}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}

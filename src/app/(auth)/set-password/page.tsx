@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { inputClass, btnPrimary } from '@/components/portal/ui';
+import PasswordInput from '@/components/portal/password-input';
 
 type Phase = 'checking' | 'ready' | 'no-session' | 'saving';
 
@@ -78,11 +79,11 @@ export default function SetPasswordPage() {
           <form className="mt-7 space-y-4" onSubmit={save}>
             <div>
               <label className="mb-1 block text-sm font-medium text-td-dark">New password</label>
-              <input type="password" required autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} placeholder="At least 8 characters" />
+              <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" placeholder="At least 8 characters" required />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-td-dark">Confirm password</label>
-              <input type="password" required autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={inputClass} placeholder="••••••••" />
+              <PasswordInput value={confirm} onChange={setConfirm} autoComplete="new-password" required />
             </div>
             <button type="submit" disabled={phase === 'saving'} className={`${btnPrimary} w-full`}>
               {phase === 'saving' && <Loader2 className="h-4 w-4 animate-spin" />}

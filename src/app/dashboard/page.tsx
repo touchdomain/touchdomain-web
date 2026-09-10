@@ -3,18 +3,12 @@ import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
 import { getClientContext, getClientMilestones, getClientOnboarding, getClientPaymentSchedule, getClientFiles, getClientContracts } from '@/lib/portal-data';
 import { PageHeader, Card, SectionTitle, Badge, EmptyState } from '@/components/portal/ui';
 import { summariseSchedule, PAYMENT_STATUS_TONE } from '@/lib/payment-schedule';
+import { STATUS_LABEL, STATUS_STEPS, progressFor } from '@/lib/project-status';
+import type { ProjectStatus } from '@/lib/database.types';
 
 const money = (n: number) => 'R ' + n.toLocaleString('en-ZA', { minimumFractionDigits: 2 });
 const shortDate = (d: string) =>
   new Date(d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
-
-const STATUS_LABEL: Record<string, string> = {
-  discovery: 'Discovery',
-  in_progress: 'In progress',
-  review: 'In review',
-  completed: 'Completed',
-  paused: 'Paused',
-};
 
 export default async function DashboardOverviewPage() {
   const { profile, project } = await getClientContext();
@@ -27,6 +21,15 @@ export default async function DashboardOverviewPage() {
   ]);
   const pay = summariseSchedule(payments);
   const contractToSign = contracts.find((c) => c.status === 'sent');
+
+  const displayProgress = project
+    ? progressFor(
+        project.status,
+        milestones.length,
+        milestones.filter((m) => m.is_completed).length,
+        project.progress_percentage
+      )
+    : 0;
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there';
   const onboardingDone = onboarding?.status === 'submitted' || onboarding?.status === 'reviewed';
@@ -54,7 +57,7 @@ export default async function DashboardOverviewPage() {
     { label: 'First payment', value: paymentStage.label, tone: paymentStage.tone },
     {
       label: 'Build',
-      value: STATUS_LABEL[project?.status ?? ''] ?? project?.status ?? '—',
+      value: (project?.status ? STATUS_LABEL[project.status] : null) ?? project?.status ?? '—',
       tone: project?.status === 'completed' ? 'green' : project?.status === 'paused' ? 'amber' : 'purple',
     },
   ];
@@ -102,10 +105,38 @@ export default async function DashboardOverviewPage() {
             <div className="mb-4 flex items-center justify-between">
               <SectionTitle className="mb-0">{project.title}</SectionTitle>
               <Badge tone={project.status === 'completed' ? 'green' : project.status === 'paused' ? 'amber' : 'purple'}>
-                {STATUS_LABEL[project.status] ?? project.status}
+                {STATUS_LABEL[project.status as ProjectStatus] ?? project.status}
               </Badge>
             </div>
-            <ul className="divide-y divide-td-purple/10">
+
+            {/* Progress bar + stage stepper */}
+            <div className="mb-1 flex items-center justify-between text-sm">
+              <span className="text-gray-500">Overall progress</span>
+              <span className="font-semibold text-td-dark">{displayProgress}%</span>
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-td-purple/10">
+              <div className="h-full rounded-full bg-td-accent transition-all" style={{ width: `${displayProgress}%` }} />
+            </div>
+            {project.status !== 'paused' && (
+              <ol className="mt-3 flex justify-between">
+                {STATUS_STEPS.map((step, i) => {
+                  const currentIdx = STATUS_STEPS.findIndex((s) => s.status === project.status);
+                  const state = i < currentIdx ? 'done' : i === currentIdx ? 'current' : 'todo';
+                  return (
+                    <li key={step.status} className="flex flex-col items-center gap-1 text-center">
+                      <span
+                        className={`h-2.5 w-2.5 rounded-full ${
+                          state === 'done' ? 'bg-td-accent' : state === 'current' ? 'bg-td-purple ring-2 ring-td-purple/25' : 'bg-td-purple/15'
+                        }`}
+                      />
+                      <span className={`text-[11px] ${state === 'todo' ? 'text-gray-300' : 'text-gray-500'}`}>{step.label}</span>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+
+            <ul className="mt-4 divide-y divide-td-purple/10">
               {stages.map((s) => (
                 <li key={s.label} className="flex items-center justify-between py-2.5">
                   <span className="text-sm text-gray-500">{s.label}</span>
