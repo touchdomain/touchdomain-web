@@ -5,6 +5,7 @@ import PortalShell, { type NavItem } from '@/components/portal/shell';
 const NAV: NavItem[] = [
   { name: 'Overview', href: '/dashboard', icon: 'overview' },
   { name: 'Onboarding', href: '/dashboard/onboarding', icon: 'onboarding' },
+  { name: 'Contracts', href: '/dashboard/contracts', icon: 'contracts' },
   { name: 'Files', href: '/dashboard/files', icon: 'files' },
   { name: 'Invoices', href: '/dashboard/invoices', icon: 'invoices' },
 ];

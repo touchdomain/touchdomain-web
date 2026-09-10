@@ -16,6 +16,7 @@ export type InvoiceStatus = 'unpaid' | 'paid' | 'overdue' | 'cancelled';
 export type ProjectStatus = 'discovery' | 'in_progress' | 'review' | 'completed' | 'paused';
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'submitted' | 'reviewed';
 export type PaymentStatus = 'pending' | 'invoiced' | 'partial' | 'paid' | 'waived';
+export type ContractStatus = 'draft' | 'sent' | 'client_signed' | 'executed' | 'void';
 
 export interface Database {
   public: {
@@ -212,6 +213,55 @@ export interface Database {
           { foreignKeyName: 'invoices_project_id_fkey'; columns: ['project_id']; referencedRelation: 'projects'; referencedColumns: ['id'] },
         ];
       };
+      contracts: {
+        Row: {
+          id: string;
+          client_id: string;
+          project_id: string | null;
+          doc_type: string;
+          title: string;
+          status: ContractStatus;
+          source_drive_file_id: string;
+          source_pdf_sha256: string;
+          client_signer_name: string | null;
+          client_signed_at: string | null;
+          client_signed_ip: string | null;
+          client_signature_png: string | null;
+          rep_signer_name: string | null;
+          rep_signed_at: string | null;
+          rep_signed_ip: string | null;
+          executed_drive_file_id: string | null;
+          executed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          project_id?: string | null;
+          doc_type: string;
+          title: string;
+          status?: ContractStatus;
+          source_drive_file_id: string;
+          source_pdf_sha256: string;
+          client_signer_name?: string | null;
+          client_signed_at?: string | null;
+          client_signed_ip?: string | null;
+          client_signature_png?: string | null;
+          rep_signer_name?: string | null;
+          rep_signed_at?: string | null;
+          rep_signed_ip?: string | null;
+          executed_drive_file_id?: string | null;
+          executed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['contracts']['Insert']>;
+        Relationships: [
+          { foreignKeyName: 'contracts_client_id_fkey'; columns: ['client_id']; referencedRelation: 'profiles'; referencedColumns: ['id'] },
+          { foreignKeyName: 'contracts_project_id_fkey'; columns: ['project_id']; referencedRelation: 'projects'; referencedColumns: ['id'] },
+        ];
+      };
       payment_proofs: {
         Row: {
           id: string;
@@ -324,6 +374,7 @@ export interface Database {
       project_status: ProjectStatus;
       onboarding_status: OnboardingStatus;
       payment_status: PaymentStatus;
+      contract_status: ContractStatus;
     };
     CompositeTypes: { [_ in never]: never };
   };
@@ -339,3 +390,4 @@ export type Invoice = Tables['invoices']['Row'];
 export type ClientFile = Tables['client_files']['Row'];
 export type PaymentMilestone = Tables['payment_milestones']['Row'];
 export type PaymentProof = Tables['payment_proofs']['Row'];
+export type Contract = Tables['contracts']['Row'];

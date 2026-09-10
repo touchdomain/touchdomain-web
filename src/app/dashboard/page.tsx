@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
-import { getClientContext, getClientMilestones, getClientOnboarding, getClientPaymentSchedule, getClientFiles } from '@/lib/portal-data';
+import { getClientContext, getClientMilestones, getClientOnboarding, getClientPaymentSchedule, getClientFiles, getClientContracts } from '@/lib/portal-data';
 import { PageHeader, Card, SectionTitle, Badge, EmptyState } from '@/components/portal/ui';
 import { summariseSchedule, PAYMENT_STATUS_TONE } from '@/lib/payment-schedule';
 
@@ -18,13 +18,15 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function DashboardOverviewPage() {
   const { profile, project } = await getClientContext();
-  const [milestones, onboarding, payments, files] = await Promise.all([
+  const [milestones, onboarding, payments, files, contracts] = await Promise.all([
     project ? getClientMilestones(project.id) : Promise.resolve([]),
     getClientOnboarding(),
     project ? getClientPaymentSchedule(project.id) : Promise.resolve([]),
     getClientFiles(),
+    getClientContracts(),
   ]);
   const pay = summariseSchedule(payments);
+  const contractToSign = contracts.find((c) => c.status === 'sent');
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there';
   const onboardingDone = onboarding?.status === 'submitted' || onboarding?.status === 'reviewed';
@@ -68,6 +70,20 @@ export default async function DashboardOverviewPage() {
         />
       ) : (
         <div className="space-y-6">
+          {contractToSign && (
+            <Card className="border-td-accent/40 bg-td-purple/[0.04]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-td-purple">A contract is waiting for your signature</p>
+                  <p className="mt-0.5 text-xs text-gray-500">{contractToSign.title}</p>
+                </div>
+                <Link href="/dashboard/contracts" className="inline-flex items-center gap-1.5 text-sm font-semibold text-td-purple hover:text-td-accent">
+                  Review &amp; sign <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </Card>
+          )}
+
           {!onboardingDone && (
             <Card className="border-td-accent/30 bg-td-purple/[0.03]">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

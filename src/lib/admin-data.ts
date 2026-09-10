@@ -1,6 +1,6 @@
 import 'server-only';
 import { createClient } from '@/lib/supabase/server';
-import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone, PaymentProof } from '@/lib/database.types';
+import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone, PaymentProof, Contract } from '@/lib/database.types';
 
 // Admin server components run with the admin's session; RLS "Admin full …"
 // policies give read access to every row.
@@ -106,6 +106,19 @@ export async function getAllInvoices(): Promise<InvoiceWithClient[]> {
     .select('*, profiles(full_name, company_name)')
     .order('created_at', { ascending: false });
   return (data ?? []) as InvoiceWithClient[];
+}
+
+export interface ContractWithClient extends Contract {
+  profiles: Pick<Profile, 'full_name' | 'company_name' | 'email'> | null;
+}
+
+export async function getContracts(): Promise<ContractWithClient[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from('contracts')
+    .select('*, profiles(full_name, company_name, email)')
+    .order('created_at', { ascending: false });
+  return (data ?? []) as ContractWithClient[];
 }
 
 export async function getPaymentProofs(): Promise<PaymentProof[]> {

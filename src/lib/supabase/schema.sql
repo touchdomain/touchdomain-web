@@ -18,6 +18,8 @@ CREATE TYPE public.project_status AS ENUM ('discovery', 'in_progress', 'review',
 CREATE TYPE public.onboarding_status AS ENUM ('not_started', 'in_progress', 'submitted', 'reviewed');
 -- Added in migration 002:
 CREATE TYPE public.payment_status AS ENUM ('pending', 'invoiced', 'partial', 'paid', 'waived');
+-- Added in migration 006:
+CREATE TYPE public.contract_status AS ENUM ('draft', 'sent', 'client_signed', 'executed', 'void');
 
 -- ====================================================================
 -- 2. TABLE DEFINITIONS
@@ -118,6 +120,29 @@ CREATE TABLE public.invoices (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- CONTRACTS — in-portal signing + executed PDF (migration 006)
+CREATE TABLE public.contracts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  client_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES public.projects(id) ON DELETE SET NULL,
+  doc_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  status public.contract_status NOT NULL DEFAULT 'sent',
+  source_drive_file_id TEXT NOT NULL,
+  source_pdf_sha256 TEXT NOT NULL,
+  client_signer_name TEXT,
+  client_signed_at TIMESTAMPTZ,
+  client_signed_ip TEXT,
+  client_signature_png TEXT,
+  rep_signer_name TEXT,
+  rep_signed_at TIMESTAMPTZ,
+  rep_signed_ip TEXT,
+  executed_drive_file_id TEXT,
+  executed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- PAYMENT PROOFS — client-uploaded EFT/ATM deposit slips (migration 005)
 CREATE TABLE public.payment_proofs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -216,6 +241,7 @@ CREATE TRIGGER trigger_update_profiles BEFORE UPDATE ON public.profiles FOR EACH
 CREATE TRIGGER trigger_update_projects BEFORE UPDATE ON public.projects FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER trigger_update_onboarding BEFORE UPDATE ON public.project_onboarding FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER trigger_update_payment_milestones BEFORE UPDATE ON public.payment_milestones FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE TRIGGER trigger_update_contracts BEFORE UPDATE ON public.contracts FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ====================================================================
 -- 4. ROW LEVEL SECURITY (RLS) POLICIES
@@ -241,6 +267,7 @@ ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.client_files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payment_milestones ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payment_proofs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.contracts ENABLE ROW LEVEL SECURITY;
 
 -- PROFILES
 CREATE POLICY "Admin full profiles" ON public.profiles FOR ALL TO authenticated USING (is_admin());
@@ -285,3 +312,7 @@ USING (EXISTS (
 CREATE POLICY "Admin full payment_proofs" ON public.payment_proofs FOR ALL TO authenticated USING (is_admin());
 CREATE POLICY "Client view own payment_proofs" ON public.payment_proofs FOR SELECT TO authenticated USING (client_id = auth.uid());
 CREATE POLICY "Client add own payment_proofs" ON public.payment_proofs FOR INSERT TO authenticated WITH CHECK (client_id = auth.uid());
+
+-- CONTRACTS  (migration 006 — client reads own; all writes via server actions)
+CREATE POLICY "Admin full contracts" ON public.contracts FOR ALL TO authenticated USING (is_admin());
+CREATE POLICY "Client view own contracts" ON public.contracts FOR SELECT TO authenticated USING (client_id = auth.uid());

@@ -18,6 +18,7 @@ import {
 } from '@/lib/pdf/generate';
 import { createInvoice } from '@/lib/actions/invoices';
 import { fileDocumentToClient } from '@/lib/actions/files';
+import { sendContractForSignature } from '@/lib/actions/contracts';
 import {
   PACKAGES,
   HOSTING_PLANS,
@@ -271,7 +272,14 @@ export default function ContractForm({
     return `TouchDomain-${kind}-${slug}.pdf`;
   };
 
-  const fileContractToPortal = async () => {
+  const contractTitle = () =>
+    docType === 'sa'
+      ? `Service Agreement — ${f.projectName || f.clientCompany}`
+      : docType === 'hosting'
+        ? `Hosting & Email Addendum — ${f.clientCompany}`
+        : `Care Plan Agreement — ${f.clientCompany}`;
+
+  const doContractPortal = async (mode: 'sign' | 'file') => {
     const data = buildContract();
     if (!data) return;
     if (!contractClientId) return toast.error('Pick which portal client this is for.');
@@ -280,21 +288,22 @@ export default function ContractForm({
       const fd = new FormData();
       fd.append('file', generateContractBlob(data), contractFileName());
       fd.append('clientId', contractClientId);
-      const label =
-        docType === 'sa'
-          ? `Service Agreement — ${f.projectName || f.clientCompany}`
-          : docType === 'hosting'
-            ? `Hosting & Email Addendum — ${f.clientCompany}`
-            : `Care Plan Agreement — ${f.clientCompany}`;
-      fd.append('label', label);
-      const res = await fileDocumentToClient(fd);
-      if (res.success) {
-        toast.success('Contract filed to the client’s Files tab.');
+      if (mode === 'sign') {
+        fd.append('docType', docType);
+        fd.append('title', contractTitle());
+        const res = await sendContractForSignature(fd);
+        if (res.success) {
+          toast.success('Sent to the client’s portal for signature.');
+          router.push('/admin/contracts');
+        } else toast.error(res.error);
       } else {
-        toast.error(res.error);
+        fd.append('label', contractTitle());
+        const res = await fileDocumentToClient(fd);
+        if (res.success) toast.success('Filed to the client’s Files tab.');
+        else toast.error(res.error);
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Failed to file contract');
+      toast.error(e instanceof Error ? e.message : 'Failed to send contract');
     } finally {
       setBusy(false);
     }
@@ -583,18 +592,18 @@ export default function ContractForm({
       )}
 
       <Card>
-        <SectionTitle>File to a client&apos;s portal</SectionTitle>
+        <SectionTitle>Send to a client&apos;s portal</SectionTitle>
         <p className="mb-3 text-xs text-gray-400">
           {docType === 'invoice'
             ? 'Records the invoice against the client and files the PDF to their Drive folder — it appears under their Invoices.'
-            : 'Files a copy of this contract to the client&apos;s Files tab and Drive folder. Optional — you can just download and send it yourself.'}
+            : 'The client signs it in their portal; once you countersign, the executed PDF is filed to their Drive folder and Files tab.'}
         </p>
         <select
           value={docType === 'invoice' ? invoiceClientId : contractClientId}
           onChange={(e) => (docType === 'invoice' ? setInvoiceClientId(e.target.value) : setContractClientId(e.target.value))}
           className={inputClass}
         >
-          <option value="">— not filed, download only —</option>
+          <option value="">— download only, not sent —</option>
           {clients.map((c) => (
             <option key={c.id} value={c.id}>{c.company_name || c.full_name} · {c.email}</option>
           ))}
@@ -608,13 +617,18 @@ export default function ContractForm({
           </button>
         )}
         {docType !== 'invoice' && contractClientId && (
-          <button onClick={fileContractToPortal} disabled={busy} className={btnSecondary}>
-            {busy && <Loader2 className="h-4 w-4 animate-spin" />} File to client&apos;s portal
-          </button>
+          <>
+            <button onClick={() => doContractPortal('file')} disabled={busy} className={btnSecondary}>
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />} File without signing
+            </button>
+            <button onClick={() => doContractPortal('sign')} disabled={busy} className={btnPrimary}>
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Send for signature
+            </button>
+          </>
         )}
-        <button onClick={generate} disabled={busy} className={btnPrimary}>
+        <button onClick={generate} disabled={busy} className={btnSecondary}>
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-          {docType === 'invoice' ? 'Download invoice PDF' : 'Download contract PDF'}
+          {docType === 'invoice' ? 'Download invoice PDF' : 'Download PDF'}
         </button>
       </div>
     </div>
