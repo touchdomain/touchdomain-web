@@ -33,7 +33,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * "request to https://oauth2.googleapis.com/token failed" into something
  * actionable.
  */
-export async function withDriveRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+export async function withDriveRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
   let lastErr: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -44,7 +44,7 @@ export async function withDriveRetry<T>(fn: () => Promise<T>, attempts = 3): Pro
       const transient =
         /failed, reason|ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|socket hang up|network|fetch failed/i.test(msg);
       if (!transient || i === attempts - 1) break;
-      await sleep(400 * (i + 1));
+      await sleep(600 * (i + 1));
     }
   }
   const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);

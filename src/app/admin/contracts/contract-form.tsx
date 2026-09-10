@@ -274,10 +274,10 @@ export default function ContractForm({
 
   const contractTitle = () =>
     docType === 'sa'
-      ? `Service Agreement — ${f.projectName || f.clientCompany}`
+      ? `Service Agreement - ${f.projectName || f.clientCompany}`
       : docType === 'hosting'
-        ? `Hosting & Email Addendum — ${f.clientCompany}`
-        : `Care Plan Agreement — ${f.clientCompany}`;
+        ? `Hosting & Email Addendum - ${f.clientCompany}`
+        : `Care Plan Agreement - ${f.clientCompany}`;
 
   const doContractPortal = async (mode: 'sign' | 'file') => {
     const data = buildContract();

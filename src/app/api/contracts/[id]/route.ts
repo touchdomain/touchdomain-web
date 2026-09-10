@@ -35,7 +35,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         'Cache-Control': 'private, no-store',
       },
     });
-  } catch {
-    return NextResponse.json({ error: 'Could not read the PDF from Drive' }, { status: 502 });
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : String(e);
+    console.error(`contract ${params.id} pdf fetch failed (fileId ${fileId}):`, detail);
+    return NextResponse.json({ error: 'Could not read the PDF from Drive', detail }, { status: 502 });
   }
 }

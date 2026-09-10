@@ -61,11 +61,12 @@ export default async function ContractsPage() {
                     <Badge tone={s.tone}>{s.label}</Badge>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-4 text-xs">
-                    <a href={`/api/contracts/${c.id}?v=source`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold text-td-purple hover:text-td-accent">
+                    {/* Admins are Shared Drive members — link straight to Drive. */}
+                    <a href={`https://drive.google.com/file/d/${c.source_drive_file_id}/view`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold text-td-purple hover:text-td-accent">
                       Source PDF <ExternalLink className="h-3.5 w-3.5" />
                     </a>
-                    {c.status === 'executed' && (
-                      <a href={`/api/contracts/${c.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold text-td-purple hover:text-td-accent">
+                    {c.executed_drive_file_id && (
+                      <a href={`https://drive.google.com/file/d/${c.executed_drive_file_id}/view`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold text-td-purple hover:text-td-accent">
                         Executed PDF <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     )}
