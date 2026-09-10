@@ -1,13 +1,12 @@
 import { redirect } from 'next/navigation';
-import { LayoutDashboard, ClipboardList, FolderOpen, ReceiptText } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import PortalShell, { type NavItem } from '@/components/portal/shell';
 
 const NAV: NavItem[] = [
-  { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Onboarding', href: '/dashboard/onboarding', icon: ClipboardList },
-  { name: 'Files', href: '/dashboard/files', icon: FolderOpen },
-  { name: 'Invoices', href: '/dashboard/invoices', icon: ReceiptText },
+  { name: 'Overview', href: '/dashboard', icon: 'overview' },
+  { name: 'Onboarding', href: '/dashboard/onboarding', icon: 'onboarding' },
+  { name: 'Files', href: '/dashboard/files', icon: 'files' },
+  { name: 'Invoices', href: '/dashboard/invoices', icon: 'invoices' },
 ];
 
 export const metadata = { title: 'Client Portal' };

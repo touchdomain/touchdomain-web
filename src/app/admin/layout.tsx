@@ -1,14 +1,13 @@
 import { redirect } from 'next/navigation';
-import { LayoutDashboard, Users, FolderKanban, ReceiptText, FileSignature } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import PortalShell, { type NavItem } from '@/components/portal/shell';
 
 const NAV: NavItem[] = [
-  { name: 'Overview', href: '/admin', icon: LayoutDashboard },
-  { name: 'Clients', href: '/admin/clients', icon: Users },
-  { name: 'Projects', href: '/admin/projects', icon: FolderKanban },
-  { name: 'Invoices', href: '/admin/invoices', icon: ReceiptText },
-  { name: 'Contracts', href: '/admin/contracts', icon: FileSignature },
+  { name: 'Overview', href: '/admin', icon: 'overview' },
+  { name: 'Clients', href: '/admin/clients', icon: 'clients' },
+  { name: 'Projects', href: '/admin/projects', icon: 'projects' },
+  { name: 'Invoices', href: '/admin/invoices', icon: 'invoices' },
+  { name: 'Contracts', href: '/admin/contracts', icon: 'contracts' },
 ];
 
 export const metadata = { title: 'Admin' };

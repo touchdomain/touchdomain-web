@@ -4,14 +4,33 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, Menu, X, type LucideIcon } from 'lucide-react';
+import {
+  LogOut, Menu, X,
+  LayoutDashboard, Users, FolderKanban, ReceiptText, FileSignature,
+  ClipboardList, FolderOpen,
+  type LucideIcon,
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
+
+// Server components (the portal layouts) can't hand a component reference
+// across the RSC boundary, so nav items carry a string key resolved here.
+const ICONS = {
+  overview: LayoutDashboard,
+  clients: Users,
+  projects: FolderKanban,
+  invoices: ReceiptText,
+  contracts: FileSignature,
+  onboarding: ClipboardList,
+  files: FolderOpen,
+} satisfies Record<string, LucideIcon>;
+
+export type NavIcon = keyof typeof ICONS;
 
 export interface NavItem {
   name: string;
   href: string;
-  icon: LucideIcon;
+  icon: NavIcon;
 }
 
 interface PortalShellProps {
@@ -69,6 +88,7 @@ export default function PortalShell({ navItems, variant, user, children }: Porta
         <nav className="flex-1 space-y-1 px-3 py-4">
           {navItems.map((item) => {
             const active = isActive(item.href);
+            const Icon = ICONS[item.icon];
             return (
               <Link
                 key={item.name}
@@ -81,7 +101,7 @@ export default function PortalShell({ navItems, variant, user, children }: Porta
                     : 'text-gray-500 hover:bg-td-purple/[0.04] hover:text-td-dark'
                 )}
               >
-                <item.icon className={cn('h-[18px] w-[18px] shrink-0', active ? 'text-td-purple' : 'text-gray-400')} />
+                <Icon className={cn('h-[18px] w-[18px] shrink-0', active ? 'text-td-purple' : 'text-gray-400')} />
                 {item.name}
               </Link>
             );
