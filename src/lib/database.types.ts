@@ -186,6 +186,7 @@ export interface Database {
           reference: string | null;
           is_tax_invoice: boolean;
           pdf_drive_file_id: string | null;
+          pdf_storage_path: string | null;
           created_at: string;
         };
         Insert: {
@@ -200,6 +201,7 @@ export interface Database {
           reference?: string | null;
           is_tax_invoice?: boolean;
           pdf_drive_file_id?: string | null;
+          pdf_storage_path?: string | null;
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['invoices']['Insert']>;

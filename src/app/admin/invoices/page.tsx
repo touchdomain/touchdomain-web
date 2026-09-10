@@ -40,15 +40,26 @@ export default async function AdminInvoicesPage() {
               <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-td-dark">{money(Number(inv.amount_zar))}</span>
                 <InvoiceStatusControl invoiceId={inv.id} status={inv.status} />
-                {inv.pdf_drive_file_id && (
+                {inv.pdf_storage_path ? (
                   <a
-                    href={`https://drive.google.com/file/d/${inv.pdf_drive_file_id}/view`}
+                    href={`/api/invoices/${inv.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs font-semibold text-td-purple hover:text-td-accent"
                   >
                     PDF <ExternalLink className="h-3.5 w-3.5" />
                   </a>
+                ) : inv.pdf_drive_file_id ? (
+                  <a
+                    href={`https://drive.google.com/file/d/${inv.pdf_drive_file_id}/view`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-td-purple hover:text-td-accent"
+                  >
+                    Drive <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                ) : (
+                  <span className="text-xs text-gray-300">no PDF</span>
                 )}
               </div>
             </Card>

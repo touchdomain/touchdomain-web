@@ -47,11 +47,10 @@ export async function createInvoice(
       folderId = project?.google_drive_folder_id ?? null;
     }
 
-    // File the PDF to Drive — but don't lose the invoice if Drive is
-    // unavailable (no Shared Drive configured, quota, auth). Record it anyway.
+    // Best-effort: also file a copy to the project's Drive folder.
     const buffer = Buffer.from(await file.arrayBuffer());
     let driveFileId: string | null = null;
-    let driveError: string | null = null;
+    let pdfError: string | null = null;
     try {
       const uploaded = await uploadToDrive(
         buffer,
@@ -60,8 +59,8 @@ export async function createInvoice(
         folderId
       );
       driveFileId = uploaded.id;
-    } catch (e) {
-      driveError = e instanceof Error ? e.message : 'Drive upload failed';
+    } catch {
+      // Drive is optional — Supabase Storage below is the canonical copy.
     }
 
     const { data, error } = await admin
@@ -82,6 +81,20 @@ export async function createInvoice(
       .single();
     if (error) throw error;
 
+    // Canonical copy in Supabase Storage — this is what the client downloads.
+    let storagePath: string | null = null;
+    try {
+      const path = `${clientId}/${data.id}.pdf`;
+      const { error: upErr } = await admin.storage
+        .from('invoices')
+        .upload(path, buffer, { contentType: 'application/pdf', upsert: true });
+      if (upErr) throw upErr;
+      storagePath = path;
+      await admin.from('invoices').update({ pdf_storage_path: path }).eq('id', data.id);
+    } catch (e) {
+      pdfError = e instanceof Error ? e.message : 'storage error';
+    }
+
     if (milestoneId) {
       await admin
         .from('payment_milestones')
@@ -94,12 +107,13 @@ export async function createInvoice(
     revalidatePath('/dashboard/invoices');
     revalidatePath('/dashboard');
     if (projectId) revalidatePath(`/admin/projects/${projectId}`);
+    const filed = storagePath != null || driveFileId != null;
     return {
       success: true,
-      data: { id: data.id, filed: driveFileId != null },
-      error: driveError
-        ? `Invoice recorded, but the PDF was not filed to Drive (${driveError}). Attach it manually or set up a Shared Drive.`
-        : undefined,
+      data: { id: data.id, filed },
+      error: filed
+        ? undefined
+        : `Invoice recorded, but the PDF could not be stored (${pdfError ?? 'unknown error'}). Regenerate and attach it manually.`,
     };
   } catch (error) {
     return fail(error, 'Failed to create invoice');

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
-import { getClientContext, getClientMilestones, getClientOnboarding, getClientPaymentSchedule } from '@/lib/portal-data';
+import { getClientContext, getClientMilestones, getClientOnboarding, getClientPaymentSchedule, getClientFiles } from '@/lib/portal-data';
 import { PageHeader, Card, SectionTitle, Badge, EmptyState } from '@/components/portal/ui';
 import { summariseSchedule, PAYMENT_STATUS_TONE } from '@/lib/payment-schedule';
 
@@ -18,15 +18,44 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function DashboardOverviewPage() {
   const { profile, project } = await getClientContext();
-  const [milestones, onboarding, payments] = await Promise.all([
+  const [milestones, onboarding, payments, files] = await Promise.all([
     project ? getClientMilestones(project.id) : Promise.resolve([]),
     getClientOnboarding(),
     project ? getClientPaymentSchedule(project.id) : Promise.resolve([]),
+    getClientFiles(),
   ]);
   const pay = summariseSchedule(payments);
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there';
   const onboardingDone = onboarding?.status === 'submitted' || onboarding?.status === 'reviewed';
+
+  const firstPayment = payments[0];
+  const paymentStage: { label: string; tone: 'green' | 'amber' | 'neutral' } = !firstPayment
+    ? { label: 'Not yet invoiced', tone: 'neutral' }
+    : firstPayment.status === 'paid'
+      ? { label: 'Deposit paid', tone: 'green' }
+      : firstPayment.status === 'invoiced' || firstPayment.status === 'partial'
+        ? { label: 'Invoice sent — awaiting payment', tone: 'amber' }
+        : { label: 'Not yet invoiced', tone: 'neutral' };
+
+  const stages: { label: string; value: string; tone: 'green' | 'amber' | 'neutral' | 'purple' }[] = [
+    {
+      label: 'Onboarding',
+      value: onboardingDone ? 'Submitted' : 'Awaiting your answers',
+      tone: onboardingDone ? 'green' : 'amber',
+    },
+    {
+      label: 'Your files',
+      value: files.length ? `${files.length} uploaded` : 'None uploaded yet',
+      tone: files.length ? 'green' : 'neutral',
+    },
+    { label: 'First payment', value: paymentStage.label, tone: paymentStage.tone },
+    {
+      label: 'Build',
+      value: STATUS_LABEL[project?.status ?? ''] ?? project?.status ?? '—',
+      tone: project?.status === 'completed' ? 'green' : project?.status === 'paused' ? 'amber' : 'purple',
+    },
+  ];
 
   return (
     <div className="max-w-4xl">
@@ -60,13 +89,14 @@ export default async function DashboardOverviewPage() {
                 {STATUS_LABEL[project.status] ?? project.status}
               </Badge>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">Overall progress</span>
-              <span className="font-semibold text-td-dark">{project.progress_percentage}%</span>
-            </div>
-            <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-td-purple/10">
-              <div className="h-full rounded-full bg-td-accent transition-all" style={{ width: `${project.progress_percentage}%` }} />
-            </div>
+            <ul className="divide-y divide-td-purple/10">
+              {stages.map((s) => (
+                <li key={s.label} className="flex items-center justify-between py-2.5">
+                  <span className="text-sm text-gray-500">{s.label}</span>
+                  <Badge tone={s.tone}>{s.value}</Badge>
+                </li>
+              ))}
+            </ul>
             {project.target_launch_date && (
               <p className="mt-3 text-xs text-gray-400">
                 Target launch: {new Date(project.target_launch_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })}

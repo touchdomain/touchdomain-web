@@ -112,7 +112,8 @@ CREATE TABLE public.invoices (
   description TEXT,                                                   -- migration 002: what this invoice bills
   reference TEXT,                                                     -- migration 002: SOW / plan ref on the PDF
   is_tax_invoice BOOLEAN NOT NULL DEFAULT FALSE,                      -- migration 002
-  pdf_drive_file_id TEXT,
+  pdf_drive_file_id TEXT,                                             -- best-effort Drive copy
+  pdf_storage_path TEXT,                                              -- migration 003: canonical PDF in the 'invoices' Storage bucket
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
