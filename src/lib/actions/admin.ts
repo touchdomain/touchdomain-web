@@ -122,8 +122,14 @@ export async function createAdminAccount(input: {
   }
 }
 
-/** Re-send the set-password email to an existing portal user. */
-export async function resendInvite(userId: string): Promise<ActionResult> {
+/**
+ * Re-send the set-password email to an existing portal user. Always returns
+ * the raw link too, so the admin can send it manually if email delivery is
+ * unavailable (e.g. no SMTP configured locally).
+ */
+export async function resendInvite(
+  userId: string
+): Promise<ActionResult<{ link: string; emailed: boolean }>> {
   try {
     await requireAdmin();
     const admin = getServiceClient();
@@ -144,13 +150,20 @@ export async function resendInvite(userId: string): Promise<ActionResult> {
     const actionLink = link.properties?.action_link;
     if (!actionLink) throw new Error('No action link returned');
 
-    await sendPortalInvite({
-      to: profile.email,
-      name: profile.full_name,
-      link: actionLink,
-      role: profile.role,
-    });
-    return { success: true };
+    let emailed = false;
+    try {
+      await sendPortalInvite({
+        to: profile.email,
+        name: profile.full_name,
+        link: actionLink,
+        role: profile.role,
+      });
+      emailed = true;
+    } catch {
+      // fall through — caller still gets the link to share manually
+    }
+
+    return { success: true, data: { link: actionLink, emailed } };
   } catch (error) {
     return fail(error, 'Failed to resend invite');
   }

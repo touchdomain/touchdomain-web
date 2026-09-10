@@ -37,6 +37,25 @@ export default function UserActions({
       setOpen(false);
     });
 
+  const doResend = () =>
+    start(async () => {
+      const res = await resendInvite(userId);
+      setOpen(false);
+      if (!res.success) {
+        toast.error(res.error);
+        return;
+      }
+      const link = res.data?.link;
+      if (link) {
+        try { await navigator.clipboard.writeText(link); } catch { /* clipboard blocked */ }
+      }
+      toast.success(
+        res.data?.emailed
+          ? 'Set-password email sent (link also copied to your clipboard).'
+          : 'Email unavailable — invite link copied to your clipboard. Send it to them directly.'
+      );
+    });
+
   const del = () => {
     if (!confirm(`Permanently delete ${name}'s account and all their portal data? This cannot be undone. Export any invoice PDFs from Drive first — SARS requires tax records to be kept for 5 years.`)) return;
     run(() => deleteUserAccount(userId), `${name}'s account was deleted.`);
@@ -54,8 +73,8 @@ export default function UserActions({
       </button>
       {open && (
         <div className="absolute right-0 z-20 mt-1 w-52 rounded-xl border border-td-purple/10 bg-white py-1 shadow-lg">
-          <button onClick={() => run(() => resendInvite(userId), 'Set-password email sent.')} className={item}>
-            Resend set-password email
+          <button onClick={doResend} className={item}>
+            Resend set-password link
           </button>
           {!isSelf && (
             <button
