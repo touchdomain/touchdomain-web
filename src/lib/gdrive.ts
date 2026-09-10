@@ -25,6 +25,37 @@ export function getGoogleDriveClient(): drive_v3.Drive {
   return google.drive({ version: 'v3', auth });
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Retry a Drive/Google call a few times on transient network failures
+ * (DNS / reset / timeout reaching googleapis.com). Rewrites the opaque
+ * "request to https://oauth2.googleapis.com/token failed" into something
+ * actionable.
+ */
+export async function withDriveRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const transient =
+        /failed, reason|ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|socket hang up|network|fetch failed/i.test(msg);
+      if (!transient || i === attempts - 1) break;
+      await sleep(400 * (i + 1));
+    }
+  }
+  const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
+  if (/oauth2\.googleapis\.com\/token failed|fetch failed|ENOTFOUND|EAI_AGAIN/i.test(msg)) {
+    throw new Error(
+      'Could not reach Google (oauth2.googleapis.com). This machine’s network is blocking or dropping the connection — try again, use a different network, or run it on the deployed site.'
+    );
+  }
+  throw lastErr;
+}
+
 export interface DriveUploadResult {
   id: string;
   name: string;
@@ -55,14 +86,17 @@ export async function createDriveFolder(
   if (!parent) throw new DriveNotConfiguredError();
 
   const drive = getGoogleDriveClient();
-  const { data } = await drive.files.create({
-    requestBody: {
-      name,
-      mimeType: 'application/vnd.google-apps.folder',
-      parents: [parent],
-    },
-    fields: 'id',
-    supportsAllDrives: true,
+  const data = await withDriveRetry(async () => {
+    const res = await drive.files.create({
+      requestBody: {
+        name,
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: [parent],
+      },
+      fields: 'id',
+      supportsAllDrives: true,
+    });
+    return res.data;
   });
   if (!data.id) throw new Error('Drive folder creation returned no id');
   return data.id;
@@ -71,9 +105,8 @@ export async function createDriveFolder(
 /** Fetch a Drive file's bytes (service account must have access). */
 export async function downloadFromDrive(fileId: string): Promise<Buffer> {
   const drive = getGoogleDriveClient();
-  const res = await drive.files.get(
-    { fileId, alt: 'media', supportsAllDrives: true },
-    { responseType: 'arraybuffer' }
+  const res = await withDriveRetry(() =>
+    drive.files.get({ fileId, alt: 'media', supportsAllDrives: true }, { responseType: 'arraybuffer' })
   );
   return Buffer.from(res.data as ArrayBuffer);
 }
@@ -86,21 +119,21 @@ export async function uploadToDrive(
   folderId?: string | null
 ): Promise<DriveUploadResult> {
   const drive = getGoogleDriveClient();
-
-  const stream = new Readable();
-  stream.push(buffer);
-  stream.push(null);
-
   const parent = folderId || process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || undefined;
 
-  const { data } = await drive.files.create({
-    requestBody: {
-      name: fileName,
-      parents: parent ? [parent] : undefined,
-    },
-    media: { mimeType, body: stream },
-    fields: 'id, name, mimeType, size, webViewLink, webContentLink',
-    supportsAllDrives: true,
+  const data = await withDriveRetry(async () => {
+    // Fresh stream per attempt — a consumed Readable can't be re-sent.
+    const stream = Readable.from(buffer);
+    const res = await drive.files.create({
+      requestBody: {
+        name: fileName,
+        parents: parent ? [parent] : undefined,
+      },
+      media: { mimeType, body: stream },
+      fields: 'id, name, mimeType, size, webViewLink, webContentLink',
+      supportsAllDrives: true,
+    });
+    return res.data;
   });
 
   if (!data.id) throw new Error('Drive upload returned no file id');
