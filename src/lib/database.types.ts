@@ -30,6 +30,7 @@ export interface Database {
           phone: string | null;
           company_name: string | null;
           drive_folder_id: string | null;
+          whmcs_client_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,6 +42,7 @@ export interface Database {
           phone?: string | null;
           company_name?: string | null;
           drive_folder_id?: string | null;
+          whmcs_client_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -61,6 +63,10 @@ export interface Database {
           target_launch_date: string | null;
           total_fee_zar: number | null;
           playbooks: string[];
+          whmcs_service_id: string | null;
+          whmcs_product_id: string | null;
+          whmcs_domain: string | null;
+          whmcs_status: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -75,6 +81,10 @@ export interface Database {
           target_launch_date?: string | null;
           total_fee_zar?: number | null;
           playbooks?: string[];
+          whmcs_service_id?: string | null;
+          whmcs_product_id?: string | null;
+          whmcs_domain?: string | null;
+          whmcs_status?: string | null;
           created_at?: string;
           updated_at?: string;
         };

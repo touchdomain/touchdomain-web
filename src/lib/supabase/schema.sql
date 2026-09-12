@@ -34,6 +34,7 @@ CREATE TABLE public.profiles (
   phone TEXT,
   company_name TEXT,
   drive_folder_id TEXT,                                  -- migration 004: client's company folder in the Shared Drive
+  whmcs_client_id TEXT,                                  -- migration 009: HostAfrica/WHMCS client id
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -50,6 +51,10 @@ CREATE TABLE public.projects (
   target_launch_date DATE,
   total_fee_zar DECIMAL(10, 2),                          -- added in migration 002
   playbooks TEXT[] NOT NULL DEFAULT '{}',                -- migration 007: which product playbooks apply
+  whmcs_service_id TEXT,                                 -- migration 009: HostAfrica/WHMCS hosting service id
+  whmcs_product_id TEXT,
+  whmcs_domain TEXT,
+  whmcs_status TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -151,6 +151,22 @@ export default async function DashboardOverviewPage() {
             )}
           </Card>
 
+          {project.whmcs_service_id && (
+            <Card>
+              <div className="mb-1 flex items-center justify-between">
+                <SectionTitle className="mb-0">Hosting</SectionTitle>
+                <Badge tone={project.whmcs_status === 'Active' ? 'green' : project.whmcs_status === 'Suspended' ? 'amber' : 'neutral'}>
+                  {project.whmcs_status || 'Pending'}
+                </Badge>
+              </div>
+              <p className="text-sm text-gray-500">{project.whmcs_domain || 'Domain to be confirmed'}</p>
+              <p className="mt-2 text-xs text-gray-400">
+                Managed by Touch Domain via our hosting partner — questions go to{' '}
+                <a href="mailto:helper@touchdomain.co.za" className="text-td-accent hover:underline">helper@touchdomain.co.za</a>, not a separate login.
+              </p>
+            </Card>
+          )}
+
           {payments.length > 0 && (
             <Card>
               <SectionTitle>Payments</SectionTitle>

@@ -9,8 +9,10 @@ import PaymentPanel from './payment-panel';
 import DriveFolderButton from './drive-folder-button';
 import OnboardingReopen from './onboarding-reopen';
 import PlaybooksControl from './playbooks-control';
+import HostingPanel from './hosting-panel';
 import { PLAYBOOKS } from '@/lib/playbooks';
 import { progressFor } from '@/lib/project-status';
+import { isWhmcsConfigured } from '@/lib/actions/whmcs';
 
 const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
   {
@@ -48,10 +50,11 @@ const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
 ];
 
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
-  const detail = await getProjectDetail(params.id);
+  const [detail, whmcsConfigured] = await Promise.all([getProjectDetail(params.id), isWhmcsConfigured()]);
   if (!detail) notFound();
   const { project, onboarding, milestones, files, paymentMilestones } = detail;
   const agreementDate = project.created_at.slice(0, 10);
+  const showHosting = project.playbooks?.includes('hosting') || !!project.whmcs_service_id;
   const displayProgress = progressFor(
     project.status,
     milestones.length,
@@ -103,6 +106,16 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
           <Card>
             <PlaybooksControl projectId={project.id} selected={project.playbooks ?? []} />
           </Card>
+
+          {showHosting && (
+            <HostingPanel
+              projectId={project.id}
+              whmcsServiceId={project.whmcs_service_id}
+              whmcsDomain={project.whmcs_domain}
+              whmcsStatus={project.whmcs_status}
+              configured={whmcsConfigured}
+            />
+          )}
 
           <Card>
             <div className="mb-3 flex items-center justify-between">
