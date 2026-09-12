@@ -224,6 +224,7 @@ export interface Database {
           project_id: string | null;
           doc_type: string;
           title: string;
+          sow_reference: string | null;
           status: ContractStatus;
           source_drive_file_id: string;
           source_pdf_sha256: string;
@@ -245,6 +246,7 @@ export interface Database {
           project_id?: string | null;
           doc_type: string;
           title: string;
+          sow_reference?: string | null;
           status?: ContractStatus;
           source_drive_file_id: string;
           source_pdf_sha256: string;

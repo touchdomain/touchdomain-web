@@ -18,7 +18,7 @@ import {
 } from '@/lib/pdf/generate';
 import { createInvoice } from '@/lib/actions/invoices';
 import { fileDocumentToClient } from '@/lib/actions/files';
-import { sendContractForSignature } from '@/lib/actions/contracts';
+import { sendContractForSignature, lookupSowReference } from '@/lib/actions/contracts';
 import {
   PACKAGES,
   HOSTING_PLANS,
@@ -43,6 +43,12 @@ interface ClientOption {
   full_name: string;
   company_name: string | null;
   email: string;
+}
+
+interface ProjectOption {
+  id: string;
+  client_id: string;
+  title: string;
 }
 
 type DocType = ContractDocType | 'invoice';
@@ -74,21 +80,27 @@ function periodParts(yyyymm: string) {
 
 export default function ContractForm({
   clients,
+  projects,
   nextInvoiceNumber,
+  nextSowReference,
 }: {
   clients: ClientOption[];
+  projects: ProjectOption[];
   nextInvoiceNumber: string;
+  nextSowReference: string;
 }) {
   const router = useRouter();
   const [docType, setDocType] = useState<DocType>('sa');
   const [busy, setBusy] = useState(false);
   const [invoiceClientId, setInvoiceClientId] = useState('');
   const [contractClientId, setContractClientId] = useState('');
+  const [contractProjectId, setContractProjectId] = useState('');
+  const [invoiceProjectId, setInvoiceProjectId] = useState('');
 
   const [f, setF] = useState({
     agreementDate: new Date().toISOString().split('T')[0],
     clientContact: '', clientCompany: '', clientReg: '', clientAddress: '',
-    projectName: '', sowRef: '',
+    projectName: '', sowRef: nextSowReference,
     deliverables: '', outOfScope: '', clientMaterials: '',
     totalFee: 0, revisions: 2, warrantyDays: 30,
     startDays: 3, draftDays: 14, feedbackDays: 21, finalDays: 35,
@@ -197,6 +209,7 @@ export default function ContractForm({
       const fd = new FormData();
       fd.append('file', generateInvoiceBlob(buildInvoice()), `${inv.invoiceNumber.trim()}.pdf`);
       fd.append('clientId', invoiceClientId);
+      if (invoiceProjectId) fd.append('projectId', invoiceProjectId);
       fd.append('invoiceNumber', inv.invoiceNumber.trim());
       fd.append('amountZar', String(invTotal));
       fd.append('dueDate', invoiceDueDate());
@@ -291,6 +304,8 @@ export default function ContractForm({
       if (mode === 'sign') {
         fd.append('docType', docType);
         fd.append('title', contractTitle());
+        if (f.sowRef.trim()) fd.append('sowRef', f.sowRef.trim());
+        if (contractProjectId) fd.append('projectId', contractProjectId);
         const res = await sendContractForSignature(fd);
         if (res.success) {
           toast.success('Sent to the client’s portal for signature.');
@@ -389,7 +404,37 @@ export default function ContractForm({
             <Field label="Client address *" value={f.clientAddress} onChange={(v) => set('clientAddress', v)} />
           </div>
           {docType !== 'invoice' && <Field label="Project name" value={f.projectName} onChange={(v) => set('projectName', v)} />}
-          {docType !== 'invoice' && <Field label="SOW reference" value={f.sowRef} onChange={(v) => set('sowRef', v)} />}
+          {docType !== 'invoice' && (
+            <Field label="SOW reference" value={f.sowRef} onChange={(v) => set('sowRef', v)} help="Auto-generated — edit if you want to reuse an existing reference." />
+          )}
+          {docType !== 'invoice' && (
+            <div className="sm:col-span-2">
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium text-td-dark">Related project (optional)</span>
+                <select
+                  value={contractProjectId}
+                  onChange={async (e) => {
+                    const id = e.target.value;
+                    setContractProjectId(id);
+                    const proj = projects.find((p) => p.id === id);
+                    if (proj) {
+                      set('projectName', proj.title);
+                      const res = await lookupSowReference(proj.client_id, id);
+                      if (res.success && res.data?.sowReference) set('sowRef', res.data.sowReference);
+                    }
+                  }}
+                  className={inputClass}
+                >
+                  <option value="">— none —</option>
+                  {projects.map((p) => {
+                    const c = clients.find((cl) => cl.id === p.client_id);
+                    return <option key={p.id} value={p.id}>{p.title} — {c?.company_name || c?.full_name || 'client'}</option>;
+                  })}
+                </select>
+              </label>
+              <p className="mt-1 text-xs text-gray-400">Links this document to a project so invoices raised against it can auto-fill the SOW reference.</p>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -522,6 +567,29 @@ export default function ContractForm({
                 </label>
               )}
             </div>
+            <label className="mt-3 block">
+              <span className="mb-1 block text-xs font-semibold text-gray-400">Charge against a project (optional — auto-fills the reference from its SOW)</span>
+              <select
+                value={invoiceProjectId}
+                onChange={async (e) => {
+                  const id = e.target.value;
+                  setInvoiceProjectId(id);
+                  const proj = projects.find((p) => p.id === id);
+                  if (proj) {
+                    if (!invoiceClientId) setInvoiceClientId(proj.client_id);
+                    const res = await lookupSowReference(proj.client_id, id);
+                    if (res.success && res.data?.sowReference) setI('reference', res.data.sowReference);
+                  }
+                }}
+                className={inputClass}
+              >
+                <option value="">— none —</option>
+                {projects.map((p) => {
+                  const c = clients.find((cl) => cl.id === p.client_id);
+                  return <option key={p.id} value={p.id}>{p.title} — {c?.company_name || c?.full_name || 'client'}</option>;
+                })}
+              </select>
+            </label>
             {inv.kind === 'recurring' ? (
               <label className="mt-3 block">
                 <span className="mb-1 block text-xs font-semibold text-gray-400">Quick-add a recurring plan as a line item</span>
@@ -635,11 +703,12 @@ export default function ContractForm({
   );
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function Field({ label, value, onChange, help }: { label: string; value: string; onChange: (v: string) => void; help?: string }) {
   return (
     <label className="block">
       <span className="mb-1 block text-sm font-medium text-td-dark">{label}</span>
       <input value={value} onChange={(e) => onChange(e.target.value)} className={inputClass} />
+      {help && <span className="mt-1 block text-xs text-gray-400">{help}</span>}
     </label>
   );
 }

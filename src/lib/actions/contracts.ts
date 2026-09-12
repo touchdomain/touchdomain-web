@@ -67,6 +67,7 @@ export async function sendContractForSignature(
     const projectId = String(formData.get('projectId') || '') || null;
     const docType = String(formData.get('docType') || 'sa');
     const title = String(formData.get('title') || 'Agreement').trim();
+    const sowRef = String(formData.get('sowRef') || '').trim() || null;
     if (!(file instanceof File)) return { success: false, error: 'Missing contract PDF' };
     if (!clientId) return { success: false, error: 'Pick a client' };
 
@@ -82,6 +83,7 @@ export async function sendContractForSignature(
         project_id: projectId,
         doc_type: docType,
         title,
+        sow_reference: sowRef,
         status: 'sent',
         source_drive_file_id: uploaded.id,
         source_pdf_sha256: sha256(buffer),
@@ -210,6 +212,47 @@ export async function countersignContract(
     return { success: true };
   } catch (error) {
     return fail(error, 'Failed to countersign');
+  }
+}
+
+/**
+ * Look up the SOW/contract reference to auto-fill on an invoice: prefers a
+ * contract tied to the given project, falls back to the client's latest.
+ */
+export async function lookupSowReference(
+  clientId: string,
+  projectId?: string | null
+): Promise<ActionResult<{ sowReference: string | null }>> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+
+    if (projectId) {
+      const { data } = await admin
+        .from('contracts')
+        .select('sow_reference')
+        .eq('project_id', projectId)
+        .neq('status', 'void')
+        .not('sow_reference', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (data?.sow_reference) return { success: true, data: { sowReference: data.sow_reference } };
+    }
+
+    const { data } = await admin
+      .from('contracts')
+      .select('sow_reference')
+      .eq('client_id', clientId)
+      .neq('status', 'void')
+      .not('sow_reference', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return { success: true, data: { sowReference: data?.sow_reference ?? null } };
+  } catch (error) {
+    return fail(error, 'Failed to look up the SOW reference');
   }
 }
 

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { getProjectDetail, getNextInvoiceNumber } from '@/lib/admin-data';
+import { getProjectDetail, getNextInvoiceNumber, getReferenceContract } from '@/lib/admin-data';
 import { PageHeader } from '@/components/portal/ui';
 import { summariseSchedule } from '@/lib/payment-schedule';
 import InvoiceGenerator from './invoice-generator';
@@ -21,6 +21,7 @@ export default async function NewInvoicePage({
   ]);
   if (!detail) notFound();
   const { project, paymentMilestones } = detail;
+  const referenceContract = await getReferenceContract(project.client_id, project.id);
 
   const milestone = searchParams.milestone
     ? paymentMilestones.find((m) => m.id === searchParams.milestone) ?? null
@@ -46,6 +47,7 @@ export default async function NewInvoicePage({
         projectId={project.id}
         clientId={project.client_id}
         defaultInvoiceNumber={nextInvoiceNumber}
+        defaultReference={referenceContract?.sow_reference ?? undefined}
         defaultTerms={
           isFirstInstalment
             ? 'Payable on signature of the agreement. Work commences once this payment reflects. Accounts more than 14 calendar days past due may pause the project.'

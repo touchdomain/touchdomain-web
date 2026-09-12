@@ -33,6 +33,7 @@ interface Props {
   clientId: string;
   defaultInvoiceNumber: string;
   defaultTerms: string;
+  defaultReference?: string;
   client: { name: string; company: string | null; email: string; address?: string };
   milestone: MilestoneCtx | null;
   schedule: ScheduleRow[];
@@ -52,6 +53,7 @@ export default function InvoiceGenerator({
   clientId,
   defaultInvoiceNumber,
   defaultTerms,
+  defaultReference,
   client,
   milestone,
   schedule,
@@ -62,7 +64,7 @@ export default function InvoiceGenerator({
   const [invoiceNumber, setInvoiceNumber] = useState(defaultInvoiceNumber);
   const [issueDate, setIssueDate] = useState(today());
   const [dueDate, setDueDate] = useState(milestone?.dueDate || plusDays(7));
-  const [reference, setReference] = useState('');
+  const [reference, setReference] = useState(defaultReference ?? '');
   const [terms, setTerms] = useState(defaultTerms);
   const [notes, setNotes] = useState('');
   const [isTaxInvoice, setIsTaxInvoice] = useState(false);
@@ -171,7 +173,8 @@ export default function InvoiceGenerator({
           </label>
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-td-dark">Reference (SOW / plan)</span>
-            <input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="e.g. SOW TD-2026-014" className={inputClass} />
+            <input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="e.g. SOW-2026-014" className={inputClass} />
+            {defaultReference && <span className="mt-1 block text-xs text-gray-400">Auto-filled from this project&apos;s signed SOW.</span>}
           </label>
         </div>
         <p className="mt-3 text-xs text-gray-400">

@@ -129,6 +129,7 @@ CREATE TABLE public.contracts (
   project_id UUID REFERENCES public.projects(id) ON DELETE SET NULL,
   doc_type TEXT NOT NULL,
   title TEXT NOT NULL,
+  sow_reference TEXT,                                    -- migration 008
   status public.contract_status NOT NULL DEFAULT 'sent',
   source_drive_file_id TEXT NOT NULL,
   source_pdf_sha256 TEXT NOT NULL,

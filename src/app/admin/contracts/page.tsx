@@ -1,5 +1,5 @@
 import { ExternalLink } from 'lucide-react';
-import { getClientOptions, getNextInvoiceNumber, getContracts } from '@/lib/admin-data';
+import { getClientOptions, getNextInvoiceNumber, getNextSowReference, getAllProjects, getContracts } from '@/lib/admin-data';
 import { createClient } from '@/lib/supabase/server';
 import { PageHeader, Card, Badge, SectionTitle } from '@/components/portal/ui';
 import type { ContractStatus } from '@/lib/database.types';
@@ -21,10 +21,12 @@ const shortDate = (d: string) =>
 
 export default async function ContractsPage() {
   const supabase = createClient();
-  const [{ data: { user } }, clients, nextInvoiceNumber, contracts] = await Promise.all([
+  const [{ data: { user } }, clients, nextInvoiceNumber, nextSowReference, projects, contracts] = await Promise.all([
     supabase.auth.getUser(),
     getClientOptions(),
     getNextInvoiceNumber(),
+    getNextSowReference(),
+    getAllProjects(),
     getContracts(),
   ]);
   const myProfile = user
@@ -83,12 +85,14 @@ export default async function ContractsPage() {
         <SectionTitle>New document</SectionTitle>
         <ContractForm
           nextInvoiceNumber={nextInvoiceNumber}
+          nextSowReference={nextSowReference}
           clients={clients.map((c) => ({
             id: c.id,
             full_name: c.full_name ?? '',
             company_name: c.company_name,
             email: c.email ?? '',
           }))}
+          projects={projects.map((p) => ({ id: p.id, client_id: p.client_id, title: p.title }))}
         />
       </section>
     </div>

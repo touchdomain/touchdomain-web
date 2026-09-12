@@ -146,6 +146,52 @@ export async function getNextInvoiceNumber(): Promise<string> {
   return `${prefix}${String(max + 1).padStart(3, '0')}`;
 }
 
+/** Next SOW/contract reference in the running yearly series, e.g. "SOW-2026-007". */
+export async function getNextSowReference(): Promise<string> {
+  const supabase = createClient();
+  const year = new Date().getFullYear();
+  const prefix = `SOW-${year}-`;
+  const { data } = await supabase
+    .from('contracts')
+    .select('sow_reference')
+    .like('sow_reference', `${prefix}%`);
+  const max = (data ?? []).reduce((m, r) => {
+    const n = r.sow_reference ? parseInt(r.sow_reference.slice(prefix.length), 10) : 0;
+    return Math.max(m, n || 0);
+  }, 0);
+  return `${prefix}${String(max + 1).padStart(3, '0')}`;
+}
+
+/** Most recent non-void contract for a project (falls back to the client's latest if no project match). */
+export async function getReferenceContract(
+  clientId: string,
+  projectId?: string | null
+): Promise<{ sow_reference: string | null } | null> {
+  const supabase = createClient();
+  if (projectId) {
+    const { data } = await supabase
+      .from('contracts')
+      .select('sow_reference')
+      .eq('project_id', projectId)
+      .neq('status', 'void')
+      .not('sow_reference', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (data) return data;
+  }
+  const { data } = await supabase
+    .from('contracts')
+    .select('sow_reference')
+    .eq('client_id', clientId)
+    .neq('status', 'void')
+    .not('sow_reference', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data ?? null;
+}
+
 export async function getStaff(): Promise<Profile[]> {
   const supabase = createClient();
   const { data } = await supabase
