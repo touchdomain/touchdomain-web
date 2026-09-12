@@ -102,8 +102,8 @@ export default async function DashboardOverviewPage() {
           )}
 
           <Card>
-            <div className="mb-4 flex items-center justify-between">
-              <SectionTitle className="mb-0">{project.title}</SectionTitle>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <SectionTitle className="mb-0 min-w-0 truncate">{project.title}</SectionTitle>
               <Badge tone={project.status === 'completed' ? 'green' : project.status === 'paused' ? 'amber' : 'purple'}>
                 {STATUS_LABEL[project.status as ProjectStatus] ?? project.status}
               </Badge>
@@ -138,7 +138,7 @@ export default async function DashboardOverviewPage() {
 
             <ul className="mt-4 divide-y divide-td-purple/10">
               {stages.map((s) => (
-                <li key={s.label} className="flex items-center justify-between py-2.5">
+                <li key={s.label} className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 py-2.5">
                   <span className="text-sm text-gray-500">{s.label}</span>
                   <Badge tone={s.tone}>{s.value}</Badge>
                 </li>

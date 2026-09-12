@@ -43,7 +43,7 @@ export default async function InvoicesPage() {
                       Due {new Date(inv.due_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                     <span className="text-sm font-semibold text-td-dark">{money(Number(inv.amount_zar))}</span>
                     <Badge tone={TONE[inv.status]}>{inv.status}</Badge>
                     {inv.pdf_drive_file_id && (
@@ -53,7 +53,7 @@ export default async function InvoicesPage() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-xs font-semibold text-td-purple hover:text-td-accent"
                       >
-                        View / download PDF <ExternalLink className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">View / download </span>PDF <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     )}
                   </div>

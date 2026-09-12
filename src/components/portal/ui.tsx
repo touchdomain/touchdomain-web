@@ -13,8 +13,8 @@ export function PageHeader({
 }) {
   return (
     <div className="mb-8 flex flex-col gap-3 border-b border-td-purple/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 className="text-2xl font-bold text-td-dark">{title}</h1>
+      <div className="min-w-0">
+        <h1 className="text-xl font-bold text-td-dark sm:text-2xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
       </div>
       {action}
@@ -32,7 +32,7 @@ export function SectionTitle({ children, className }: { children: React.ReactNod
 
 export function Card({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('rounded-2xl border border-td-purple/10 bg-white p-6 shadow-[0_1px_3px_rgba(69,44,99,0.04)]', className)}>
+    <div className={cn('rounded-2xl border border-td-purple/10 bg-white p-4 shadow-[0_1px_3px_rgba(69,44,99,0.04)] sm:p-6', className)}>
       {children}
     </div>
   );
@@ -50,11 +50,11 @@ export function StatCard({
   icon?: LucideIcon;
 }) {
   return (
-    <Card className="p-5">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</p>
-          <p className="mt-1.5 text-2xl font-bold text-td-dark">{value}</p>
+    <Card className="p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</p>
+          <p className="mt-1.5 truncate text-xl font-bold text-td-dark sm:text-2xl">{value}</p>
           {hint && <p className="mt-0.5 text-xs text-gray-400">{hint}</p>}
         </div>
         {Icon && <Icon className="h-5 w-5 text-td-accent" />}
@@ -92,7 +92,7 @@ export function Badge({
 
 export function EmptyState({ title, hint }: { title: string; hint?: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-td-purple/20 bg-white/50 p-10 text-center">
+    <div className="rounded-2xl border border-dashed border-td-purple/20 bg-white/50 p-6 text-center sm:p-10">
       <p className="text-sm font-medium text-td-dark">{title}</p>
       {hint && <p className="mt-1 text-xs text-gray-400">{hint}</p>}
     </div>

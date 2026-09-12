@@ -40,7 +40,7 @@ export default function UploadWidget() {
       onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) upload(f); }}
       onClick={() => inputRef.current?.click()}
       className={cn(
-        'flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 text-center transition-colors',
+        'flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-colors sm:p-10',
         dragging ? 'border-td-accent bg-td-purple/[0.04]' : 'border-td-purple/20 bg-white hover:border-td-accent/50'
       )}
     >

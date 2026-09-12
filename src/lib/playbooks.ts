@@ -7,16 +7,23 @@
 //
 // Questions are lifted from the "Client Intake Questionnaire" table in each
 // playbook (Web / Brand / Content / App) or distilled from the Hosting &
-// Ongoing Support playbook. Reworded slightly to address the client directly.
+// Ongoing Support playbook. Reworded slightly to address the client directly,
+// with a `help` line added to anything that leans on agency jargon and a
+// small `visual` diagram (src/components/portal/explainers.tsx) for the
+// handful of questions that are genuinely easier to show than to explain.
+
+import type { ExplainerKey } from '@/components/portal/explainers';
 
 export interface PlaybookQuestion {
   key: string;
   label: string;
-  /** Small helper line under the label. */
+  /** Small helper line under the label — plain-language explanation of any jargon. */
   help?: string;
   type?: 'text' | 'select';
   options?: string[];
   rows?: number;
+  /** Optional small diagram rendered under the help text. */
+  visual?: ExplainerKey;
 }
 
 export interface Playbook {
@@ -34,14 +41,35 @@ export const PLAYBOOKS: Record<string, Playbook> = {
       'A few questions specific to your website build. The more detail here, the smoother the design phase — missing answers are the main cause of delays mid-build.',
     questions: [
       { key: 'business_goal', label: 'What should this website achieve?', help: 'Leads, sales, bookings, information — what does success look like?' },
-      { key: 'website_type', label: 'Website type', type: 'select', options: ['Informational', 'E-commerce Store', 'Portfolio / Personal', 'Blog / Content Hub'], rows: 1 },
-      { key: 'audience', label: 'Who is the primary visitor, and what device do they mostly browse on?' },
-      { key: 'content_readiness', label: 'Do you have copy and images ready, or do you need us to write copy / source stock images?' },
-      { key: 'sitemap', label: 'What pages are must-haves vs nice-to-haves?', help: 'This confirms the page-count tier.' },
-      { key: 'functionality', label: 'Any of: payments, bookings, user accounts, custom functionality, CRM integration?' },
+      {
+        key: 'website_type',
+        label: 'Website type',
+        type: 'select',
+        options: ['Informational', 'E-commerce Store', 'Portfolio / Personal', 'Blog / Content Hub'],
+        help: 'Informational = tells people about you (most small businesses). E-commerce = sells products online. Portfolio = showcases your work. Blog = regularly-updated articles.',
+        rows: 1,
+      },
+      { key: 'audience', label: 'Who is the primary visitor, and what device do they mostly browse on?', help: 'Most South African visitors browse on a phone — this shapes how we design the layout.' },
+      { key: 'content_readiness', label: 'Do you have copy and images ready, or do you need us to write copy / source stock images?', help: '"Copy" just means the words on the page.' },
+      {
+        key: 'sitemap',
+        label: 'What pages are must-haves vs nice-to-haves?',
+        help: 'A "sitemap" is simply the list of pages your site needs and how they link together. This confirms the page-count tier.',
+        visual: 'sitemap',
+      },
+      {
+        key: 'functionality',
+        label: 'Any of: payments, bookings, user accounts, custom functionality, CRM integration?',
+        help: 'Payments = customers pay online. Bookings = an appointment/reservation calendar. User accounts = customers log in to see their own info. CRM = the system that tracks your customer/lead contacts.',
+      },
       { key: 'competitors', label: '2–3 competitor sites — what do you like and dislike about them?' },
-      { key: 'existing_brand', label: 'Do you have an existing logo, colour palette, or brand guide?' },
-      { key: 'domain_hosting', label: 'Do you have a domain already? Are you taking a Touch Domain hosting plan?' },
+      { key: 'existing_brand', label: 'Do you have an existing logo, colour palette, or brand guide?', help: 'A "brand guide" is a document setting out your logo, colours and fonts — skip this if you don\'t have one yet.' },
+      {
+        key: 'domain_hosting',
+        label: 'Do you have a domain already? Are you taking a Touch Domain hosting plan?',
+        help: 'Your domain is your web address (e.g. yourbusiness.co.za). Hosting is the separate service that stores your site so it’s reachable at that address.',
+        visual: 'domain-hosting',
+      },
       { key: 'timeline', label: 'Any hard launch date?', help: 'Event, campaign, financial year-end…' },
       { key: 'decision_maker', label: 'Who signs off on design and copy — one person, or a committee?', rows: 1 },
     ],
@@ -55,12 +83,12 @@ export const PLAYBOOKS: Record<string, Playbook> = {
       { key: 'business_overview', label: 'What does the business do, and what does it want to be known for in 3 years?' },
       { key: 'audience', label: 'Who is the primary customer?', help: 'Age range, income band, where they spend time online.' },
       { key: 'competitors', label: '3 direct competitors — what do you like and dislike about their branding?' },
-      { key: 'personality', label: 'Pick 3 adjectives the brand should feel like', help: 'e.g. bold, trustworthy, playful.', rows: 1 },
+      { key: 'personality', label: 'Pick 3 adjectives the brand should feel like', help: 'If your brand walked into a room, how should it come across? e.g. bold, trustworthy, playful.', rows: 1 },
       { key: 'existing_assets', label: 'Any existing logo, colours, or fonts that must be kept, or retired?' },
       { key: 'colour_direction', label: 'Colours to use / colours to avoid. Any industry or cultural constraints?' },
       { key: 'usage_context', label: 'Where will this brand appear first — website, signage, uniforms, packaging?' },
-      { key: 'inspiration', label: '3 reference brands (any industry) whose visual identity you admire.' },
-      { key: 'non_negotiables', label: 'Anything you explicitly do not want.' },
+      { key: 'inspiration', label: '3 reference brands (any industry) whose visual identity you admire.', help: 'Not competitors — any brand at all, from any industry, whose look and feel you like.' },
+      { key: 'non_negotiables', label: 'Anything you explicitly do not want.', help: 'Colours, styles, or associations to avoid — as useful to us as what you do want.' },
       { key: 'decision_maker', label: 'Who signs off — a single person or a committee?', rows: 1 },
     ],
   },
@@ -71,11 +99,11 @@ export const PLAYBOOKS: Record<string, Playbook> = {
     intro: 'Run through this before we start production, even for a small batch.',
     questions: [
       { key: 'purpose', label: 'What is this content for — a campaign, always-on social presence, a launch, ads?' },
-      { key: 'platforms', label: 'Where will this content be published?', help: 'Confirms the sizes and formats we produce.' },
+      { key: 'platforms', label: 'Where will this content be published?', help: 'e.g. Instagram, Facebook, LinkedIn, your website, email — this decides the exact sizes and formats we produce.' },
       { key: 'quantities', label: 'Confirm the exact counts you need for each content type.' },
       { key: 'messaging', label: 'Key messages or offers that must appear across the batch.' },
-      { key: 'brand_assets', label: 'Is there a brand board / brand guide on file for your business?' },
-      { key: 'content_themes', label: 'Any recurring themes, campaigns, or content pillars to plan around?' },
+      { key: 'brand_assets', label: 'Is there a brand board / brand guide on file for your business?', help: 'A one-page (or few-page) summary of your logo, colours and fonts — skip if you don\'t have one.' },
+      { key: 'content_themes', label: 'Any recurring themes, campaigns, or content pillars to plan around?', help: '"Content pillars" just means the 2–3 recurring topics your posts tend to circle back to.' },
       { key: 'reference_examples', label: 'Any content (yours or a competitor’s) you want used as a quality benchmark.' },
       { key: 'review_process', label: 'Who reviews and approves before content goes live — one person or several?', rows: 1 },
       { key: 'deadline', label: 'Any hard publish dates?', help: 'Campaign launch, event, seasonal tie-in.' },
@@ -88,13 +116,21 @@ export const PLAYBOOKS: Record<string, Playbook> = {
     intro:
       'These answers set the scope and the price. Be as concrete as you can — vague requirements here are the main cause of scope creep.',
     questions: [
-      { key: 'core_purpose', label: 'What is the one thing this app must let a user do?' },
+      { key: 'core_purpose', label: 'What is the one thing this app must let a user do?', help: 'If it did only this one thing well, would it already be useful? Start there.' },
       { key: 'users', label: 'Who uses it — the public, staff only, or both? Roughly how many users?' },
-      { key: 'platforms', label: 'Platform', type: 'select', options: ['Installable web app (PWA) only', 'Native App Store / Play Store presence', 'Not sure yet'], rows: 1 },
+      {
+        key: 'platforms',
+        label: 'Platform',
+        type: 'select',
+        options: ['Installable web app (PWA) only', 'Native App Store / Play Store presence', 'Not sure yet'],
+        help: 'Not sure which fits? See the comparison below.',
+        visual: 'pwa-vs-native',
+        rows: 1,
+      },
       { key: 'offline_needs', label: 'Does any part of the app need to work without an internet connection?', rows: 1 },
-      { key: 'data_accounts', label: 'Does it need user accounts, saved data, or a database behind it?' },
-      { key: 'integrations', label: 'Any third-party services it must connect to?', help: 'Payments, calendars, CRM, other APIs.' },
-      { key: 'multi_user_roles', label: 'Are there different permission levels (admin vs staff vs customer)?' },
+      { key: 'data_accounts', label: 'Does it need user accounts, saved data, or a database behind it?', help: 'A "database" is just where the app remembers information between visits — e.g. orders, bookings, saved profiles.' },
+      { key: 'integrations', label: 'Any third-party services it must connect to?', help: 'e.g. a payment provider, Google Calendar, a CRM — any outside system the app needs to talk to.' },
+      { key: 'multi_user_roles', label: 'Are there different permission levels (admin vs staff vs customer)?', help: 'i.e. should different people see different things when they log in?' },
       { key: 'existing_systems', label: 'Does this need to talk to any existing software or spreadsheet-based process you use?' },
       { key: 'design_assets', label: 'Is there a brand guide / design system on file to build from?' },
       { key: 'timeline_budget', label: 'Any hard deadline, and is there a budget ceiling above the “from” price?' },
@@ -106,13 +142,18 @@ export const PLAYBOOKS: Record<string, Playbook> = {
     label: 'Hosting & Email',
     intro: 'A few details so we can provision the right plan and plan any migration.',
     questions: [
-      { key: 'domain', label: 'Do you already own the domain? Who is it registered with?' },
-      { key: 'what_you_need', label: 'What do you need?', type: 'select', options: ['Website hosting', 'Professional email only', 'Both'], rows: 1 },
+      {
+        key: 'domain',
+        label: 'Do you already own the domain? Who is it registered with?',
+        help: 'Your domain is your web address, e.g. yourbusiness.co.za — see how it fits with hosting below.',
+        visual: 'domain-hosting',
+      },
+      { key: 'what_you_need', label: 'What do you need?', type: 'select', options: ['Website hosting', 'Professional email only', 'Both'], help: '"Hosting" stores your website; "email" gives you a professional inbox at your own domain (e.g. you@yourbusiness.co.za) — you can have either or both.', rows: 1 },
       { key: 'current_setup', label: 'Is the site currently hosted somewhere (Wix, WordPress, another host)? Is email set up already?' },
-      { key: 'migration', label: 'Are we moving an existing site / mailboxes across, or starting fresh?', rows: 1 },
+      { key: 'migration', label: 'Are we moving an existing site / mailboxes across, or starting fresh?', help: '"Migrating" means moving your existing site or inbox to us without losing anything.', rows: 1 },
       { key: 'email_accounts', label: 'How many mailboxes, and what addresses do you want?', help: 'e.g. hello@yourdomain, accounts@yourdomain' },
-      { key: 'access', label: 'Do you have login access to your current domain / DNS and hosting?', help: 'Share credentials via a one-time secret link in the Technical section above — never in plain text.' },
-      { key: 'ongoing_support', label: 'Interested in a Care Plan (updates, backups, monitoring) or a monthly content / SEO retainer?' },
+      { key: 'access', label: 'Do you have login access to your current domain / DNS and hosting?', help: '"DNS" is the settings that point your domain to where it\'s hosted — share credentials via a one-time secret link in the Technical section above, never in plain text.' },
+      { key: 'ongoing_support', label: 'Interested in a Care Plan (updates, backups, monitoring) or a monthly content / SEO retainer?', help: 'A Care Plan keeps your site updated and backed up after launch; a retainer is ongoing content or SEO work billed monthly.' },
     ],
   },
 };

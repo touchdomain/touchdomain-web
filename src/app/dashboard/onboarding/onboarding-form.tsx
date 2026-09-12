@@ -7,6 +7,7 @@ import { Check, Loader2, ShieldAlert } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { saveOnboardingProgress, submitOnboarding, type OnboardingInput } from '@/lib/actions/onboarding';
 import { PLAYBOOKS, type DiscoveryAnswers } from '@/lib/playbooks';
+import { EXPLAINERS, type ExplainerKey } from '@/components/portal/explainers';
 import { Card, SectionTitle, inputClass, btnPrimary } from '@/components/portal/ui';
 import type { ProjectOnboarding } from '@/lib/database.types';
 
@@ -17,6 +18,10 @@ interface FieldDef {
   label: string;
   placeholder: string;
   rows?: number;
+  /** Small helper line under the label — plain-language explanation of any jargon. */
+  help?: string;
+  /** Optional small diagram rendered under the help text. */
+  visual?: ExplainerKey;
 }
 
 const SECTIONS: { title: string; fields: FieldDef[]; note?: string }[] = [
@@ -26,7 +31,7 @@ const SECTIONS: { title: string; fields: FieldDef[]; note?: string }[] = [
       { key: 'business_name', label: 'Business / trading name', placeholder: 'e.g. Acme Trading', rows: 1 },
       { key: 'primary_goal', label: 'The single most important goal for this project', placeholder: 'What does success look like 3 months after launch?' },
       { key: 'target_audience', label: 'Who are your customers?', placeholder: 'Describe your ideal client.' },
-      { key: 'unique_value_prop', label: 'What makes you different from competitors?', placeholder: 'Your edge, in your own words.' },
+      { key: 'unique_value_prop', label: 'What makes you different from competitors?', placeholder: 'Your edge, in your own words.', help: 'Why would someone choose you over the next option? No need for polish — we’ll help shape the wording later.' },
       { key: 'competitors', label: 'Competitors or businesses you admire', placeholder: 'Names or links — what you like about them.' },
     ],
   },
@@ -44,16 +49,22 @@ const SECTIONS: { title: string; fields: FieldDef[]; note?: string }[] = [
       { key: 'content_strategy', label: 'What content do you already have?', placeholder: 'Copy, photos, videos, testimonials…' },
       { key: 'copywriting_status', label: 'Website copy — who writes it?', placeholder: 'You’ll supply it / you want us to write it / a mix.', rows: 2 },
       { key: 'photography_status', label: 'Photography', placeholder: 'You have your own / need stock / need a shoot.', rows: 2 },
-      { key: 'primary_cta', label: 'Main call-to-action for visitors', placeholder: 'e.g. “Book a call”, “Get a quote”, “Shop now”.', rows: 1 },
+      { key: 'primary_cta', label: 'Main call-to-action for visitors', placeholder: 'e.g. “Book a call”, “Get a quote”, “Shop now”.', help: 'The one action you most want a visitor to take — the button most of the page should point toward.', rows: 1 },
     ],
   },
   {
     title: '4. Technical & Access',
     note: 'Never paste passwords or API keys here. Share them as a one-time secret link (e.g. onetimesecret.com) in the field at the bottom of this section.',
     fields: [
-      { key: 'domain_status', label: 'Domain name', placeholder: 'Registered with whom? Do you have access?' },
-      { key: 'tech_infrastructure', label: 'Existing hosting / infrastructure', placeholder: 'Current host, platform, anything we must work around.' },
-      { key: 'third_party_integrations', label: 'Third-party tools to connect', placeholder: 'CRM, payment gateway, email marketing, booking…' },
+      {
+        key: 'domain_status',
+        label: 'Domain name',
+        placeholder: 'Registered with whom? Do you have access?',
+        help: 'Your domain is your web address (e.g. yourbusiness.co.za) — separate from where the site itself is hosted, see below.',
+        visual: 'domain-hosting',
+      },
+      { key: 'tech_infrastructure', label: 'Existing hosting / infrastructure', placeholder: 'Current host, platform, anything we must work around.', help: '"Hosting" is whatever currently stores your website so it’s reachable online — leave blank if you’re starting fresh.' },
+      { key: 'third_party_integrations', label: 'Third-party tools to connect', placeholder: 'CRM, payment gateway, email marketing, booking…', help: 'Any outside service or software the site needs to talk to — a CRM (customer-tracking tool), a way to take payments, an email newsletter tool, a booking calendar, etc.' },
     ],
   },
   {
@@ -185,19 +196,24 @@ export default function OnboardingForm({
             </p>
           )}
           <div className="space-y-4">
-            {section.fields.map((f) => (
-              <div key={f.key}>
-                <label className="mb-1 block text-sm font-medium text-td-dark">{f.label}</label>
-                <textarea
-                  rows={f.rows ?? 3}
-                  value={form[f.key]}
-                  onChange={(e) => set(f.key, e.target.value)}
-                  placeholder={f.placeholder}
-                  disabled={alreadySubmitted}
-                  className={`${inputClass} resize-y disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
-                />
-              </div>
-            ))}
+            {section.fields.map((f) => {
+              const Visual = f.visual ? EXPLAINERS[f.visual] : null;
+              return (
+                <div key={f.key}>
+                  <label className="mb-1 block text-sm font-medium text-td-dark">{f.label}</label>
+                  {f.help && <p className="mb-1.5 text-xs text-gray-400">{f.help}</p>}
+                  {Visual && <Visual />}
+                  <textarea
+                    rows={f.rows ?? 3}
+                    value={form[f.key]}
+                    onChange={(e) => set(f.key, e.target.value)}
+                    placeholder={f.placeholder}
+                    disabled={alreadySubmitted}
+                    className={`${inputClass} mt-1.5 resize-y disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
+                  />
+                </div>
+              );
+            })}
             {section.title.startsWith('4.') && (
               <div>
                 <label className="mb-1 block text-sm font-medium text-td-dark">
@@ -222,37 +238,41 @@ export default function OnboardingForm({
           <SectionTitle>{pb.label} — project details</SectionTitle>
           {pb.intro && <p className="mb-4 text-xs text-gray-500">{pb.intro}</p>}
           <div className="space-y-4">
-            {pb.questions.map((q) => (
-              <div key={q.key}>
-                <label className="mb-1 block text-sm font-medium text-td-dark">{q.label}</label>
-                {q.help && <p className="mb-1 text-xs text-gray-400">{q.help}</p>}
-                {q.type === 'select' && q.options ? (
-                  <select
-                    value={discovery[pb.key]?.[q.key] ?? ''}
-                    onChange={(e) => setDisc(pb.key, q.key, e.target.value)}
-                    disabled={alreadySubmitted}
-                    className={`${inputClass} disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
-                  >
-                    <option value="">— select —</option>
-                    {q.options.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                ) : (
-                  <textarea
-                    rows={q.rows ?? 3}
-                    value={discovery[pb.key]?.[q.key] ?? ''}
-                    onChange={(e) => setDisc(pb.key, q.key, e.target.value)}
-                    disabled={alreadySubmitted}
-                    className={`${inputClass} resize-y disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
-                  />
-                )}
-              </div>
-            ))}
+            {pb.questions.map((q) => {
+              const Visual = q.visual ? EXPLAINERS[q.visual] : null;
+              return (
+                <div key={q.key}>
+                  <label className="mb-1 block text-sm font-medium text-td-dark">{q.label}</label>
+                  {q.help && <p className="mb-1 text-xs text-gray-400">{q.help}</p>}
+                  {Visual && <Visual />}
+                  {q.type === 'select' && q.options ? (
+                    <select
+                      value={discovery[pb.key]?.[q.key] ?? ''}
+                      onChange={(e) => setDisc(pb.key, q.key, e.target.value)}
+                      disabled={alreadySubmitted}
+                      className={`${inputClass} mt-1.5 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
+                    >
+                      <option value="">— select —</option>
+                      {q.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  ) : (
+                    <textarea
+                      rows={q.rows ?? 3}
+                      value={discovery[pb.key]?.[q.key] ?? ''}
+                      onChange={(e) => setDisc(pb.key, q.key, e.target.value)}
+                      disabled={alreadySubmitted}
+                      className={`${inputClass} mt-1.5 resize-y disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </Card>
       ))}
 
       {!alreadySubmitted && (
-        <div className="flex items-center justify-between rounded-2xl border border-td-purple/10 bg-white p-5">
+        <div className="flex flex-col gap-3 rounded-2xl border border-td-purple/10 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <p className="text-sm text-gray-500">Done? Submit to let the team know it’s ready to review.</p>
           <button onClick={handleSubmit} disabled={submitting} className={btnPrimary}>
             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
