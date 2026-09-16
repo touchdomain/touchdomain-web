@@ -9,7 +9,7 @@ import type { ProjectOnboarding, Json } from '@/lib/database.types';
 // Columns a client is allowed to write from the questionnaire. Anything else
 // (client_id, status, submitted_at, timestamps) is managed server-side.
 const EDITABLE_FIELDS = [
-  'business_name', 'business_goals', 'brand_identity', 'content_strategy',
+  'business_name', 'business_address', 'business_goals', 'brand_identity', 'content_strategy',
   'tech_infrastructure', 'design_preferences', 'primary_goal', 'target_audience',
   'unique_value_prop', 'competitors', 'brand_colors', 'brand_fonts', 'brand_vibe',
   'copywriting_status', 'photography_status', 'primary_cta', 'domain_status',

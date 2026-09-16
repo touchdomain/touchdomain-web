@@ -29,6 +29,13 @@ const SECTIONS: { title: string; fields: FieldDef[]; note?: string }[] = [
     title: '1. Business Overview',
     fields: [
       { key: 'business_name', label: 'Business / trading name', placeholder: 'e.g. Acme Trading', rows: 1 },
+      {
+        key: 'business_address',
+        label: 'Business / registered address',
+        placeholder: 'Street, suburb, town, postal code',
+        help: 'Your physical or registered address — this is what gets printed as your address on contracts and invoices, so it should match what’s on your official paperwork.',
+        rows: 2,
+      },
       { key: 'primary_goal', label: 'The single most important goal for this project', placeholder: 'What does success look like 3 months after launch?' },
       { key: 'target_audience', label: 'Who are your customers?', placeholder: 'Describe your ideal client.' },
       { key: 'unique_value_prop', label: 'What makes you different from competitors?', placeholder: 'Your edge, in your own words.', help: 'Why would someone choose you over the next option? No need for polish — we’ll help shape the wording later.' },

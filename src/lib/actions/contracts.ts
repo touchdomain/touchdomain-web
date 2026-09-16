@@ -256,6 +256,29 @@ export async function lookupSowReference(
   }
 }
 
+/**
+ * Look up a client's business/registered address from their onboarding
+ * answers, to auto-fill the "Client address" field on a new contract.
+ */
+export async function lookupClientAddress(
+  clientId: string
+): Promise<ActionResult<{ address: string | null }>> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+
+    const { data } = await admin
+      .from('project_onboarding')
+      .select('business_address')
+      .eq('client_id', clientId)
+      .maybeSingle();
+
+    return { success: true, data: { address: data?.business_address ?? null } };
+  } catch (error) {
+    return fail(error, 'Failed to look up the client address');
+  }
+}
+
 export async function voidContract(contractId: string): Promise<ActionResult> {
   try {
     await requireAdmin();

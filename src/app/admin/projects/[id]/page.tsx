@@ -18,7 +18,7 @@ const ONBOARDING_GROUPS: { label: string; fields: [string, string][] }[] = [
   {
     label: 'Business',
     fields: [
-      ['business_name', 'Business name'], ['primary_goal', 'Primary goal'],
+      ['business_name', 'Business name'], ['business_address', 'Address'], ['primary_goal', 'Primary goal'],
       ['target_audience', 'Target audience'], ['unique_value_prop', 'Value proposition'],
       ['competitors', 'Competitors'],
     ],

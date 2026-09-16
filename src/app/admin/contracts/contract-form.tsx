@@ -18,7 +18,7 @@ import {
 } from '@/lib/pdf/generate';
 import { createInvoice } from '@/lib/actions/invoices';
 import { fileDocumentToClient } from '@/lib/actions/files';
-import { sendContractForSignature, lookupSowReference } from '@/lib/actions/contracts';
+import { sendContractForSignature, lookupSowReference, lookupClientAddress } from '@/lib/actions/contracts';
 import {
   PACKAGES,
   HOSTING_PLANS,
@@ -144,7 +144,13 @@ export default function ContractForm({
 
   const pickClient = (id: string) => {
     const c = clients.find((x) => x.id === id);
-    if (c) setF((p) => ({ ...p, clientContact: c.full_name, clientCompany: c.company_name ?? '' }));
+    if (!c) return;
+    setF((p) => ({ ...p, clientContact: c.full_name, clientCompany: c.company_name ?? '' }));
+    lookupClientAddress(c.id).then((res) => {
+      if (res.success && res.data?.address) {
+        setF((p) => ({ ...p, clientAddress: res.data!.address as string }));
+      }
+    });
   };
   const pickPackage = (key: string) => {
     const pkg = PACKAGES[key];

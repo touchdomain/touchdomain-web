@@ -100,6 +100,7 @@ export interface Database {
           client_id: string;
           status: OnboardingStatus;
           business_name: string | null;
+          business_address: string | null;
           business_goals: string | null;
           brand_identity: string | null;
           content_strategy: string | null;
@@ -133,6 +134,7 @@ export interface Database {
           status?: OnboardingStatus;
           discovery?: Json;
           business_name?: string | null;
+          business_address?: string | null;
           business_goals?: string | null;
           brand_identity?: string | null;
           content_strategy?: string | null;

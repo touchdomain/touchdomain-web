@@ -68,6 +68,7 @@ CREATE TABLE public.project_onboarding (
 
   -- Questionnaire Fields matching our frontend state
   business_name TEXT,
+  business_address TEXT,                                 -- migration 010: used to auto-fill contracts/invoices
   business_goals TEXT,
   brand_identity TEXT,
   content_strategy TEXT,
