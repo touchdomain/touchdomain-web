@@ -19,6 +19,7 @@ import {
 import { createInvoice } from '@/lib/actions/invoices';
 import { fileDocumentToClient } from '@/lib/actions/files';
 import { sendContractForSignature, lookupSowReference, lookupClientAddress, lookupPaymentSchedule } from '@/lib/actions/contracts';
+import { savePaymentSchedule } from '@/lib/actions/payments';
 import {
   PACKAGES,
   HOSTING_PLANS,
@@ -357,6 +358,16 @@ export default function ContractForm({
         if (contractProjectId) fd.append('projectId', contractProjectId);
         const res = await sendContractForSignature(fd);
         if (res.success) {
+          if (docType === 'sa') {
+            if (contractProjectId) {
+              const schedRes = await savePaymentSchedule(contractProjectId, Number(f.totalFee), scheduleRows);
+              if (!schedRes.success) {
+                toast.warning(`Contract sent, but the payment schedule wasn’t saved to the project (${schedRes.error}). Invoices raised against it won’t show the schedule.`, { duration: Infinity });
+              }
+            } else {
+              toast.warning('Contract sent, but no project was linked — the payment schedule won’t be available when you invoice this client. Link a project next time to carry it over automatically.', { duration: Infinity });
+            }
+          }
           toast.success('Sent to the client’s portal for signature.');
           router.push('/admin/contracts');
         } else toast.error(res.error);
