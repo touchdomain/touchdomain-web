@@ -47,6 +47,7 @@ export default function RootLayout({
         {children}
         <Toaster
           position="top-center"
+          closeButton
           toastOptions={{
             style: { fontFamily: 'inherit' },
             classNames: {

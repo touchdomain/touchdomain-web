@@ -69,6 +69,9 @@ async function provisionUser(
     await sendPortalInvite({ to: email, name: opts.fullName, link: actionLink, role: opts.role });
     invited = true;
   } catch (e) {
+    // Surface in Vercel's function logs — the toast that also shows this is
+    // easy to miss/dismiss before it's read.
+    console.error(`Portal invite email failed for ${email}:`, e);
     note = `Account is ready, but the invite email failed (${e instanceof Error ? e.message : 'unknown'}). Use "Resend invite".`;
   }
 
@@ -159,7 +162,8 @@ export async function resendInvite(
         role: profile.role,
       });
       emailed = true;
-    } catch {
+    } catch (e) {
+      console.error(`Resend invite email failed for ${profile.email}:`, e);
       // fall through — caller still gets the link to share manually
     }
 

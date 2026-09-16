@@ -46,7 +46,7 @@ export default function NewClient() {
     if (acc.data?.invited) {
       toast.success(`${form.fullName} provisioned — a set-password email is on its way.`);
     } else {
-      toast.warning(acc.data?.note || `${form.fullName} provisioned, but the invite email did not send. Use "Resend invite".`);
+      toast.warning(acc.data?.note || `${form.fullName} provisioned, but the invite email did not send. Use "Resend invite".`, { duration: Infinity });
     }
     setBusy(false);
     setOpen(false);

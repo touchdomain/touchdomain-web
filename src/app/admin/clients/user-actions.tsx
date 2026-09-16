@@ -57,7 +57,8 @@ export default function UserActions({
       toast.success(
         res.data?.emailed
           ? 'Set-password email sent (link also copied to your clipboard).'
-          : 'Email unavailable — invite link copied to your clipboard. Send it to them directly.'
+          : 'Email unavailable — invite link copied to your clipboard. Send it to them directly.',
+        res.data?.emailed ? undefined : { duration: Infinity }
       );
     });
 

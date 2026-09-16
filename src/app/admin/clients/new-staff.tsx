@@ -21,7 +21,7 @@ export default function NewStaff() {
     setBusy(false);
     if (!res.success) return toast.error(res.error);
     if (res.data?.invited) toast.success(`${fullName} added as staff — invite email sent.`);
-    else toast.warning(res.data?.note || 'Staff account created, but the invite email did not send.');
+    else toast.warning(res.data?.note || 'Staff account created, but the invite email did not send.', { duration: Infinity });
     setOpen(false);
     setFullName('');
     setEmail('');
