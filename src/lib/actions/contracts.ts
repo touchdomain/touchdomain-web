@@ -5,7 +5,7 @@ import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
-import { uploadToDrive, downloadFromDrive } from '@/lib/gdrive';
+import { uploadToDrive, downloadFromDrive, deleteFromDrive } from '@/lib/gdrive';
 import { generateSignatureCertificate, mergeExecutedContract } from '@/lib/pdf/certificate';
 import { notify } from '@/lib/notify';
 
@@ -335,18 +335,43 @@ export async function lookupPaymentSchedule(projectId: string): Promise<
   }
 }
 
+/**
+ * Void a contract: since only never-executed contracts can be voided, its
+ * only Drive artifact is the unsigned source PDF — remove that (and its
+ * client_files row, so it also disappears from the client's Files tab), then
+ * mark the row void. The DB row itself stays for the admin/client audit
+ * trail; only the document contents are erased.
+ */
 export async function voidContract(contractId: string): Promise<ActionResult> {
   try {
     await requireAdmin();
     const admin = getServiceClient();
+
+    const { data: contract } = await admin
+      .from('contracts')
+      .select('source_drive_file_id')
+      .eq('id', contractId)
+      .neq('status', 'executed')
+      .maybeSingle();
+    if (!contract) return { success: false, error: 'Contract not found or already executed.' };
+
+    try {
+      await deleteFromDrive(contract.source_drive_file_id);
+    } catch (e) {
+      console.error(`Failed to delete voided contract's Drive file ${contract.source_drive_file_id}:`, e);
+    }
+    await admin.from('client_files').delete().eq('drive_file_id', contract.source_drive_file_id);
+
     const { error } = await admin
       .from('contracts')
       .update({ status: 'void' })
       .eq('id', contractId)
       .neq('status', 'executed');
     if (error) throw error;
+
     revalidatePath('/admin/contracts');
     revalidatePath('/dashboard/contracts');
+    revalidatePath('/dashboard/files');
     return { success: true };
   } catch (error) {
     return fail(error, 'Failed to void the contract');

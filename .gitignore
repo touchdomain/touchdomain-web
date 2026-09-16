@@ -32,3 +32,10 @@ tsconfig.tsbuildinfo
 
 # compressed files
 *.zip
+
+# local AI agent skills + their outputs (e.g. /brag) — not part of the project
+/.agents/
+/.claude/
+/.codeartsdoer/
+/skills-lock.json
+/brag-output/

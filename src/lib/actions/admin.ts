@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { requireAdmin, getServiceClient, fail, type ActionResult } from '@/lib/auth-helpers';
-import { createDriveFolder, getGoogleDriveClient } from '@/lib/gdrive';
+import { createDriveFolder, getGoogleDriveClient, deleteFromDrive } from '@/lib/gdrive';
 import { sendPortalInvite } from '@/lib/mailer';
 import { SITE_URL } from '@/lib/site';
 import type { Database, UserRole } from '@/lib/database.types';
@@ -176,8 +176,12 @@ export async function resendInvite(
 /**
  * Permanently delete a user and all their portal data (POPIA erasure).
  * profiles → projects → onboarding / milestones / invoices / files /
- * payment_milestones all cascade via ON DELETE CASCADE. Drive files are
- * best-effort removed first.
+ * payment_milestones all cascade via ON DELETE CASCADE. Drive content is
+ * best-effort removed first: deleting the client's company folder recursively
+ * takes every project folder, invoice, and contract PDF nested under it,
+ * since that's where uploadToDrive always files them (see driveFolderFor).
+ * Any client_files row pointing outside that folder (defensive, shouldn't
+ * happen) is cleaned up individually as a fallback.
  *
  * NOTE: this also removes invoice records. SARS requires tax records to be
  * kept for 5 years — export the invoice PDFs from Drive before deleting a
@@ -191,7 +195,20 @@ export async function deleteUserAccount(userId: string): Promise<ActionResult> {
     }
     const admin = getServiceClient();
 
-    // Best-effort: remove the client's Drive files.
+    // Best-effort: remove the client's entire Drive folder (recursive), plus
+    // any tracked file that somehow lives outside it.
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('drive_folder_id')
+      .eq('id', userId)
+      .maybeSingle();
+    if (profile?.drive_folder_id) {
+      try {
+        await deleteFromDrive(profile.drive_folder_id);
+      } catch (e) {
+        console.error(`Failed to delete Drive folder ${profile.drive_folder_id} for client ${userId}:`, e);
+      }
+    }
     const { data: files } = await admin
       .from('client_files')
       .select('drive_file_id')

@@ -72,6 +72,7 @@ export async function getClientContracts(): Promise<Contract[]> {
   const { data } = await supabase
     .from('contracts')
     .select('*')
+    .neq('status', 'void')
     .order('created_at', { ascending: false });
   return data ?? [];
 }

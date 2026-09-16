@@ -147,3 +147,20 @@ export async function uploadToDrive(
     downloadLink: data.webContentLink ?? null,
   };
 }
+
+/**
+ * Permanently delete a file or folder from Drive (folders delete recursively).
+ * Swallows a 404 (already gone) since the caller's goal — the item not
+ * existing — is already met; other errors propagate for the caller to decide
+ * how strictly to enforce.
+ */
+export async function deleteFromDrive(fileId: string): Promise<void> {
+  const drive = getGoogleDriveClient();
+  try {
+    await withDriveRetry(() => drive.files.delete({ fileId, supportsAllDrives: true }));
+  } catch (err) {
+    const code = (err as { code?: number })?.code;
+    if (code === 404) return;
+    throw err;
+  }
+}
