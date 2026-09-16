@@ -32,6 +32,7 @@ export async function createInvoice(
     const description = String(formData.get('description') || '').trim() || null;
     const reference = String(formData.get('reference') || '').trim() || null;
     const isTaxInvoice = String(formData.get('isTaxInvoice') || '') === 'true';
+    const scheduleNote = String(formData.get('scheduleNote') || '').trim() || null;
 
     if (!(file instanceof File)) return { success: false, error: 'Missing invoice PDF' };
     if (!clientId || !invoiceNumber || !dueDate || !Number.isFinite(amountZar) || amountZar <= 0) {
@@ -105,6 +106,7 @@ export async function createInvoice(
       amountZar: amountZar,
       dueDate,
       covers: description,
+      scheduleNote,
     });
 
     revalidatePath('/admin/invoices');

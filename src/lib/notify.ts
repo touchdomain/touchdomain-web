@@ -56,7 +56,7 @@ export const notify = {
 
   invoiceIssued: (
     clientId: string,
-    inv: { number: string; amountZar: number; dueDate: string; covers?: string | null }
+    inv: { number: string; amountZar: number; dueDate: string; covers?: string | null; scheduleNote?: string | null }
   ) =>
     notifySafe(async () => {
       const c = await contact(clientId);
@@ -69,6 +69,7 @@ export const notify = {
         lines: [
           `A new invoice for <strong>${money(inv.amountZar)}</strong> is on your portal${inv.covers ? ` (${inv.covers})` : ''}.`,
           `Payment is due by <strong>${dateZA(inv.dueDate)}</strong>. Banking details and the reference are on the PDF.`,
+          ...(inv.scheduleNote ? [inv.scheduleNote] : []),
           'Paid by EFT or ATM deposit? Upload the slip against the invoice and we&rsquo;ll confirm it.',
         ],
         ctaLabel: 'View invoice',

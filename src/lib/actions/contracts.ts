@@ -279,6 +279,62 @@ export async function lookupClientAddress(
   }
 }
 
+/**
+ * The project's agreed payment schedule (from `payment_milestones`), so a
+ * standalone invoice can bill a specific milestone and show the same
+ * schedule the client saw on their signed SOW.
+ */
+export async function lookupPaymentSchedule(projectId: string): Promise<
+  ActionResult<{
+    milestones: {
+      id: string;
+      label: string;
+      percentage: number | null;
+      amountZar: number;
+      dueDate: string | null;
+      status: string;
+    }[];
+    projectTotal: number | null;
+    paidToDate: number;
+  }>
+> {
+  try {
+    await requireAdmin();
+    const admin = getServiceClient();
+
+    const [{ data: milestones }, { data: project }] = await Promise.all([
+      admin
+        .from('payment_milestones')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('sort_order', { ascending: true }),
+      admin.from('projects').select('total_fee_zar').eq('id', projectId).maybeSingle(),
+    ]);
+
+    const rows = (milestones ?? []).filter((m) => m.status !== 'waived');
+    const total = rows.reduce((s, m) => s + Number(m.amount_zar), 0);
+    const paid = rows.reduce((s, m) => s + Number(m.amount_paid_zar), 0);
+
+    return {
+      success: true,
+      data: {
+        milestones: rows.map((m) => ({
+          id: m.id,
+          label: m.label,
+          percentage: m.percentage,
+          amountZar: Number(m.amount_zar),
+          dueDate: m.due_date,
+          status: m.status,
+        })),
+        projectTotal: project?.total_fee_zar != null ? Number(project.total_fee_zar) : total || null,
+        paidToDate: paid,
+      },
+    };
+  } catch (error) {
+    return fail(error, 'Failed to look up the payment schedule');
+  }
+}
+
 export async function voidContract(contractId: string): Promise<ActionResult> {
   try {
     await requireAdmin();

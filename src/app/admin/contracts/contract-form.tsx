@@ -18,7 +18,7 @@ import {
 } from '@/lib/pdf/generate';
 import { createInvoice } from '@/lib/actions/invoices';
 import { fileDocumentToClient } from '@/lib/actions/files';
-import { sendContractForSignature, lookupSowReference, lookupClientAddress } from '@/lib/actions/contracts';
+import { sendContractForSignature, lookupSowReference, lookupClientAddress, lookupPaymentSchedule } from '@/lib/actions/contracts';
 import {
   PACKAGES,
   HOSTING_PLANS,
@@ -134,6 +134,15 @@ export default function ContractForm({
   const setI = <K extends keyof typeof inv>(k: K, v: (typeof inv)[K]) => setInv((p) => ({ ...p, [k]: v }));
   const [bank, setBank] = useState({ ...TD_BANKING });
   const [items, setItems] = useState<InvoiceLineItem[]>([{ description: '', quantity: 1, unitPrice: 0 }]);
+
+  // Payment schedule for the selected project (from the client's signed SOW).
+  const [schedule, setSchedule] = useState<
+    { id: string; label: string; percentage: number | null; amountZar: number; dueDate: string | null; status: string }[]
+  >([]);
+  const [projectTotal, setProjectTotal] = useState<number | null>(null);
+  const [paidToDate, setPaidToDate] = useState(0);
+  const [selectedMilestoneId, setSelectedMilestoneId] = useState('');
+  const selectedMilestone = () => schedule.find((m) => m.id === selectedMilestoneId) ?? null;
   const setItem = (i: number, patch: Partial<InvoiceLineItem>) =>
     setItems((prev) => prev.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
   const invSubtotal = useMemo(
@@ -162,6 +171,16 @@ export default function ContractForm({
       regenSchedule(tier, small, pkg.fee);
     }
   };
+  const pickMilestone = (id: string) => {
+    setSelectedMilestoneId(id);
+    const m = schedule.find((x) => x.id === id);
+    if (!m) return;
+    setItems([{ description: `${m.label}${m.percentage != null ? ` (${m.percentage}%)` : ''}`, quantity: 1, unitPrice: m.amountZar }]);
+    if (m.dueDate) {
+      const days = Math.max(0, Math.round((new Date(m.dueDate).getTime() - new Date(inv.issueDate).getTime()) / 86400000));
+      setI('termsDays', days);
+    }
+  };
   const pickPlan = (key: string) => {
     const plan = RECURRING[key];
     if (plan) setF((p) => ({ ...p, planKey: key, planLabel: plan.label, monthlyFee: plan.fee, planIncludes: plan.includes.join('\n') }));
@@ -182,6 +201,7 @@ export default function ContractForm({
 
   const buildInvoice = (): InvoiceData => {
     const rec = inv.kind === 'recurring' ? periodParts(inv.periodMonth) : null;
+    const m = selectedMilestone();
     const defaultTerms =
       inv.kind === 'recurring'
         ? 'Payable monthly in advance. This service continues month to month; either party may cancel on 30 days’ written notice.'
@@ -195,6 +215,7 @@ export default function ContractForm({
       clientAddress: f.clientAddress || undefined,
       lineItems: items.filter((it) => it.description.trim()),
       reference: inv.reference.trim() || undefined,
+      covers: m ? `${m.label}${m.percentage != null ? ` (${m.percentage}%)` : ''}` : undefined,
       paymentTerms: inv.terms.trim() || defaultTerms,
       notes: inv.notes.trim() || undefined,
       isTaxInvoice: inv.isTaxInvoice,
@@ -204,7 +225,22 @@ export default function ContractForm({
       recurringNote: rec
         ? `This is a recurring monthly charge for ongoing services. Next invoice: ${rec.next}. To pause or cancel, give 30 days' written notice.`
         : undefined,
+      schedule: schedule.length > 1
+        ? schedule.map((s) => ({ label: s.label, amountZar: s.amountZar, dueDate: s.dueDate, paid: s.status === 'paid' }))
+        : undefined,
+      projectTotal: projectTotal ?? undefined,
+      paidToDate: schedule.length > 1 ? paidToDate : undefined,
     };
+  };
+
+  /** Human-readable progress note for the invoice email, when billing a milestone. */
+  const scheduleNote = (): string | undefined => {
+    const m = selectedMilestone();
+    if (!m || schedule.length < 2) return undefined;
+    const idx = schedule.findIndex((x) => x.id === m.id);
+    const total = projectTotal ?? schedule.reduce((s, x) => s + x.amountZar, 0);
+    const outstanding = Math.max(0, total - paidToDate - m.amountZar);
+    return `This is milestone ${idx + 1} of ${schedule.length} on your agreed payment schedule. Outstanding after this payment: ${money(outstanding)}.`;
   };
 
   const fileInvoiceToPortal = async () => {
@@ -221,8 +257,15 @@ export default function ContractForm({
       fd.append('dueDate', invoiceDueDate());
       if (inv.reference.trim()) fd.append('reference', inv.reference.trim());
       fd.append('isTaxInvoice', String(inv.isTaxInvoice));
-      const desc =
-        inv.kind === 'recurring' ? `Recurring — ${periodParts(inv.periodMonth).monthYear}` : 'Ad-hoc invoice';
+      const m = selectedMilestone();
+      if (m) fd.append('milestoneId', m.id);
+      const note = scheduleNote();
+      if (note) fd.append('scheduleNote', note);
+      const desc = m
+        ? `${m.label}${m.percentage != null ? ` (${m.percentage}%)` : ''}`
+        : inv.kind === 'recurring'
+          ? `Recurring — ${periodParts(inv.periodMonth).monthYear}`
+          : 'Ad-hoc invoice';
       fd.append('description', desc);
       const res = await createInvoice(fd);
       if (res.success) {
@@ -580,11 +623,21 @@ export default function ContractForm({
                 onChange={async (e) => {
                   const id = e.target.value;
                   setInvoiceProjectId(id);
+                  setSelectedMilestoneId('');
+                  setSchedule([]);
+                  setProjectTotal(null);
+                  setPaidToDate(0);
                   const proj = projects.find((p) => p.id === id);
                   if (proj) {
                     if (!invoiceClientId) setInvoiceClientId(proj.client_id);
                     const res = await lookupSowReference(proj.client_id, id);
                     if (res.success && res.data?.sowReference) setI('reference', res.data.sowReference);
+                    const sched = await lookupPaymentSchedule(id);
+                    if (sched.success && sched.data) {
+                      setSchedule(sched.data.milestones);
+                      setProjectTotal(sched.data.projectTotal);
+                      setPaidToDate(sched.data.paidToDate);
+                    }
                   }
                 }}
                 className={inputClass}
@@ -596,6 +649,46 @@ export default function ContractForm({
                 })}
               </select>
             </label>
+            {inv.kind === 'once' && schedule.length > 0 && (
+              <div className="mt-3">
+                <label className="block">
+                  <span className="mb-1 block text-xs font-semibold text-gray-400">Bill against a payment milestone (optional)</span>
+                  <select value={selectedMilestoneId} onChange={(e) => pickMilestone(e.target.value)} className={inputClass}>
+                    <option value="">— none, itemise manually —</option>
+                    {schedule.filter((m) => m.status !== 'paid').map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}{m.percentage != null ? ` (${m.percentage}%)` : ''} — {money(m.amountZar)}{m.dueDate ? ` — due ${m.dueDate}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="mt-2 overflow-x-auto rounded-lg border border-td-purple/10">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="bg-td-purple/5 text-left text-gray-400">
+                        <th className="px-2 py-1.5">Milestone</th>
+                        <th className="px-2 py-1.5">Amount</th>
+                        <th className="px-2 py-1.5">Due</th>
+                        <th className="px-2 py-1.5">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {schedule.map((m) => (
+                        <tr key={m.id} className="border-t border-td-purple/5">
+                          <td className="px-2 py-1">{m.label}{m.percentage != null ? ` (${m.percentage}%)` : ''}</td>
+                          <td className="px-2 py-1">{money(m.amountZar)}</td>
+                          <td className="px-2 py-1">{m.dueDate || '—'}</td>
+                          <td className="px-2 py-1 capitalize">{m.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-1 text-xs text-gray-400">
+                  This is the payment schedule from the client&apos;s signed SOW. Selecting a milestone bills it directly, marks it invoiced, and the schedule is printed on the invoice PDF for context.
+                </p>
+              </div>
+            )}
             {inv.kind === 'recurring' ? (
               <label className="mt-3 block">
                 <span className="mb-1 block text-xs font-semibold text-gray-400">Quick-add a recurring plan as a line item</span>
