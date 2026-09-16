@@ -95,6 +95,32 @@ export async function getProjectDetail(id: string): Promise<ProjectDetail | null
   };
 }
 
+export interface ClientDetail {
+  profile: Profile;
+  projects: Project[];
+  invoices: Invoice[];
+  contracts: Contract[];
+}
+
+export async function getClientDetail(id: string): Promise<ClientDetail | null> {
+  const supabase = createClient();
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
+  if (!profile) return null;
+
+  const [{ data: projects }, { data: invoices }, { data: contracts }] = await Promise.all([
+    supabase.from('projects').select('*').eq('client_id', id).order('created_at', { ascending: false }),
+    supabase.from('invoices').select('*').eq('client_id', id).order('created_at', { ascending: false }),
+    supabase.from('contracts').select('*').eq('client_id', id).order('created_at', { ascending: false }),
+  ]);
+
+  return {
+    profile,
+    projects: projects ?? [],
+    invoices: invoices ?? [],
+    contracts: contracts ?? [],
+  };
+}
+
 export interface InvoiceWithClient extends Invoice {
   profiles: Pick<Profile, 'full_name' | 'company_name'> | null;
 }

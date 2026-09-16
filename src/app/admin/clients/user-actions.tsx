@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { MoreVertical, Loader2 } from 'lucide-react';
 import { resendInvite, setUserRole, deleteUserAccount } from '@/lib/actions/admin';
@@ -11,15 +12,19 @@ export default function UserActions({
   name,
   role,
   isSelf,
+  redirectAfterDelete,
 }: {
   userId: string;
   name: string;
   role: UserRole;
   isSelf: boolean;
+  /** Where to send the admin once this account is deleted (e.g. back to the clients list). */
+  redirectAfterDelete?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -58,7 +63,16 @@ export default function UserActions({
 
   const del = () => {
     if (!confirm(`Permanently delete ${name}'s account and all their portal data? This cannot be undone. Export any invoice PDFs from Drive first — SARS requires tax records to be kept for 5 years.`)) return;
-    run(() => deleteUserAccount(userId), `${name}'s account was deleted.`);
+    start(async () => {
+      const res = await deleteUserAccount(userId);
+      setOpen(false);
+      if (!res.success) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(`${name}'s account was deleted.`);
+      if (redirectAfterDelete) router.push(redirectAfterDelete);
+    });
   };
 
   return (

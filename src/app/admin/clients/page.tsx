@@ -36,9 +36,10 @@ export default async function ClientsPage() {
           {staff.map((s) => (
             <Card key={s.id} className="flex items-center justify-between gap-3 p-4">
               <div>
-                <p className="text-sm font-semibold text-td-dark">
-                  {s.full_name}{s.id === meId && <span className="ml-2 text-xs font-normal text-gray-400">(you)</span>}
-                </p>
+                <Link href={`/admin/clients/${s.id}`} className="text-sm font-semibold text-td-dark hover:text-td-purple hover:underline">
+                  {s.full_name}
+                </Link>
+                {s.id === meId && <span className="ml-2 text-xs font-normal text-gray-400">(you)</span>}
                 <p className="text-xs text-gray-400">{s.email}</p>
               </div>
               <div className="flex items-center gap-2">
@@ -60,7 +61,9 @@ export default async function ClientsPage() {
               <Card key={c.id}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-td-dark">{c.full_name}</p>
+                    <Link href={`/admin/clients/${c.id}`} className="text-sm font-semibold text-td-dark hover:text-td-purple hover:underline">
+                      {c.full_name}
+                    </Link>
                     <p className="text-xs text-gray-400">{c.company_name || '—'} · {c.email}{c.phone ? ` · ${c.phone}` : ''}</p>
                   </div>
                   <div className="flex items-center gap-3">
