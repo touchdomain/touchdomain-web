@@ -1,23 +1,36 @@
 import 'server-only';
+import { cache } from 'react';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import type { Database } from '@/lib/database.types';
 import type { User } from '@supabase/supabase-js';
 
-/** The signed-in user, or throw. */
-export async function requireUser(): Promise<User> {
+/**
+ * The signed-in user for this request, or null. `auth.getUser()` always
+ * hits Supabase's Auth API (by design — it's what makes the call trustworthy
+ * for authorization), so several data-loaders calling it independently
+ * within the same page render used to mean several redundant round-trips.
+ * `cache()` collapses those to one per request.
+ */
+export const getAuthedUser = cache(async (): Promise<User | null> => {
   const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
+  return user;
+});
+
+/** The signed-in user, or throw. */
+export async function requireUser(): Promise<User> {
+  const user = await getAuthedUser();
   if (!user) throw new Error('Unauthorized');
   return user;
 }
 
 /** The signed-in user, guaranteed to be an admin, or throw. */
 export async function requireAdmin(): Promise<User> {
-  const supabase = createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) throw new Error('Unauthorized');
 
+  const supabase = createServerClient();
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')

@@ -1,6 +1,6 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { getClientsWithProjects, getStaff } from '@/lib/admin-data';
-import { createClient } from '@/lib/supabase/server';
 import { PageHeader, Card, Badge, EmptyState, SectionTitle } from '@/components/portal/ui';
 import NewClient from './new-client';
 import NewStaff from './new-staff';
@@ -9,13 +9,12 @@ import UserActions from './user-actions';
 export const metadata = { title: 'Clients & staff' };
 
 export default async function ClientsPage() {
-  const supabase = createClient();
-  const [{ data: { user } }, clients, staff] = await Promise.all([
-    supabase.auth.getUser(),
+  // Middleware already verified who this is for this request.
+  const meId = headers().get('x-user-id') ?? '';
+  const [clients, staff] = await Promise.all([
     getClientsWithProjects(),
     getStaff(),
   ]);
-  const meId = user?.id ?? '';
 
   return (
     <div className="max-w-4xl">

@@ -4,17 +4,12 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { FileDown, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import {
-  generateContractDoc,
-  generateContractBlob,
-  generateInvoiceDoc,
-  generateInvoiceBlob,
-  downloadDoc,
-  TD_BANKING,
-  type ContractData,
-  type ContractDocType,
-  type InvoiceData,
-  type InvoiceLineItem,
+import { TD_BANKING } from '@/lib/pdf/banking';
+import type {
+  ContractData,
+  ContractDocType,
+  InvoiceData,
+  InvoiceLineItem,
 } from '@/lib/pdf/generate';
 import { createInvoice } from '@/lib/actions/invoices';
 import { fileDocumentToClient } from '@/lib/actions/files';
@@ -249,6 +244,7 @@ export default function ContractForm({
     if (!invoiceClientId) return toast.error('Pick which portal client this invoice is for.');
     setBusy(true);
     try {
+      const { generateInvoiceBlob } = await import('@/lib/pdf/generate');
       const fd = new FormData();
       fd.append('file', generateInvoiceBlob(buildInvoice()), `${inv.invoiceNumber.trim()}.pdf`);
       fd.append('clientId', invoiceClientId);
@@ -348,6 +344,7 @@ export default function ContractForm({
     if (!contractClientId) return toast.error('Pick which portal client this is for.');
     setBusy(true);
     try {
+      const { generateContractBlob } = await import('@/lib/pdf/generate');
       const fd = new FormData();
       fd.append('file', generateContractBlob(data), contractFileName());
       fd.append('clientId', contractClientId);
@@ -384,11 +381,12 @@ export default function ContractForm({
     }
   };
 
-  const generate = () => {
+  const generate = async () => {
     if (docType === 'invoice') {
       if (!invoiceValid()) return toast.error('Add an invoice number and at least one line item.');
       setBusy(true);
       try {
+        const { generateInvoiceDoc, downloadDoc } = await import('@/lib/pdf/generate');
         downloadDoc(generateInvoiceDoc(buildInvoice()), `${inv.invoiceNumber.trim()}.pdf`);
         toast.success('Invoice PDF generated.');
       } catch (e) {
@@ -403,6 +401,7 @@ export default function ContractForm({
     if (!data) return;
     setBusy(true);
     try {
+      const { generateContractDoc, downloadDoc } = await import('@/lib/pdf/generate');
       downloadDoc(generateContractDoc(data), contractFileName());
       toast.success('Contract PDF generated.');
     } catch (e) {

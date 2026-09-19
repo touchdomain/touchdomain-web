@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import PortalShell, { type NavItem } from '@/components/portal/shell';
 
@@ -13,18 +14,23 @@ const NAV: NavItem[] = [
 export const metadata = { title: 'Client Portal' };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  // Identity + role were already verified by middleware for this exact
+  // request — trust its result instead of re-calling auth.getUser() and
+  // re-querying `profiles` for role, which used to happen on every
+  // navigation on top of what middleware had just done.
+  const userId = headers().get('x-user-id');
+  const role = headers().get('x-user-role');
+  if (!userId) redirect('/login');
+  if (role === 'admin') redirect('/admin');
 
+  const supabase = createClient();
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, email, role')
-    .eq('id', user.id)
+    .select('full_name, email')
+    .eq('id', userId)
     .maybeSingle();
 
   if (!profile) redirect('/login');
-  if (profile.role === 'admin') redirect('/admin');
 
   return (
     <PortalShell

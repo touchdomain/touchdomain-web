@@ -1,4 +1,5 @@
 import { ExternalLink } from 'lucide-react';
+import { headers } from 'next/headers';
 import { getClientOptions, getNextInvoiceNumber, getNextSowReference, getAllProjects, getContracts } from '@/lib/admin-data';
 import { createClient } from '@/lib/supabase/server';
 import { PageHeader, Card, Badge, SectionTitle } from '@/components/portal/ui';
@@ -20,19 +21,18 @@ const shortDate = (d: string) =>
   new Date(d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export default async function ContractsPage() {
+  // Middleware already verified who this is for this request.
+  const meId = headers().get('x-user-id');
   const supabase = createClient();
-  const [{ data: { user } }, clients, nextInvoiceNumber, nextSowReference, projects, contracts] = await Promise.all([
-    supabase.auth.getUser(),
+  const [myProfileRes, clients, nextInvoiceNumber, nextSowReference, projects, contracts] = await Promise.all([
+    meId ? supabase.from('profiles').select('full_name').eq('id', meId).maybeSingle() : Promise.resolve({ data: null }),
     getClientOptions(),
     getNextInvoiceNumber(),
     getNextSowReference(),
     getAllProjects(),
     getContracts(),
   ]);
-  const myProfile = user
-    ? (await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()).data
-    : null;
-  const myName = myProfile?.full_name && myProfile.full_name !== 'Client' ? myProfile.full_name : 'Touch Domain';
+  const myName = myProfileRes.data?.full_name && myProfileRes.data.full_name !== 'Client' ? myProfileRes.data.full_name : 'Touch Domain';
 
   const active = contracts.filter((c) => c.status !== 'void');
 

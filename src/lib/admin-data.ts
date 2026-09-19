@@ -71,20 +71,23 @@ export interface ProjectDetail {
 
 export async function getProjectDetail(id: string): Promise<ProjectDetail | null> {
   const supabase = createClient();
-  const { data: project } = await supabase
-    .from('projects')
-    .select('*, profiles(full_name, email, company_name)')
-    .eq('id', id)
-    .maybeSingle();
+  // All five queries key off the caller-supplied `id`, not each other's
+  // results, so they run as one round-trip instead of "fetch project, then
+  // wait, then fetch the rest".
+  const [
+    { data: project },
+    { data: onboarding },
+    { data: milestones },
+    { data: files },
+    { data: paymentMilestones },
+  ] = await Promise.all([
+    supabase.from('projects').select('*, profiles(full_name, email, company_name)').eq('id', id).maybeSingle(),
+    supabase.from('project_onboarding').select('*').eq('project_id', id).maybeSingle(),
+    supabase.from('milestones').select('*').eq('project_id', id).order('created_at', { ascending: true }),
+    supabase.from('client_files').select('*').eq('project_id', id).order('created_at', { ascending: false }),
+    supabase.from('payment_milestones').select('*').eq('project_id', id).order('sort_order', { ascending: true }),
+  ]);
   if (!project) return null;
-
-  const [{ data: onboarding }, { data: milestones }, { data: files }, { data: paymentMilestones }] =
-    await Promise.all([
-      supabase.from('project_onboarding').select('*').eq('project_id', id).maybeSingle(),
-      supabase.from('milestones').select('*').eq('project_id', id).order('created_at', { ascending: true }),
-      supabase.from('client_files').select('*').eq('project_id', id).order('created_at', { ascending: false }),
-      supabase.from('payment_milestones').select('*').eq('project_id', id).order('sort_order', { ascending: true }),
-    ]);
 
   return {
     project: project as ProjectWithClient,
@@ -104,14 +107,15 @@ export interface ClientDetail {
 
 export async function getClientDetail(id: string): Promise<ClientDetail | null> {
   const supabase = createClient();
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
-  if (!profile) return null;
-
-  const [{ data: projects }, { data: invoices }, { data: contracts }] = await Promise.all([
+  // All four queries key off the caller-supplied `id`, not each other's
+  // results, so they run as one round-trip instead of two sequential ones.
+  const [{ data: profile }, { data: projects }, { data: invoices }, { data: contracts }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', id).maybeSingle(),
     supabase.from('projects').select('*').eq('client_id', id).order('created_at', { ascending: false }),
     supabase.from('invoices').select('*').eq('client_id', id).order('created_at', { ascending: false }),
     supabase.from('contracts').select('*').eq('client_id', id).order('created_at', { ascending: false }),
   ]);
+  if (!profile) return null;
 
   return {
     profile,

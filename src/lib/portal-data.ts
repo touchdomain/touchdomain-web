@@ -1,5 +1,6 @@
 import 'server-only';
 import { createClient } from '@/lib/supabase/server';
+import { getAuthedUser } from '@/lib/auth-helpers';
 import type { Profile, Project, Milestone, ProjectOnboarding, Invoice, ClientFile, PaymentMilestone, PaymentProof, Contract } from '@/lib/database.types';
 
 /** The signed-in client's profile + most-recent project (RLS-scoped). */
@@ -8,7 +9,7 @@ export async function getClientContext(): Promise<{
   project: Project | null;
 }> {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return { profile: null, project: null };
 
   const [{ data: profile }, { data: project }] = await Promise.all([
@@ -38,7 +39,7 @@ export async function getClientMilestones(projectId: string): Promise<Milestone[
 
 export async function getClientOnboarding(): Promise<ProjectOnboarding | null> {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return null;
   const { data } = await supabase
     .from('project_onboarding')

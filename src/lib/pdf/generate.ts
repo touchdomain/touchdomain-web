@@ -1,5 +1,8 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { TD_BANKING, type BankingDetails } from './banking';
+
+export { TD_BANKING, type BankingDetails };
 
 // ── Touch Domain brand ────────────────────────────────────────────────
 const PURPLE: [number, number, number] = [69, 44, 99];   // #452C63
@@ -16,25 +19,6 @@ const TD = {
   email: 'helper@touchdomain.co.za',
   web: 'www.touchdomain.co.za',
   signatory: 'Thabo Mtsweni',
-};
-
-export interface BankingDetails {
-  bank: string;
-  holder: string;
-  account: string;
-  branch: string;
-  accountType?: string;
-  swift?: string;
-}
-
-/** Default banking block — override per-invoice via InvoiceData.banking. */
-export const TD_BANKING: BankingDetails = {
-  bank: 'Standard Bank',
-  holder: 'Touch Domain',
-  account: '10286525788',
-  branch: '051001', // universal / electronic-payments branch code
-  accountType: 'MyMoBiz Current Account',
-  swift: 'SBZAZAJJ',
 };
 
 const PAGE_W = 595.28;

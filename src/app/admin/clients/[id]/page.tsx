@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { headers } from 'next/headers';
 import { ArrowLeft, ExternalLink, FolderKanban } from 'lucide-react';
 import { getClientDetail } from '@/lib/admin-data';
 import { PageHeader, Card, Badge, SectionTitle, EmptyState } from '@/components/portal/ui';
@@ -29,10 +29,9 @@ const shortDate = (d: string) =>
   new Date(d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export default async function ClientDetailPage({ params }: { params: { id: string } }) {
-  const [detail, { data: { user } }] = await Promise.all([
-    getClientDetail(params.id),
-    createClient().auth.getUser(),
-  ]);
+  // Middleware already verified who this is for this request.
+  const meId = headers().get('x-user-id');
+  const detail = await getClientDetail(params.id);
   if (!detail) notFound();
   const { profile, projects, invoices, contracts } = detail;
 
@@ -50,7 +49,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
             userId={profile.id}
             name={profile.full_name}
             role={profile.role}
-            isSelf={profile.id === user?.id}
+            isSelf={profile.id === meId}
             redirectAfterDelete="/admin/clients"
           />
         }

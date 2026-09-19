@@ -4,14 +4,8 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Plus, Trash2, Loader2, Download } from 'lucide-react';
-import {
-  generateInvoiceDoc,
-  generateInvoiceBlob,
-  downloadDoc,
-  TD_BANKING,
-  type InvoiceLineItem,
-  type InvoiceData,
-} from '@/lib/pdf/generate';
+import { TD_BANKING } from '@/lib/pdf/banking';
+import type { InvoiceLineItem, InvoiceData } from '@/lib/pdf/generate';
 import { createInvoice } from '@/lib/actions/invoices';
 import { Card, SectionTitle, inputClass, btnPrimary, btnSecondary } from '@/components/portal/ui';
 
@@ -117,8 +111,9 @@ export default function InvoiceGenerator({
     dueDate &&
     items.some((it) => it.description.trim() && it.unitPrice > 0);
 
-  const preview = () => {
+  const preview = async () => {
     if (!valid()) return toast.error('Add an invoice number and at least one line item.');
+    const { generateInvoiceDoc, downloadDoc } = await import('@/lib/pdf/generate');
     downloadDoc(generateInvoiceDoc(build()), `${invoiceNumber.trim()}.pdf`);
   };
 
@@ -126,6 +121,7 @@ export default function InvoiceGenerator({
     if (!valid()) return toast.error('Add an invoice number and at least one line item.');
     setSaving(true);
     try {
+      const { generateInvoiceBlob } = await import('@/lib/pdf/generate');
       const blob = generateInvoiceBlob(build());
       const fd = new FormData();
       fd.append('file', blob, `${invoiceNumber.trim()}.pdf`);
