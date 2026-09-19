@@ -39,3 +39,4 @@ tsconfig.tsbuildinfo
 /.codeartsdoer/
 /skills-lock.json
 /brag-output/
+/brag-output-*/
