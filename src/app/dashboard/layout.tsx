@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import PortalShell, { type NavItem } from '@/components/portal/shell';
+import PortalIntro from '@/components/portal/portal-intro';
 
 const NAV: NavItem[] = [
   { name: 'Overview', href: '/dashboard', icon: 'overview' },
@@ -26,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const supabase = createClient();
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, email')
+    .select('full_name, email, portal_intro_seen_at')
     .eq('id', userId)
     .maybeSingle();
 
@@ -38,6 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       navItems={NAV}
       user={{ name: profile.full_name, email: profile.email }}
     >
+      <PortalIntro show={!profile.portal_intro_seen_at} />
       {children}
     </PortalShell>
   );

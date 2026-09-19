@@ -35,6 +35,7 @@ CREATE TABLE public.profiles (
   company_name TEXT,
   drive_folder_id TEXT,                                  -- migration 004: client's company folder in the Shared Drive
   whmcs_client_id TEXT,                                  -- migration 009: HostAfrica/WHMCS client id
+  portal_intro_seen_at TIMESTAMPTZ,                      -- migration 011: one-time client welcome walkthrough
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
