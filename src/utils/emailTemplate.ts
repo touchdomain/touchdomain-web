@@ -58,7 +58,6 @@ export const generateBrandedEmail = (title: string, content: string) => {
                                     <table cellpadding="0" cellspacing="0" border="0">
                                       <tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#452c63;padding-bottom:2px;">Your Helper</td></tr>
                                       <tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#2a1b3d;line-height:1.7;">
-                                        <a href="tel:+27813276153" style="color:#2a1b3d;text-decoration:none;">+27 81 327 6153</a><br>
                                         <a href="mailto:${CUSTOMER_CONTACT_EMAIL}" style="color:#2a1b3d;text-decoration:none;">${CUSTOMER_CONTACT_EMAIL}</a><br>
                                         <a href="${SITE}" style="color:#9972ab;text-decoration:none;">www.touchdomain.co.za</a>
                                       </td></tr>

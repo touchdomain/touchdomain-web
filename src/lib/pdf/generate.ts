@@ -56,7 +56,7 @@ function drawLetterhead(doc: jsPDF) {
   doc.setTextColor(228, 217, 236);
   doc.text(`${TD.legal}  ·  Reg. ${TD.reg}`, PAGE_W - MARGIN, 20, { align: 'right' });
   doc.text(TD.address, PAGE_W - MARGIN, 30, { align: 'right' });
-  doc.text(`${TD.phone}  ·  ${TD.email}`, PAGE_W - MARGIN, 40, { align: 'right' });
+  doc.text(TD.email, PAGE_W - MARGIN, 40, { align: 'right' });
 
   doc.setTextColor(...INK);
 }
@@ -488,7 +488,7 @@ export function generateInvoiceDoc(data: InvoiceData): jsPDF {
     c.heading('Notes');
     c.paragraph(data.notes, { size: 9 });
   }
-  c.paragraph(`${TD.legal}  ·  Reg. ${TD.reg}  ·  ${TD.email}  ·  ${TD.phone}`, { size: 8 });
+  c.paragraph(`${TD.legal}  ·  Reg. ${TD.reg}  ·  ${TD.email}`, { size: 8 });
 
   drawFooter(doc, `${taxInvoice ? 'Tax Invoice' : 'Invoice'} ${data.invoiceNumber}`);
   return doc;

@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage, PDFImage } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage, PDFImage, PDFName, PDFString } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
 import { CUSTOMER_CONTACT_EMAIL } from '../lib/mailer';
@@ -101,6 +101,25 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
   let pageNum = 1;
   const pages: PDFPage[] = [];
 
+  const WEBSITE_URL = 'https://www.touchdomain.co.za';
+  const WEBSITE_LABEL = 'touchdomain.co.za';
+
+  /** Attach a clickable URI link over an already-drawn text region. */
+  const addLink = (p: PDFPage, x: number, y: number, width: number, height: number, url: string) => {
+    const link = pdfDoc.context.register(
+      pdfDoc.context.obj({
+        Type: 'Annot',
+        Subtype: 'Link',
+        Rect: [x, y, x + width, y + height],
+        Border: [0, 0, 0],
+        A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) },
+      })
+    );
+    const existing = p.node.Annots();
+    if (existing) existing.push(link);
+    else p.node.set(PDFName.of('Annots'), pdfDoc.context.obj([link]));
+  };
+
   const drawHeader = (p: PDFPage) => {
     p.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT, width: PAGE_WIDTH, height: HEADER_HEIGHT, color: BRAND.plum });
     p.drawRectangle({ x: 0, y: PAGE_HEIGHT - HEADER_HEIGHT - 3, width: PAGE_WIDTH, height: 3, color: BRAND.mauve });
@@ -126,9 +145,15 @@ export const generateQuotePDFBuffer = async (data: QuoteData): Promise<Buffer> =
 
   const drawFooter = (p: PDFPage, pageIndex: number, pageTotal: number) => {
     p.drawRectangle({ x: 0, y: 0, width: PAGE_WIDTH, height: FOOTER_HEIGHT, color: BRAND.plum });
-    const footText = `touchdomain.co.za   |   ${CUSTOMER_CONTACT_EMAIL}   |   081 327 6153`;
-    const footWidth = fontRegular.widthOfTextAtSize(footText, 8.5);
-    p.drawText(footText, { x: MARGIN, y: (FOOTER_HEIGHT - 8.5) / 2, size: 8.5, font: fontRegular, color: BRAND.white });
+    const footSize = 8.5;
+    const footY = (FOOTER_HEIGHT - footSize) / 2;
+    const separator = '   |   ';
+
+    p.drawText(WEBSITE_LABEL, { x: MARGIN, y: footY, size: footSize, font: fontRegular, color: BRAND.white });
+    const websiteWidth = fontRegular.widthOfTextAtSize(WEBSITE_LABEL, footSize);
+    addLink(p, MARGIN, footY - 1, websiteWidth, footSize + 2, WEBSITE_URL);
+
+    p.drawText(`${separator}${CUSTOMER_CONTACT_EMAIL}`, { x: MARGIN + websiteWidth, y: footY, size: footSize, font: fontRegular, color: BRAND.white });
 
     const pageLabel = `${quoteRef}   ·   Page ${pageIndex} of ${pageTotal}`;
     const pageLabelWidth = fontRegular.widthOfTextAtSize(pageLabel, 8);
